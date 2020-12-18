@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
+
+
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.15" />
+
+    <ImageView
+        android:id="@+id/imageViewIntro"
+        android:layout_width="248dp"
+        android:layout_height="248dp"
+        android:src="@drawable/page_1"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/guideline"
+        />
+
+    <TextView
+        android:id="@+id/textViewIntroTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Request Ride"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/imageViewIntro"
+        android:textSize="24sp"
+        android:layout_marginTop="48dp"
+        android:fontFamily="@font/g_bold"
+        android:textColor="@color/purple_200"
+        />
+
+    <TextView
+        android:id="@+id/textViewIntroContent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Request a ride get picked up by a\nnearby community driver"
+        android:gravity="center"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textViewIntroTitle"
+        android:textSize="18sp"
+        android:alpha="0.6"
+        android:layout_marginTop="32dp"
+        android:fontFamily="@font/g_bold"
+        android:textColor="@color/purple_200"
+        />
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
