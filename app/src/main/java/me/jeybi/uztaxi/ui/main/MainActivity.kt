@@ -33,6 +33,7 @@ import me.jeybi.uztaxi.R
 import me.jeybi.uztaxi.ui.BaseActivity
 import me.jeybi.uztaxi.ui.intro.IntroActivity
 import me.jeybi.uztaxi.ui.main.fragments.SearchFragment
+import me.jeybi.uztaxi.ui.main.fragments.WhereToFragment
 import me.jeybi.uztaxi.utils.Constants
 import okhttp3.Cache
 import okhttp3.CacheControl
@@ -54,6 +55,9 @@ class MainActivity : BaseActivity(), MainController.view, MapView.MapReadyCallba
 
     var mapController: MapController? = null
     var mLocationManager: LocationManager? = null
+
+    lateinit var bottomSheetBehaviour: BottomSheetBehavior<View>
+
 
     override fun setLayoutId(): Int {
         return R.layout.activity_main
@@ -92,6 +96,7 @@ class MainActivity : BaseActivity(), MainController.view, MapView.MapReadyCallba
 
     }
 
+
     private fun setUpMap() {
         setUpBottomSheet()
         presenter.checkGPS()
@@ -102,12 +107,12 @@ class MainActivity : BaseActivity(), MainController.view, MapView.MapReadyCallba
     }
 
     fun setUpBottomSheet() {
-        val bottomSheetBehaviour = BottomSheetBehavior.from(bottomSheet)
+        bottomSheetBehaviour = BottomSheetBehavior.from(bottomSheet)
         bottomSheetBehaviour.isFitToContents = false
-        bottomSheetBehaviour.halfExpandedRatio = 0.4f
+        bottomSheetBehaviour.halfExpandedRatio = 0.45f
 
 
-        changeBottomSheetFragment(SearchFragment())
+        changeBottomSheetFragment(SearchFragment(),false)
 
         bottomSheetBehaviour.addBottomSheetCallback(object :
             BottomSheetBehavior.BottomSheetCallback() {
@@ -139,15 +144,26 @@ class MainActivity : BaseActivity(), MainController.view, MapView.MapReadyCallba
 
     }
 
-    fun changeBottomSheetFragment(newFragment: Fragment) {
+    override fun onBottomSheetSearchItemClicked() {
+        bottomSheetBehaviour.state = BottomSheetBehavior.STATE_HALF_EXPANDED
+        changeBottomSheetFragment(WhereToFragment(), true)
+    }
+
+    override fun startFindingCar() {
+        imageViewPointerShadow.visibility = View.INVISIBLE
+        imageViewPointerFoot.visibility = View.GONE
+        lottieAnimation.visibility = View.VISIBLE
+//        viewWhiteBC.visibility = View.VISIBLE
+        lottieAnimation.playAnimation()
+    }
+
+
+    fun changeBottomSheetFragment(newFragment: Fragment, backStack: Boolean) {
         val transaction: FragmentTransaction = supportFragmentManager.beginTransaction()
 
-// Replace whatever is in the fragment_container view with this fragment,
-// and add the transaction to the back stack if needed
-
-// Replace whatever is in the fragment_container view with this fragment,
-// and add the transaction to the back stack if needed
         transaction.replace(R.id.containerBottomSheet, newFragment)
+        if (backStack)
+            transaction.addToBackStack(null)
 
         transaction.commit()
     }
@@ -213,7 +229,8 @@ class MainActivity : BaseActivity(), MainController.view, MapView.MapReadyCallba
 
         touchInput.setPanResponder(object : TouchInput.PanResponder {
             override fun onPanBegin(): Boolean {
-                imageViewCloudTop.animate().translationY(-200f).alpha(0.6f).setInterpolator(AccelerateInterpolator()).setDuration(800).start()
+                imageViewCloudTop.animate().translationY(-200f).alpha(0.6f)
+                    .setInterpolator(AccelerateInterpolator()).setDuration(800).start()
                 mapController.updateCameraPosition(
                     CameraUpdateFactory.setZoom(mapController.cameraPosition.zoom - 0.05f),
                     0,
@@ -260,7 +277,8 @@ class MainActivity : BaseActivity(), MainController.view, MapView.MapReadyCallba
             }
 
             override fun onPanEnd(): Boolean {
-                imageViewCloudTop.animate().translationY(0f).alpha(1f).setInterpolator(DecelerateInterpolator()).setDuration(600).start()
+                imageViewCloudTop.animate().translationY(0f).alpha(1f)
+                    .setInterpolator(DecelerateInterpolator()).setDuration(600).start()
 
                 mapController.updateCameraPosition(
                     CameraUpdateFactory.setZoom(mapController.cameraPosition.zoom + 0.05f),

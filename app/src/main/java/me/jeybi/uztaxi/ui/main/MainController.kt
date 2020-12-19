@@ -5,6 +5,10 @@ interface MainController {
         fun onUserNotAuthenticated()
         fun onUserApproved()
         fun buildAlertMessageNoGps()
+
+        fun onBottomSheetSearchItemClicked()
+
+        fun startFindingCar()
     }
     interface presenter{
         fun checkIfAuthenticated()
