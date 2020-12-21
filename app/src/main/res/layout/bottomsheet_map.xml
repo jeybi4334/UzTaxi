@@ -35,6 +35,7 @@
        </com.google.android.material.card.MaterialCardView>
 
        <com.google.android.material.card.MaterialCardView
+
            android:clickable="true"
            android:id="@+id/cardNext"
            android:layout_width="84dp"

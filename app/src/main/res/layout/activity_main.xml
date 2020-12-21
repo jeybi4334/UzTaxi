@@ -26,7 +26,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            app:layout_constraintGuide_percent="0.2" />
+            app:layout_constraintGuide_percent="0.25" />
 
 
 
@@ -47,7 +47,7 @@
             android:layout_width="54dp"
             android:layout_height="54dp"
             android:background="@drawable/bc_btn_menu"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="56dp"
             android:layout_marginStart="16dp"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -68,7 +68,7 @@
             android:layout_width="54dp"
             android:layout_height="54dp"
             android:background="@drawable/bc_btn_menu"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="56dp"
             android:layout_marginEnd="16dp"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent"

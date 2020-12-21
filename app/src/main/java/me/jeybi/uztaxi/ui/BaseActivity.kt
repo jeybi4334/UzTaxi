@@ -1,12 +1,15 @@
 package me.jeybi.uztaxi.ui
 
-import android.app.Activity
 import android.content.SharedPreferences
+import android.os.Build
 import android.os.Bundle
-import android.os.PersistableBundle
+import android.view.View
+import android.view.Window
+import android.view.WindowManager
 import androidx.annotation.LayoutRes
 import androidx.fragment.app.FragmentActivity
-import me.jeybi.uztaxi.UzTaxiApplication
+
+
 
 abstract class BaseActivity : FragmentActivity() {
 
@@ -14,7 +17,8 @@ abstract class BaseActivity : FragmentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        sharedPreferences = (application as UzTaxiApplication).sharedPreferences
+        window.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
+
         setContentView(setLayoutId())
         onViewDidCreate(savedInstanceState)
 
@@ -25,6 +29,5 @@ abstract class BaseActivity : FragmentActivity() {
     abstract fun setLayoutId() : Int
 
     abstract fun onViewDidCreate(savedInstanceState: Bundle?)
-
 
 }

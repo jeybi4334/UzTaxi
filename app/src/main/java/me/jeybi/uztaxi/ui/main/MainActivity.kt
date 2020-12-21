@@ -24,6 +24,7 @@ import androidx.fragment.app.FragmentTransaction
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.mapzen.tangram.*
 import com.mapzen.tangram.TouchInput.TapResponder
+import com.mapzen.tangram.geometry.Polyline
 import com.mapzen.tangram.networking.DefaultHttpHandler
 import com.mapzen.tangram.networking.HttpHandler
 import kotlinx.android.synthetic.main.activity_main.*
@@ -57,6 +58,8 @@ class MainActivity : BaseActivity(), MainController.view, MapView.MapReadyCallba
     var mLocationManager: LocationManager? = null
 
     lateinit var bottomSheetBehaviour: BottomSheetBehavior<View>
+
+    val carMarkersList = ArrayList<Marker>()
 
 
     override fun setLayoutId(): Int {
@@ -112,7 +115,7 @@ class MainActivity : BaseActivity(), MainController.view, MapView.MapReadyCallba
         bottomSheetBehaviour.halfExpandedRatio = 0.45f
 
 
-        changeBottomSheetFragment(SearchFragment(),false)
+        changeBottomSheetFragment(SearchFragment(), false)
 
         bottomSheetBehaviour.addBottomSheetCallback(object :
             BottomSheetBehavior.BottomSheetCallback() {
@@ -186,6 +189,7 @@ class MainActivity : BaseActivity(), MainController.view, MapView.MapReadyCallba
         }
     }
 
+
     override fun onMapReady(mapController: MapController?) {
 
         setUpMapButtons()
@@ -196,7 +200,7 @@ class MainActivity : BaseActivity(), MainController.view, MapView.MapReadyCallba
         updates.add(SceneUpdate("global.sdk_api_key", NEXTZEN_API_KEY))
 
         mapController?.loadSceneFileAsync("walkabout/walkabout-style.yaml", updates)
-
+//        mapController?.loadSceneFileAsync("bubble-wrap/bubble-wrap-style.yaml", updates)
 
         val cameraPosition = CameraPosition()
         cameraPosition.latitude = 41.312475324732056
@@ -208,13 +212,34 @@ class MainActivity : BaseActivity(), MainController.view, MapView.MapReadyCallba
 
         val touchInput: TouchInput = mapController!!.touchInput
 
+
+
+
         touchInput.setTapResponder(object : TapResponder {
             override fun onSingleTapUp(x: Float, y: Float): Boolean {
                 val pointLat = mapController.screenPositionToLngLat(PointF(x, y))
-                mapController.updateCameraPosition(
-                    CameraUpdateFactory.setPosition(pointLat!!),
-                    1000
-                )
+//                mapController.updateCameraPosition(
+//                    CameraUpdateFactory.setPosition(pointLat!!),
+//                    1000
+//                )
+
+                val carMarker = mapController.addMarker()
+
+                carMarker.isVisible = true
+
+                carMarker.setStylingFromString(Constants.MARKER_CAR_2)
+
+                carMarker.setDrawable(R.drawable.car_map)
+                carMarker.setPointEased(LngLat(pointLat!!.longitude, pointLat.latitude),400,MapController.EaseType.QUINT)
+
+                mapController.requestRender()
+
+
+
+
+
+                carMarkersList.add(carMarker)
+
                 return false
             }
 
@@ -292,6 +317,37 @@ class MainActivity : BaseActivity(), MainController.view, MapView.MapReadyCallba
                 cancelPointerRectangleAnimation()
                 mapController.panResponder.onPanEnd()
 
+                val zoomLVL = mapController.cameraPosition.getZoom()
+
+                when (zoomLVL) {
+                    in 0.0..13.0 -> {
+                        for (carMarker in carMarkersList)
+                            carMarker.setStylingFromString(Constants.MARKER_CAR_0)
+                    }
+
+                    in 13.0..15.5 -> {
+                        for (carMarker in carMarkersList)
+                            carMarker.setStylingFromString(Constants.MARKER_CAR_1)
+                    }
+                    in 15.5..16.5 -> {
+                        for (carMarker in carMarkersList)
+                            carMarker.setStylingFromString(Constants.MARKER_CAR_2)
+                    }
+                    in 16.5..17.5 -> {
+                        for (carMarker in carMarkersList)
+                            carMarker.setStylingFromString(Constants.MARKER_CAR_3)
+                    }
+                    in 17.5..19.0 -> {
+                        for (carMarker in carMarkersList)
+                            carMarker.setStylingFromString(Constants.MARKER_CAR_4)
+                    }
+                    in 19.0..100.0 -> {
+                        for (carMarker in carMarkersList)
+                            carMarker.setStylingFromString(Constants.MARKER_CAR_5)
+                    }
+
+                }
+
                 return false
 
             }
@@ -321,7 +377,6 @@ class MainActivity : BaseActivity(), MainController.view, MapView.MapReadyCallba
             }
 
         })
-
 
     }
 
