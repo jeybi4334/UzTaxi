@@ -1,10 +1,11 @@
 package me.jeybi.uztaxi.ui.main
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.PointF
+import android.graphics.Color
 import android.location.Criteria
 import android.location.Location
 import android.location.LocationListener
@@ -17,49 +18,62 @@ import android.view.animation.AccelerateInterpolator
 import android.view.animation.DecelerateInterpolator
 import android.view.animation.LinearInterpolator
 import android.view.animation.OvershootInterpolator
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.mapzen.tangram.*
-import com.mapzen.tangram.TouchInput.TapResponder
-import com.mapzen.tangram.geometry.Polyline
-import com.mapzen.tangram.networking.DefaultHttpHandler
-import com.mapzen.tangram.networking.HttpHandler
+import com.mapbox.android.core.permissions.PermissionsListener
+import com.mapbox.android.core.permissions.PermissionsManager
+import com.mapbox.android.gestures.MoveGestureDetector
+import com.mapbox.geojson.Point
+import com.mapbox.mapboxsdk.camera.CameraPosition
+import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
+import com.mapbox.mapboxsdk.geometry.LatLng
+import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions
+import com.mapbox.mapboxsdk.location.LocationComponentOptions
+import com.mapbox.mapboxsdk.location.modes.CameraMode
+import com.mapbox.mapboxsdk.location.modes.RenderMode
+import com.mapbox.mapboxsdk.maps.MapboxMap
+import com.mapbox.mapboxsdk.maps.Style
+import com.mapbox.mapboxsdk.style.expressions.Expression
+import com.mapbox.mapboxsdk.style.expressions.Expression.*
+import com.mapbox.mapboxsdk.style.layers.PropertyFactory.*
+import com.mapbox.mapboxsdk.style.layers.SymbolLayer
+import com.mapbox.mapboxsdk.style.layers.TransitionOptions
+import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions
+import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
+import com.mapbox.mapboxsdk.utils.BitmapUtils
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.bottomsheet_map.*
-import me.jeybi.uztaxi.BuildConfig.NEXTZEN_API_KEY
 import me.jeybi.uztaxi.R
 import me.jeybi.uztaxi.ui.BaseActivity
 import me.jeybi.uztaxi.ui.intro.IntroActivity
 import me.jeybi.uztaxi.ui.main.fragments.SearchFragment
 import me.jeybi.uztaxi.ui.main.fragments.WhereToFragment
 import me.jeybi.uztaxi.utils.Constants
-import okhttp3.Cache
-import okhttp3.CacheControl
-import okhttp3.HttpUrl
-import okhttp3.Request
-import java.io.File
-import java.util.*
-import java.util.concurrent.TimeUnit
-import kotlin.collections.ArrayList
-import kotlin.math.abs
+import java.lang.Math.abs
+import java.net.URI
+import java.net.URISyntaxException
 
 
-class MainActivity : BaseActivity(), MainController.view, MapView.MapReadyCallback,
-    LocationListener {
+class MainActivity : BaseActivity(), MainController.view,
+    LocationListener, PermissionsListener {
 
     private val REQUEST_PERMISSIONS_REQUEST_CODE = 1
 
+    private var permissionsManager: PermissionsManager = PermissionsManager(this)
+
     lateinit var presenter: MainPresenter
 
-    var mapController: MapController? = null
     var mLocationManager: LocationManager? = null
 
     lateinit var bottomSheetBehaviour: BottomSheetBehavior<View>
 
-    val carMarkersList = ArrayList<Marker>()
+    val routeCoordinates = ArrayList<Point>()
 
 
     override fun setLayoutId(): Int {
@@ -100,14 +114,90 @@ class MainActivity : BaseActivity(), MainController.view, MapView.MapReadyCallba
     }
 
 
+    lateinit var mapboxMap: MapboxMap
+    lateinit var mapBoxStyle: Style
+
+
     private fun setUpMap() {
         setUpBottomSheet()
         presenter.checkGPS()
         presenter.requestPermissions()
 
-        // This starts a background process to set up the map.
-        mapView.getMapAsync(this, getHttpHandler())
+
+        mapView?.getMapAsync { mapboxMap ->
+            this.mapboxMap = mapboxMap
+            mapboxMap.setStyle(
+                Style.Builder().fromUri("mapbox://styles/jeybi24/ckiyh6njc4oxw19o2lh0n9rtl")
+            )
+            {
+                mapBoxStyle = it
+
+                enableLocationComponent(it)
+
+                val position = CameraPosition.Builder()
+                    .target(LatLng(41.350537, 69.219483))
+                    .zoom(16.0)
+                    .tilt(20.0)
+                    .build()
+                mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(position), 1000)
+                setUpMapButtons()
+
+
+
+            }
+
+            mapboxMap.addOnMoveListener(object : MapboxMap.OnMoveListener {
+                override fun onMoveBegin(detector: MoveGestureDetector) {
+                    // user started moving the map
+                    rotatePointerRectangleAnimation()
+                    imageViewCloudTop.animate().translationY(-200f).alpha(0.6f)
+                        .setInterpolator(AccelerateInterpolator()).setDuration(800).start()
+
+                }
+
+                override fun onMove(detector: MoveGestureDetector) {
+                    // user is moving the map
+
+                    if (abs(detector.lastDistanceX) > abs(detector.lastDistanceY)) {
+                        if (detector.lastDistanceX < 0) {
+                            animatePointerRectangle(DIRECTION_LEFT)
+                            RECTANGLE_ANIMATING = true
+                        }
+                        if (detector.lastDistanceX > 0) {
+                            animatePointerRectangle(DIRECTION_RIGHT)
+                            RECTANGLE_ANIMATING = true
+                        }
+                    } else {
+                        if (detector.lastDistanceY < 0) {
+                            animatePointerRectangle(DIRECTION_BOTTOM)
+                            RECTANGLE_ANIMATING = true
+                        }
+                        if (detector.lastDistanceY > 0) {
+                            animatePointerRectangle(DIRECTION_TOP)
+                            RECTANGLE_ANIMATING = true
+                        }
+
+
+                    }
+
+                }
+
+                override fun onMoveEnd(detector: MoveGestureDetector) {
+                    imageViewCloudTop.animate().translationY(0f).alpha(1f)
+                        .setInterpolator(DecelerateInterpolator()).setDuration(600).start()
+                    // user stopped moving the map
+                    RECTANGLE_ANIMATING = false
+                    cancelPointerAnimation()
+                    cancelPointerRectangleAnimation()
+
+                }
+            })
+
+
+        }
+
     }
+
 
     fun setUpBottomSheet() {
         bottomSheetBehaviour = BottomSheetBehavior.from(bottomSheet)
@@ -129,18 +219,11 @@ class MainActivity : BaseActivity(), MainController.view, MapView.MapReadyCallba
                     cardGPS.alpha = 0.6f - slideOffset
                     cardNext.alpha = 0.6f - slideOffset
 
-                    //                    if (cardGPS.alpha == 1f) {
-//                        cardGPS.animate().alpha(0f).setDuration(200)
-//                            .setInterpolator(AccelerateInterpolator()).start()
-//                    }
 
                 } else {
                     cardGPS.alpha = 1f
                     cardNext.alpha = 1f
-//                    if (cardGPS.alpha == 0f) {
-//                        cardGPS.animate().alpha(1f).setDuration(200)
-//                            .setInterpolator(AccelerateInterpolator()).start()
-//                    }
+
                 }
             }
         })
@@ -156,7 +239,6 @@ class MainActivity : BaseActivity(), MainController.view, MapView.MapReadyCallba
         imageViewPointerShadow.visibility = View.INVISIBLE
         imageViewPointerFoot.visibility = View.GONE
         lottieAnimation.visibility = View.VISIBLE
-//        viewWhiteBC.visibility = View.VISIBLE
         lottieAnimation.playAnimation()
     }
 
@@ -187,197 +269,6 @@ class MainActivity : BaseActivity(), MainController.view, MapView.MapReadyCallba
                 REQUEST_PERMISSIONS_REQUEST_CODE
             )
         }
-    }
-
-
-    override fun onMapReady(mapController: MapController?) {
-
-        setUpMapButtons()
-
-        this.mapController = mapController
-        // Set our API key as a scene update.
-        val updates: MutableList<SceneUpdate> = java.util.ArrayList()
-        updates.add(SceneUpdate("global.sdk_api_key", NEXTZEN_API_KEY))
-
-        mapController?.loadSceneFileAsync("walkabout/walkabout-style.yaml", updates)
-//        mapController?.loadSceneFileAsync("bubble-wrap/bubble-wrap-style.yaml", updates)
-
-        val cameraPosition = CameraPosition()
-        cameraPosition.latitude = 41.312475324732056
-        cameraPosition.longitude = 69.28003451322134
-        cameraPosition.zoom = 16f
-        cameraPosition.tilt = Math.toRadians(45.0).toFloat()
-
-        mapController?.flyToCameraPosition(cameraPosition, 0, null)
-
-        val touchInput: TouchInput = mapController!!.touchInput
-
-
-
-
-        touchInput.setTapResponder(object : TapResponder {
-            override fun onSingleTapUp(x: Float, y: Float): Boolean {
-                val pointLat = mapController.screenPositionToLngLat(PointF(x, y))
-//                mapController.updateCameraPosition(
-//                    CameraUpdateFactory.setPosition(pointLat!!),
-//                    1000
-//                )
-
-                val carMarker = mapController.addMarker()
-
-                carMarker.isVisible = true
-
-                carMarker.setStylingFromString(Constants.MARKER_CAR_2)
-
-                carMarker.setDrawable(R.drawable.car_map)
-                carMarker.setPointEased(LngLat(pointLat!!.longitude, pointLat.latitude),400,MapController.EaseType.QUINT)
-
-                mapController.requestRender()
-
-
-
-
-
-                carMarkersList.add(carMarker)
-
-                return false
-            }
-
-            override fun onSingleTapConfirmed(x: Float, y: Float): Boolean {
-                return true
-            }
-        })
-
-        touchInput.setAllGesturesEnabled()
-
-
-
-        touchInput.setPanResponder(object : TouchInput.PanResponder {
-            override fun onPanBegin(): Boolean {
-                imageViewCloudTop.animate().translationY(-200f).alpha(0.6f)
-                    .setInterpolator(AccelerateInterpolator()).setDuration(800).start()
-                mapController.updateCameraPosition(
-                    CameraUpdateFactory.setZoom(mapController.cameraPosition.zoom - 0.05f),
-                    0,
-                    MapController.EaseType.CUBIC
-                )
-                rotatePointerRectangleAnimation()
-
-                mapController.panResponder.onPanBegin()
-
-                return false
-            }
-
-            override fun onPan(startX: Float, startY: Float, endX: Float, endY: Float): Boolean {
-                mapController.panResponder.onPan(startX, startY, endX, endY)
-
-                val diffY: Float = startY - endY
-                val diffX: Float = startX - endX
-
-
-                if (abs(diffX) > abs(diffY)) {
-                    if (startX - endX < 0) {
-                        animatePointerRectangle(DIRECTION_LEFT)
-                        RECTANGLE_ANIMATING = true
-                    }
-                    if (startX - endX > 0) {
-                        animatePointerRectangle(DIRECTION_RIGHT)
-                        RECTANGLE_ANIMATING = true
-                    }
-                } else {
-                    if (startY - endY < 0) {
-                        animatePointerRectangle(DIRECTION_BOTTOM)
-                        RECTANGLE_ANIMATING = true
-                    }
-                    if (startY - endY > 0) {
-                        animatePointerRectangle(DIRECTION_TOP)
-                        RECTANGLE_ANIMATING = true
-                    }
-
-
-                }
-
-
-                return false
-            }
-
-            override fun onPanEnd(): Boolean {
-                imageViewCloudTop.animate().translationY(0f).alpha(1f)
-                    .setInterpolator(DecelerateInterpolator()).setDuration(600).start()
-
-                mapController.updateCameraPosition(
-                    CameraUpdateFactory.setZoom(mapController.cameraPosition.zoom + 0.05f),
-                    500,
-                    MapController.EaseType.QUINT
-                )
-
-
-                RECTANGLE_ANIMATING = false
-                cancelPointerAnimation()
-                cancelPointerRectangleAnimation()
-                mapController.panResponder.onPanEnd()
-
-                val zoomLVL = mapController.cameraPosition.getZoom()
-
-                when (zoomLVL) {
-                    in 0.0..13.0 -> {
-                        for (carMarker in carMarkersList)
-                            carMarker.setStylingFromString(Constants.MARKER_CAR_0)
-                    }
-
-                    in 13.0..15.5 -> {
-                        for (carMarker in carMarkersList)
-                            carMarker.setStylingFromString(Constants.MARKER_CAR_1)
-                    }
-                    in 15.5..16.5 -> {
-                        for (carMarker in carMarkersList)
-                            carMarker.setStylingFromString(Constants.MARKER_CAR_2)
-                    }
-                    in 16.5..17.5 -> {
-                        for (carMarker in carMarkersList)
-                            carMarker.setStylingFromString(Constants.MARKER_CAR_3)
-                    }
-                    in 17.5..19.0 -> {
-                        for (carMarker in carMarkersList)
-                            carMarker.setStylingFromString(Constants.MARKER_CAR_4)
-                    }
-                    in 19.0..100.0 -> {
-                        for (carMarker in carMarkersList)
-                            carMarker.setStylingFromString(Constants.MARKER_CAR_5)
-                    }
-
-                }
-
-                return false
-
-            }
-
-            override fun onFling(
-                posX: Float,
-                posY: Float,
-                velocityX: Float,
-                velocityY: Float
-            ): Boolean {
-                mapController.panResponder.onFling(posX, posY, velocityX, velocityY)
-
-                mapController.updateCameraPosition(
-                    CameraUpdateFactory.setZoom(mapController.cameraPosition.zoom + 0.05f),
-                    500,
-                    MapController.EaseType.QUINT
-                )
-
-
-                return false
-            }
-
-            override fun onCancelFling(): Boolean {
-
-                mapController.panResponder.onCancelFling()
-                return false
-            }
-
-        })
-
     }
 
     private fun setUpMapButtons() {
@@ -507,57 +398,54 @@ class MainActivity : BaseActivity(), MainController.view, MapView.MapReadyCallba
             ).start()
     }
 
+    override fun onStart() {
+        super.onStart()
+        mapView?.onStart()
+    }
 
     override fun onResume() {
         super.onResume()
-        mapView.onResume()
+        mapView?.onResume()
     }
 
     override fun onPause() {
         super.onPause()
-        mapView.onPause()
+        mapView?.onPause()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        mapView.onDestroy()
+    override fun onStop() {
+        super.onStop()
+        mapView?.onStop()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        mapView?.onSaveInstanceState(outState)
     }
 
     override fun onLowMemory() {
         super.onLowMemory()
-        mapView.onLowMemory()
+        mapView?.onLowMemory()
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        mapView?.onDestroy()
 
-    fun getHttpHandler(): HttpHandler? {
-        val builder = DefaultHttpHandler.getClientBuilder()
-        val cacheDir: File? = externalCacheDir
-        if (cacheDir != null && cacheDir.exists()) {
-            builder.cache(Cache(cacheDir, 16 * 1024 * 1024))
-        }
-        return object : DefaultHttpHandler(builder) {
-            var tileCacheControl = CacheControl.Builder().maxStale(7, TimeUnit.DAYS).build()
-            override fun configureRequest(url: HttpUrl, builder: Request.Builder) {
-                if ("tile.nextzen.com" == url.host()) {
-                    builder.cacheControl(tileCacheControl)
-                }
-            }
-        }
+
     }
 
     override fun onLocationChanged(location: Location) {
-        val cameraPosition = CameraPosition()
+        val position = CameraPosition.Builder()
+            .target(LatLng(location.latitude, location.longitude))
+            .zoom(16.0)
+            .tilt(20.0)
+            .build()
+        mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(position), 1000)
 
-        cameraPosition.latitude = location.latitude
-        cameraPosition.longitude = location.longitude
-        cameraPosition.zoom = 16f
-        cameraPosition.tilt = Math.toRadians(45.0).toFloat()
-
-        mapController?.flyToCameraPosition(cameraPosition, 1000, null)
-//        mLocationManager?.removeUpdates(this)
     }
 
-    // Required functions
+// Required functions
 
     override fun onProviderEnabled(provider: String) {
         super.onProviderEnabled(provider)
@@ -568,5 +456,70 @@ class MainActivity : BaseActivity(), MainController.view, MapView.MapReadyCallba
     }
 
     override fun onStatusChanged(arg0: String?, arg1: Int, arg2: Bundle?) {}
+
+
+    @SuppressLint("MissingPermission")
+    private fun enableLocationComponent(loadedMapStyle: Style) {
+// Check if permissions are enabled and if not request
+        if (PermissionsManager.areLocationPermissionsGranted(this)) {
+
+// Create and customize the LocationComponent's options
+            val customLocationComponentOptions = LocationComponentOptions.builder(this)
+                .trackingGesturesManagement(true)
+                .pulseColor(ResourcesCompat.getColor(resources, R.color.purple_200, null))
+                .backgroundStaleTintColor(
+                    ResourcesCompat.getColor(
+                        resources,
+                        R.color.purple_200,
+                        null
+                    )
+                )
+                .bearingTintColor(ResourcesCompat.getColor(resources, R.color.purple_200, null))
+                .foregroundStaleTintColor(ResourcesCompat.getColor(resources, R.color.white, null))
+                .pulseColor(ResourcesCompat.getColor(resources, R.color.white, null))
+                .foregroundTintColor(ResourcesCompat.getColor(resources, R.color.white, null))
+                .accuracyColor(ContextCompat.getColor(this, R.color.mapboxGreen))
+                .build()
+
+            val locationComponentActivationOptions = LocationComponentActivationOptions.builder(
+                this,
+                loadedMapStyle
+            )
+                .locationComponentOptions(customLocationComponentOptions)
+                .build()
+
+// Get an instance of the LocationComponent and then adjust its settings
+            mapboxMap.locationComponent.apply {
+
+// Activate the LocationComponent with options
+                activateLocationComponent(locationComponentActivationOptions)
+
+// Enable to make the LocationComponent visible
+                isLocationComponentEnabled = true
+
+// Set the LocationComponent's camera mode
+                cameraMode = CameraMode.TRACKING
+
+// Set the LocationComponent's render mode
+                renderMode = RenderMode.COMPASS
+            }
+        } else {
+            permissionsManager = PermissionsManager(this)
+            permissionsManager.requestLocationPermissions(this)
+        }
+    }
+
+    override fun onExplanationNeeded(permissionsToExplain: List<String>) {
+        Toast.makeText(this, "Explanation", Toast.LENGTH_LONG).show()
+    }
+
+    override fun onPermissionResult(granted: Boolean) {
+        if (granted) {
+            enableLocationComponent(mapboxMap.style!!)
+        } else {
+            Toast.makeText(this, "Location Permission Not Granted", Toast.LENGTH_LONG).show()
+            finish()
+        }
+    }
 
 }

@@ -4,6 +4,8 @@ buildscript {
     repositories {
         google()
         jcenter()
+        mavenCentral()
+        maven { url "http://oss.sonatype.org/content/repositories/snapshots/" }
     }
     dependencies {
         classpath "com.android.tools.build:gradle:4.1.1"
@@ -17,6 +19,16 @@ allprojects {
     repositories {
         google()
         jcenter()
+        maven {
+            url 'https://api.mapbox.com/downloads/v2/releases/maven'
+            authentication {
+                basic(BasicAuthentication)
+            }
+            credentials {
+                username = "mapbox"
+                password = "sk.eyJ1IjoiamV5YmkyNCIsImEiOiJja2l5ZGwwdjE0MmsxMzFxamx6bTdmYmYxIn0.CFAvQDlIBIoV0iKJtedScQ"
+            }
+        }
     }
 }
 

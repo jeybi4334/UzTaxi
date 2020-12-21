@@ -8,7 +8,6 @@ android {
     compileSdkVersion 30
     buildToolsVersion "30.0.2"
 
-    def apiKey = project.hasProperty('nextzenApiKey') ? nextzenApiKey : System.getenv('NEXTZEN_API_KEY')
 
     defaultConfig {
         applicationId "me.jeybi.uztaxi"
@@ -17,7 +16,7 @@ android {
         versionCode 1
         versionName "1.0"
 
-        buildConfigField 'String', 'NEXTZEN_API_KEY', '"' + "pgdrRVyDRfqoxAD2exCHlg" + '"'
+        buildConfigField 'String', 'THUNDER_FOREST_API_KEY', '"' + "5a07b854cc41404893a8bbaccfd8f7ab" + '"'
     }
 
     buildTypes {
@@ -27,11 +26,6 @@ android {
         }
     }
 
-//    sourceSets.main.assets.srcDirs = ['../styles']
-//
-//    sourceSets {
-//        main.assets.srcDirs += '../assets'
-//    }
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -50,10 +44,16 @@ dependencies {
     implementation 'com.google.android.material:material:1.2.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
 
-    implementation 'com.mapzen.tangram:tangram:0.13.0'
+    implementation 'com.mapbox.mapboxsdk:mapbox-android-sdk:9.5.0'
+    implementation 'com.mapbox.mapboxsdk:mapbox-android-gestures:0.7.0'
+    implementation 'com.mapbox.mapboxsdk:mapbox-sdk-services:5.6.0'
 
     implementation 'com.airbnb.android:lottie:3.5.0'
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
     implementation 'com.github.rubensousa:gravitysnaphelper:1.2'
+
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    implementation 'com.google.code.gson:gson:2.8.6'
+    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
 
 }

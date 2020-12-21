@@ -6,8 +6,6 @@ import android.os.SystemClock
 import android.util.DisplayMetrics
 import android.view.animation.Interpolator
 import android.view.animation.LinearInterpolator
-import com.mapzen.tangram.LngLat
-import com.mapzen.tangram.Marker
 
 
 class Constants {
@@ -45,45 +43,5 @@ class Constants {
     }
 
 
-    private fun bearingBetweenLocations(latLng1: LngLat, latLng2: LngLat): Double {
-        val PI = 3.14159
-        val lat1: Double = latLng1.latitude * PI / 180
-        val long1: Double = latLng1.longitude * PI / 180
-        val lat2: Double = latLng2.latitude * PI / 180
-        val long2: Double = latLng2.longitude * PI / 180
-        val dLon = long2 - long1
-        val y = Math.sin(dLon) * Math.cos(lat2)
-        val x = Math.cos(lat1) * Math.sin(lat2) - (Math.sin(lat1)
-                * Math.cos(lat2) * Math.cos(dLon))
-        var brng = Math.atan2(y, x)
-        brng = Math.toDegrees(brng)
-        brng = (brng + 360) % 360
-        return brng
-    }
-
-//    private fun rotateMarker(marker: Marker, toRotation: Float) {
-//        if (!isMarkerRotating) {
-//            val handler = Handler()
-//            val start = SystemClock.uptimeMillis()
-//            val startRotation: Float = marker.getRotation()
-//            val duration: Long = 1000
-//            val interpolator: Interpolator = LinearInterpolator()
-//            handler.post(object : Runnable {
-//                override fun run() {
-//                    isMarkerRotating = true
-//                    val elapsed = SystemClock.uptimeMillis() - start
-//                    val t: Float = interpolator.getInterpolation(elapsed.toFloat() / duration)
-//                    val rot = t * toRotation + (1 - t) * startRotation
-//                    marker.setRotation(if (-rot > 180) rot / 2 else rot)
-//                    if (t < 1.0) {
-//                        // Post again 16ms later.
-//                        handler.postDelayed(this, 16)
-//                    } else {
-//                        isMarkerRotating = false
-//                    }
-//                }
-//            })
-//        }
-//    }
 
 }
