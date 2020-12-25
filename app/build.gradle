@@ -2,12 +2,16 @@ plugins {
     id 'com.android.application'
     id 'kotlin-android'
     id 'kotlin-android-extensions'
+    id 'com.google.gms.google-services'
 }
 
 android {
     compileSdkVersion 30
     buildToolsVersion "30.0.2"
 
+//    buildFeatures {
+//        viewBinding true
+//    }
 
     defaultConfig {
         applicationId "me.jeybi.uztaxi"
@@ -52,8 +56,27 @@ dependencies {
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
     implementation 'com.github.rubensousa:gravitysnaphelper:1.2'
 
+    ///// RETROFIT
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
-    implementation 'com.google.code.gson:gson:2.8.6'
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+    implementation 'com.squareup.retrofit2:adapter-rxjava2:2.9.0'
 
+    ////RX JAVA
+    implementation 'io.reactivex.rxjava2:rxkotlin:2.2.0'
+    implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
+
+
+    /////REMOVE BEFORE RELEASE
+    implementation 'com.squareup.okhttp3:logging-interceptor:4.7.2'
+
+    //// LOTTIE FOR ANIMATIONS
+    implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
+
+
+    implementation platform('com.google.firebase:firebase-bom:26.2.0')
+
+    implementation 'com.google.firebase:firebase-analytics-ktx'
+    implementation 'com.google.firebase:firebase-messaging'
+
+    implementation 'ru.egslava:MaskedEditText:1.0.5'
 }

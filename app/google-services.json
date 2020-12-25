@@ -1,0 +1,127 @@
+{
+  "project_info": {
+    "project_number": "298244747288",
+    "firebase_url": "https://uz-taxi.firebaseio.com",
+    "project_id": "uz-taxi",
+    "storage_bucket": "uz-taxi.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:298244747288:android:4fecb73135c97c957c936d",
+        "android_client_info": {
+          "package_name": "me.jeybi.uztaxi"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "298244747288-c1bjc0k6g56pikkg3uunn7e11k1s078o.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "me.jeybi.uztaxi",
+            "certificate_hash": "18373c64b637885ab4d1d9be33ed463b127a1197"
+          }
+        },
+        {
+          "client_id": "298244747288-4frb170p14cqs1dsqs7e8f8i6rirslpc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDPtYHGB3AAexK6W4dz16d5gSml9jM2J3s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "298244747288-4frb170p14cqs1dsqs7e8f8i6rirslpc.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "298244747288-369fm3r81funr84ibfcd55ivd8uv5gla.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "net.uztaxi.ios.client"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:298244747288:android:bafd5550daba4192",
+        "android_client_info": {
+          "package_name": "net.uztaxi.client"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "298244747288-4frb170p14cqs1dsqs7e8f8i6rirslpc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDPtYHGB3AAexK6W4dz16d5gSml9jM2J3s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "298244747288-4frb170p14cqs1dsqs7e8f8i6rirslpc.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "298244747288-369fm3r81funr84ibfcd55ivd8uv5gla.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "net.uztaxi.ios.client"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:298244747288:android:455c0c1f83c364ee",
+        "android_client_info": {
+          "package_name": "net.uztaxi.driver"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "298244747288-4frb170p14cqs1dsqs7e8f8i6rirslpc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDPtYHGB3AAexK6W4dz16d5gSml9jM2J3s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "298244747288-4frb170p14cqs1dsqs7e8f8i6rirslpc.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "298244747288-369fm3r81funr84ibfcd55ivd8uv5gla.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "net.uztaxi.ios.client"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

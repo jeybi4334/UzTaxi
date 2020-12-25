@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+
+    android:background="@color/white">
+
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.35"
+        />
+
+    <ImageView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/guideline2"
+        android:src="@drawable/auth_top"
+        android:scaleType="fitXY"
+        />
+
+    <ImageView
+        android:layout_width="118dp"
+        android:layout_height="118dp"
+        android:src="@drawable/logo"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/guideline2"
+        app:layout_constraintRight_toRightOf="parent"
+        />
+
+   <ScrollView
+       android:layout_width="match_parent"
+       android:layout_height="0dp"
+       app:layout_constraintBottom_toTopOf="@id/rvConfirm"
+       app:layout_constraintTop_toBottomOf="@id/guideline2"
+       >
+
+       <LinearLayout
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:orientation="vertical"
+           >
+
+           <TextView
+               android:id="@+id/text1"
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+               android:text="Verification"
+               android:gravity="center"
+               android:textColor="#1A1A1A"
+               android:fontFamily="@font/g_bold"
+               android:textSize="50sp"
+               android:layout_marginTop="12dp"
+               android:layout_marginStart="18dp"
+               android:layout_marginEnd="18dp"
+               />
+
+           <TextView
+               android:id="@+id/text2"
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+               android:layout_marginStart="18dp"
+               android:layout_marginTop="4dp"
+               android:layout_marginEnd="18dp"
+               android:fontFamily="@font/g_regular"
+               android:gravity="center"
+               android:text="We texted you a code to verify\nyour phone number"
+               android:textColor="#1a1a1a"
+               android:textSize="14sp" />
+
+           <LinearLayout
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+               android:orientation="horizontal"
+               android:gravity="center"
+               android:layout_marginTop="24dp"
+               >
+
+               <EditText
+                   android:id="@+id/smsCode1"
+                   android:layout_width="56dp"
+                   android:layout_height="56dp"
+                   android:gravity="center"
+                   android:fontFamily="@font/g_black"
+                   android:maxLength="1"
+                   android:maxLines="1"
+                   android:inputType="numberDecimal"
+                   android:imeOptions="actionNext"
+                   android:textColor="#000000"
+                   android:background="@drawable/bc_input_smscode"
+                   />
+
+               <EditText
+                   android:id="@+id/smsCode2"
+                   android:layout_width="56dp"
+                   android:layout_height="56dp"
+                   android:gravity="center"
+                   android:layout_marginStart="18dp"
+                   android:fontFamily="@font/g_black"
+                   android:maxLength="1"
+                   android:maxLines="1"
+                   android:inputType="numberDecimal"
+                   android:imeOptions="actionNext"
+                   android:textColor="#000000"
+                   android:background="@drawable/bc_input_smscode"
+                   />
+
+               <EditText
+                   android:id="@+id/smsCode3"
+                   android:layout_width="56dp"
+                   android:layout_height="56dp"
+                   android:gravity="center"
+                   android:layout_marginStart="18dp"
+                   android:fontFamily="@font/g_black"
+                   android:maxLength="1"
+                   android:maxLines="1"
+                   android:inputType="numberDecimal"
+                   android:imeOptions="actionNext"
+                   android:textColor="#000000"
+                   android:background="@drawable/bc_input_smscode"
+                   />
+
+               <EditText
+                   android:id="@+id/smsCode4"
+                   android:layout_width="56dp"
+                   android:layout_height="56dp"
+                   android:gravity="center"
+                   android:layout_marginStart="18dp"
+                   android:fontFamily="@font/g_black"
+                   android:maxLength="1"
+                   android:maxLines="1"
+                   android:inputType="numberDecimal"
+                   android:imeOptions="actionNext"
+                   android:textColor="#000000"
+                   android:background="@drawable/bc_input_smscode"
+                   />
+
+           </LinearLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:layout_marginTop="24dp"
+            >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Did not receive code?"
+                android:textColor="#0A1B72"
+                android:layout_centerVertical="true"
+                android:fontFamily="@font/g_regular"
+                android:layout_marginLeft="24dp"
+                />
+
+            <TextView
+                android:id="@+id/textViewResend"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:text="SEND AGAIN"
+                android:textColor="#0A1B72"
+                android:fontFamily="@font/g_semi_bold"
+                android:padding="12dp"
+                android:layout_marginRight="12dp"
+                android:layout_marginLeft="24dp"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                />
+
+        </RelativeLayout>
+
+           <ProgressBar
+               android:id="@+id/progressBarCode"
+               android:layout_width="32dp"
+               android:layout_height="32dp"
+               android:layout_gravity="center"
+               android:layout_marginTop="12dp"
+               android:visibility="gone"
+               />
+
+           <TextView
+               android:id="@+id/textViewError"
+               android:layout_width="match_parent"
+               android:layout_marginLeft="18dp"
+               android:layout_marginRight="18dp"
+               android:layout_marginTop="8dp"
+               android:textColor="@color/red"
+               android:fontFamily="@font/g_regular"
+               android:textSize="14sp"
+               android:layout_gravity="center"
+               android:layout_height="wrap_content"
+               />
+
+       </LinearLayout>
+
+   </ScrollView>
+
+
+    <RelativeLayout
+        android:id="@+id/rvConfirm"
+        android:clickable="true"
+        android:layout_width="0dp"
+        android:layout_height="52dp"
+        android:background="@drawable/bc_login_button"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/viewBot"
+        android:layout_marginBottom="48dp"
+        android:layout_marginEnd="18dp"
+        android:layout_marginStart="18dp"
+
+        >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Confirm"
+            android:fontFamily="@font/g_bold"
+            android:layout_centerInParent="true"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            />
+
+    </RelativeLayout>
+
+    <View
+        android:id="@+id/viewBot"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:background="#1A1A1A"
+        android:alpha="0.3"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginBottom="32dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

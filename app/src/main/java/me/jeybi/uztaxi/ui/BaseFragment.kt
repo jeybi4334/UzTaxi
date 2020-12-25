@@ -1,15 +1,13 @@
 package me.jeybi.uztaxi.ui
 
-import android.app.Activity
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import androidx.annotation.LayoutRes
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentActivity
 import me.jeybi.uztaxi.UzTaxiApplication
 
 abstract class BaseFragment : Fragment() {
@@ -21,7 +19,8 @@ abstract class BaseFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(setLayoutId(),container,false)
+
+        return inflater.inflate(setLayoutId(), container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

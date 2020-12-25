@@ -8,4 +8,6 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="mapboxGreen">#4CAF50</color>
+
+    <color name="red">#D83030</color>
 </resources>

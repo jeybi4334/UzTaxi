@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:configChanges="keyboard"
+    android:windowSoftInputMode="adjustResize"
+    android:background="@color/white">
+
+
+    <RelativeLayout
+        android:id="@+id/rvConfirm"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="88dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="18dp"
+        android:layout_marginStart="18dp"
+        android:background="@drawable/bc_button_purple"
+        android:clickable="true"
+        >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="Confirm"
+            android:fontFamily="@font/g_bold"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            />
+
+    </RelativeLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        >
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            >
+
+            <TextView
+                android:id="@+id/text1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:fontFamily="@font/g_bold"
+                android:text="Ride Finished"
+                android:textColor="@color/purple_200"
+                android:textSize="22sp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+
+            <TextView
+                android:id="@+id/text2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:fontFamily="@font/g_semi_bold"
+                android:text="Your bill is :"
+                android:textColor="@color/purple_200"
+                android:textSize="16sp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/text1" />
+
+
+            <TextView
+                android:id="@+id/textViewBillAmount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:fontFamily="@font/g_black"
+                android:text="15 400"
+                android:textColor="@color/purple_200"
+                android:textSize="50sp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/text2" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_marginBottom="12dp"
+                android:fontFamily="@font/g_bold"
+                android:text="so'm"
+                android:textColor="@color/purple_200"
+                android:textSize="16sp"
+                app:layout_constraintBottom_toBottomOf="@id/textViewBillAmount"
+                app:layout_constraintLeft_toRightOf="@id/textViewBillAmount" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.5"
+                />
+
+
+            <TextView
+                android:id="@+id/text3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:fontFamily="@font/g_bold"
+                android:text="Your bonus :"
+                android:layout_marginEnd="8dp"
+                android:textColor="@color/purple_200"
+                android:textSize="18sp"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/textViewBillAmount"
+                app:layout_constraintRight_toLeftOf="@id/guideline"
+                />
+
+            <TextView
+                android:id="@+id/textViewCashBackAmount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:fontFamily="@font/g_bold"
+                android:text="+2000 so'm"
+                android:textColor="#FFAA00"
+                android:textSize="18sp"
+                app:layout_constraintLeft_toRightOf="@id/guideline"
+                app:layout_constraintTop_toBottomOf="@id/textViewBillAmount"
+                android:layout_marginStart="8dp"
+                />
+
+
+            <TextView
+                android:id="@+id/textViewOrderDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:fontFamily="@font/g_semi_bold"
+                android:text="October 21, 2020 at 10:30 a.m."
+                android:layout_marginEnd="8dp"
+                android:textColor="@color/purple_200"
+                android:textSize="16sp"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/textViewCashBackAmount"
+                app:layout_constraintLeft_toLeftOf="parent"
+                />
+
+            <View
+                android:id="@+id/viewDivider"
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/textViewOrderDate"
+                android:layout_marginTop="32dp"
+                android:background="#E4E9F2"
+                android:layout_marginLeft="48dp"
+                android:layout_marginRight="48dp"
+                />
+
+            <TextView
+                android:id="@+id/text4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:fontFamily="@font/g_semi_bold"
+                android:text="Rate your driver"
+                android:textColor="@color/purple_200"
+                android:textSize="16sp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/viewDivider" />
+
+
+            <TextView
+                android:id="@+id/textViewDriverName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:fontFamily="@font/g_bold"
+                android:text="Soatov Sadulla"
+                android:textColor="@color/purple_200"
+                android:textSize="20sp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/text4" />
+
+            <ImageView
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:id="@+id/imageStar3"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                app:layout_constraintTop_toBottomOf="@id/textViewDriverName"
+                app:layout_constraintLeft_toLeftOf="@id/guideline"
+                app:layout_constraintRight_toRightOf="@id/guideline"
+                android:layout_marginTop="24dp"
+                android:src="@drawable/ic_star_unselected"
+                />
+
+            <ImageView
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:id="@+id/imageStar2"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                app:layout_constraintTop_toBottomOf="@id/textViewDriverName"
+                app:layout_constraintRight_toLeftOf="@id/imageStar3"
+                android:layout_marginEnd="16dp"
+                android:layout_marginTop="24dp"
+                android:src="@drawable/ic_star_unselected"
+                />
+
+            <ImageView
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:id="@+id/imageStar1"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                app:layout_constraintTop_toBottomOf="@id/textViewDriverName"
+                app:layout_constraintRight_toLeftOf="@id/imageStar2"
+                android:layout_marginEnd="16dp"
+                android:layout_marginTop="24dp"
+                android:src="@drawable/ic_star_unselected"
+                />
+
+            <ImageView
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:id="@+id/imageStar4"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                app:layout_constraintTop_toBottomOf="@id/textViewDriverName"
+                app:layout_constraintLeft_toRightOf="@id/imageStar3"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="24dp"
+                android:src="@drawable/ic_star_unselected"
+                />
+
+            <ImageView
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:id="@+id/imageStar5"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                app:layout_constraintTop_toBottomOf="@id/textViewDriverName"
+                app:layout_constraintLeft_toRightOf="@id/imageStar4"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="24dp"
+                android:src="@drawable/ic_star_unselected"
+                />
+
+            <EditText
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                android:layout_marginRight="24dp"
+                android:layout_marginLeft="24dp"
+                app:layout_constraintTop_toBottomOf="@id/imageStar4"
+                android:layout_marginTop="32dp"
+                android:paddingLeft="14dp"
+                android:paddingTop="12dp"
+                android:hint="Type your review..."
+                android:textColorHint="#c5cee0"
+                android:inputType="text"
+                android:imeOptions="actionSend|flagNoEnterAction"
+                android:gravity="left|top"
+                android:fontFamily="@font/g_semi_bold"
+                android:textColor="@color/black"
+                android:minHeight="128dp"
+                android:background="@drawable/bc_review"
+                />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

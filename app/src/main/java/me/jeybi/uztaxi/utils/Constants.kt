@@ -1,11 +1,19 @@
 package me.jeybi.uztaxi.utils
 
 import android.content.Context
-import android.os.Handler
-import android.os.SystemClock
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.drawable.Drawable
 import android.util.DisplayMetrics
-import android.view.animation.Interpolator
-import android.view.animation.LinearInterpolator
+import java.nio.charset.StandardCharsets
+import java.security.InvalidKeyException
+import java.security.NoSuchAlgorithmException
+import java.time.OffsetDateTime
+import java.time.format.DateTimeFormatter.RFC_1123_DATE_TIME
+import java.util.*
+import javax.crypto.Mac
+import javax.crypto.spec.SecretKeySpec
+import kotlin.collections.HashMap
 
 
 class Constants {
@@ -16,31 +24,53 @@ class Constants {
 
         val PREF_AUTHENTICATED = "intro_shown"
 
+        val BASE_URL = "https://office.uz.taxi:443/api/"
+
+        val HIVE_PROFILE = "2a3ae3c1da9c04320737424a4dbd2683"
+
+        val HIVE_USER_ID = "user_id"
+        val HIVE_USER_TOKEN = "user_token"
+        val FIREBASE_TOKEN = "firebase_token"
+
+
+        val CONF_TYPE_SMS = "sms"
+        val CONF_TYPE_VOICE = "voice"
+
+        val GENDER_MALE = 0
+        val GENDER_FEMALE = 1
+
+        val STATUS_SUCCESSFUL = 200
+        val STATUS_BAD_REQUEST = 400
+        val STATUS_NOT_FOUND = 404
+        val STATUS_SERVER_ERROR = 500
+
+
+
+
         fun convertDpToPixel(dp: Float, context: Context): Float {
             return dp * (context.resources
                 .displayMetrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT)
         }
 
-        var MARKER_CAR_0 = "{ style: 'points', color: 'white', size: [9px, 18px], order: 1, collide: false }"
 
-        var MARKER_CAR_1 = "{ style: 'points', color: 'white', size: [16px, 36px], order: 1, collide: false }"
+         fun getBitmap(drawable: Drawable): Bitmap? {
+            val canvas = Canvas()
+            val bitmap = Bitmap.createBitmap(
+                drawable.intrinsicWidth,
+                drawable.intrinsicHeight,
+                Bitmap.Config.ARGB_8888
+            )
+            canvas.setBitmap(bitmap)
+            drawable.setBounds(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)
+            drawable.draw(canvas)
+            return bitmap
+        }
 
-        var MARKER_CAR_2 = "{ style: 'points', color: 'white', size: [24px, 48px], order: 1, collide: false }"
-
-        var MARKER_CAR_3 = "{ style: 'points', color: 'white', size: [28px, 56px], order: 1, collide: false }"
-
-        var MARKER_CAR_4 = "{ style: 'points', color: 'white', size: [43px, 86px], order: 1, collide: false }"
-
-        var MARKER_CAR_5 = "{ style: 'points', color: 'white', size: [51px, 102px], order: 1, collide: false }"
-
-
-        var MARKER_POINTS = "{ style: 'points', color: 'white', size: [50px, 50px], order: 2000, collide: false }"
-
-        var MARKER_LINE = "{ style: 'lines', color: '#06a6d4', width: 5px, order: 2000 }"
-        var MARKER_POLYGON = "{ style: 'polygons', color: '#06a6d4', width: 5px, order: 2000 }"
 
 
     }
+
+
 
 
 

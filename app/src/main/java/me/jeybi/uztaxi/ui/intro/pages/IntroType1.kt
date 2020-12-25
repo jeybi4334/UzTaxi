@@ -31,9 +31,15 @@ class IntroType1(val position : Int) : Fragment() {
             }
             2->{
                 imageViewIntro.setImageResource(R.drawable.page_3)
+                textViewIntroTitle.text = "The Best Drivers"
+                textViewIntroContent.text = "We choose special drivers for each ride\n" +
+                        "based on your preferences and communication type"
             }
             3->{
-
+                imageViewIntro.setImageResource(R.drawable.page_4)
+                textViewIntroTitle.text = "Any Payment Method"
+                textViewIntroContent.text = "Add your UzCard or HumoCard\n" +
+                        "to pay for a ride and get immediate cash-back"
             }
         }
     }

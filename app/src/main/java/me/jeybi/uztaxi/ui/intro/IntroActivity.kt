@@ -9,6 +9,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import kotlinx.android.synthetic.main.activity_intro.*
 import me.jeybi.uztaxi.R
+import me.jeybi.uztaxi.ui.auth.AuthenticationActivity
 import me.jeybi.uztaxi.ui.intro.pages.IntroPagerTransforMer
 import me.jeybi.uztaxi.ui.intro.pages.IntroType1
 import me.jeybi.uztaxi.ui.main.MainActivity
@@ -27,10 +28,9 @@ class IntroActivity : FragmentActivity(),IntroController.view {
             if (viewPagerIntro.currentItem+1!=INTRO_COUNT)
             viewPagerIntro.currentItem = viewPagerIntro.currentItem + 1
             else{
-                startActivity(Intent(this@IntroActivity,MainActivity::class.java))
+                startActivity(Intent(this@IntroActivity,AuthenticationActivity::class.java))
                 finish()
             }
-
         }
 
         viewPagerIntro.registerOnPageChangeCallback(object : OnPageChangeCallback() {
