@@ -9,10 +9,10 @@
 
     <ImageView
         android:id="@+id/iconSearchItem"
-        android:layout_width="16dp"
-        android:layout_height="16dp"
-        android:layout_marginLeft="16dp"
-        android:src="@drawable/ic_saerch_place"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginStart="16dp"
+        android:src="@drawable/s_default"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -33,12 +33,11 @@
         app:layout_constraintRight_toRightOf="parent"
         android:maxLines="1"
         app:layout_constraintBottom_toTopOf="@id/guideline"
-        android:text="Samarqand Darvoz"
         android:fontFamily="@font/g_semi_bold"
         android:layout_marginRight="12dp"
         android:layout_marginLeft="16dp"
         android:textSize="17sp"
-        android:textColor="#623571"
+        android:textColor="@color/black"
         android:ellipsize="end"
         />
 
@@ -49,9 +48,8 @@
         android:layout_height="wrap_content"
         app:layout_constraintLeft_toRightOf="@id/iconSearchItem"
         app:layout_constraintRight_toRightOf="parent"
-        android:maxLines="2"
+        android:maxLines="1"
         app:layout_constraintTop_toBottomOf="@id/guideline"
-        android:text="Uzbekistan, Tashkent, Khushnavo Street, 2"
         android:layout_marginRight="12dp"
         android:ellipsize="end"
         android:fontFamily="@font/g_regular"

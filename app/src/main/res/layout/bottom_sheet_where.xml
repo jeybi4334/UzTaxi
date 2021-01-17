@@ -1,25 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
+    android:clickable="true"
+    android:focusable="true"
+    android:layout_marginBottom="42dp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/white">
-
 
     <TextView
         android:id="@+id/textViewStartAddress"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:textColor="@color/purple_200"
+        android:textColor="@color/black"
         android:alpha="0.8"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginTop="24dp"
-        android:text="Yunusobod , Bodomzor 3/4"
+        android:text=""
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintLeft_toRightOf="@id/iconStart"
-        android:layout_marginLeft="24dp"
+        android:layout_marginStart="16dp"
         android:fontFamily="@font/g_semi_bold"
-        android:textSize="17sp"
+        android:textSize="15sp"
+        android:ellipsize="end"
+        android:maxLines="1"
         />
 
     <ImageView
@@ -30,24 +35,26 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="@id/textViewStartAddress"
         app:layout_constraintBottom_toBottomOf="@id/textViewStartAddress"
-        android:layout_marginStart="30dp"
+        android:layout_marginStart="24dp"
         />
 
     <TextView
         android:id="@+id/textViewDestination"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:textColor="@color/purple_200"
+        android:textColor="@color/black"
         android:alpha="0.8"
         app:layout_constraintTop_toBottomOf="@id/textViewStartAddress"
         android:layout_marginTop="16dp"
-        android:text="Where ?"
+        android:text=""
+        android:ellipsize="end"
+        android:maxLines="1"
         app:layout_constraintRight_toLeftOf="@id/viewDividerMap"
         android:layout_marginEnd="12dp"
         app:layout_constraintLeft_toRightOf="@id/iconStart"
-        android:layout_marginLeft="24dp"
+        android:layout_marginStart="16dp"
         android:fontFamily="@font/g_semi_bold"
-        android:textSize="17sp"
+        android:textSize="15sp"
         />
 
     <ImageView
@@ -58,7 +65,7 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="@id/textViewDestination"
         app:layout_constraintBottom_toBottomOf="@id/textViewDestination"
-        android:layout_marginStart="30dp"
+        android:layout_marginStart="24dp"
         />
 
 
@@ -107,8 +114,10 @@
         app:layout_constraintTop_toBottomOf="@id/recyclerViewCars"
         android:layout_marginTop="12dp"
         android:layout_marginStart="12dp"
-        android:padding="4dp"
-        android:src="@drawable/visa"
+        android:paddingTop="10dp"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:src="@drawable/ic_cash"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:clickable="true"
         />
@@ -120,8 +129,8 @@
         app:layout_constraintRight_toLeftOf="@id/imageViewArrow"
         app:layout_constraintTop_toTopOf="@id/imageViewArrow"
         app:layout_constraintBottom_toBottomOf="@id/imageViewArrow"
-        android:text="···· ···· ···· ···· 8797"
-        android:textSize="12sp"
+        android:text="Наличные"
+        android:textSize="16sp"
         android:textColor="#303030"
         android:fontFamily="@font/g_semi_bold"
         android:gravity="center"

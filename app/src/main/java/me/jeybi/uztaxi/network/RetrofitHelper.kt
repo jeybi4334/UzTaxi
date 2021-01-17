@@ -12,7 +12,8 @@ import java.util.concurrent.TimeUnit
 class RetrofitHelper {
 
     companion object {
-        fun retrofitInstance(): Retrofit {
+
+        fun retrofitInstance(BASE_URL : String): Retrofit {
             val interceptor =  HttpLoggingInterceptor()
             interceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
             var client =
@@ -20,16 +21,17 @@ class RetrofitHelper {
 
 
             return Retrofit.Builder()
-                .baseUrl(Constants.BASE_URL)
+                .baseUrl(BASE_URL)
                 .client(client)
                 .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .build()
         }
 
-        fun apiService(): ApiClient {
-            return retrofitInstance().create(ApiClient::class.java)
+        fun apiService(BASE_URL : String): ApiClient {
+            return retrofitInstance(BASE_URL).create(ApiClient::class.java)
         }
+
     }
 
 }

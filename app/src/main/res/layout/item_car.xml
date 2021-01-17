@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="168dp"
+    android:layout_width="182dp"
     android:layout_height="68dp"
     android:layout_gravity="center"
     android:background="@drawable/bc_item_car"
@@ -10,12 +10,12 @@
 
     <ImageView
         android:id="@+id/imageViewCar"
-        android:layout_width="94dp"
-        android:layout_height="52dp"
-        android:src="@drawable/car_1"
-        android:layout_alignParentRight="true"
-        android:layout_marginRight="-24dp"
-        android:layout_marginTop="-4dp"
+        android:layout_width="96dp"
+        android:layout_height="64dp"
+        android:src="@drawable/spark"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="-28dp"
+        android:layout_marginTop="0dp"
         />
 
     <TextView
@@ -23,23 +23,23 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Econom"
-        android:fontFamily="@font/g_bold"
-        android:layout_marginTop="10dp"
+        android:fontFamily="@font/g_semi_bold"
+        android:layout_marginTop="8dp"
         android:layout_marginLeft="8dp"
-        android:textSize="18sp"
+        android:textSize="14sp"
         android:textColor="#B1B1B1"
         />
 
-    <TextView
+    <com.romainpiel.shimmer.ShimmerTextView
         android:id="@+id/textViewPrice"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/textViewTarrifName"
         android:text="from 4000 sum"
-        android:fontFamily="@font/g_regular"
-        android:layout_marginTop="6dp"
+        android:fontFamily="@font/g_bold"
+        android:layout_marginTop="4dp"
         android:layout_marginLeft="8dp"
-        android:textSize="14sp"
+        android:textSize="16sp"
         android:textColor="#B1B1B1"
         />
 

@@ -27,7 +27,7 @@ class AuthenticationPresenter(val view: AuthenticationActivity) :
             RegisterUserRequest(Constants.CONF_TYPE_SMS, phoneNumber, null, null)
 
         var sendSmsDisposable : Disposable? = null
-        sendSmsDisposable = RetrofitHelper.apiService()
+        sendSmsDisposable = RetrofitHelper.apiService(Constants.BASE_URL)
             .registerClient(Constants.HIVE_PROFILE, null, registerUserRequest)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
@@ -60,7 +60,7 @@ class AuthenticationPresenter(val view: AuthenticationActivity) :
 
     override fun resendSmsCode(onErrorListener: AuthenticationController.OnErrorListener): Disposable {
         var resendDisposable : Disposable? = null
-        resendDisposable = RetrofitHelper.apiService()
+        resendDisposable = RetrofitHelper.apiService(Constants.BASE_URL)
             .resendSmsCode(Constants.HIVE_PROFILE, USER_ID, Constants.CONF_TYPE_SMS)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
@@ -93,7 +93,7 @@ class AuthenticationPresenter(val view: AuthenticationActivity) :
         onErrorListener: AuthenticationController.OnErrorListener
     ): Disposable {
         var confirmDisposable : Disposable?=null
-        confirmDisposable = RetrofitHelper.apiService()
+        confirmDisposable = RetrofitHelper.apiService(Constants.BASE_URL)
             .confirmSmsCode(Constants.HIVE_PROFILE, USER_ID, code)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())

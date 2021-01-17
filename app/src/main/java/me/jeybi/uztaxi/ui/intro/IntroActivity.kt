@@ -83,4 +83,7 @@ class IntroActivity : FragmentActivity(),IntroController.view {
             viewPagerIntro.currentItem = viewPagerIntro.currentItem - 1
         }
     }
+
+
+
 }

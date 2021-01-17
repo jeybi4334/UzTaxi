@@ -1,212 +1,391 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/drawerLayout"
     android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#fafafa"
     android:configChanges="locale|orientation|screenSize|keyboard"
     android:windowSoftInputMode="adjustResize"
-    android:layout_height="match_parent"
-    tools:context=".ui.main.MainActivity"
-    android:background="#fafafa"
-    >
+    tools:context=".ui.main.MainActivity">
 
 
-    <com.mapbox.mapboxsdk.maps.MapView
-        android:id="@+id/mapView"
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-
-        >
-
-
-    </com.mapbox.mapboxsdk.maps.MapView>
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        >
-
-
-        <ImageView
-            android:id="@+id/imageViewCloudTop"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            app:layout_constraintTop_toTopOf="parent"
-            android:scaleType="fitXY"
-            android:src="@drawable/ic_cloud_top"
-            app:layout_constraintBottom_toTopOf="@id/guideline"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            />
-
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/guideline"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            app:layout_constraintGuide_percent="0.25" />
-
-
-        <RelativeLayout
-            android:clickable="true"
-            android:id="@+id/rvMenu"
-            android:layout_width="54dp"
-            android:layout_height="54dp"
-            android:background="@drawable/bc_btn_menu"
-            android:layout_marginTop="24dp"
-            android:layout_marginStart="16dp"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            >
-
-            <ImageView
-                android:layout_width="20dp"
-                android:layout_height="13dp"
-                android:src="@drawable/ic_menu"
-                android:layout_centerInParent="true"
-                />
-
-        </RelativeLayout>
-
-        <TextView
-            android:id="@+id/textViewCurrentAddress"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            app:layout_constraintLeft_toRightOf="@id/rvMenu"
-            app:layout_constraintRight_toLeftOf="@id/rvNotification"
-            app:layout_constraintTop_toTopOf="@id/rvNotification"
-            app:layout_constraintBottom_toBottomOf="@id/rvNotification"
-            android:layout_marginRight="12dp"
-            android:layout_marginLeft="12dp"
-            android:gravity="center"
-            android:textSize="16sp"
-            android:textColor="@color/purple_200"
-            android:fontFamily="@font/g_bold"
-            />
-
-        <RelativeLayout
-            android:clickable="true"
-            android:id="@+id/rvNotification"
-            android:layout_width="54dp"
-            android:layout_height="54dp"
-            android:background="@drawable/bc_btn_menu"
-            android:layout_marginTop="24dp"
-            android:layout_marginEnd="16dp"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            >
-
-            <ImageView
-                android:layout_width="20dp"
-                android:layout_height="18dp"
-                android:src="@drawable/ic_notification"
-                android:layout_centerInParent="true"
-                />
-
-        </RelativeLayout>
-
-
-
-        <ImageView
-            android:id="@+id/imageViewPointerShadow"
-            android:layout_width="36dp"
-            android:layout_height="24dp"
-            android:scaleType="fitXY"
-            android:src="@drawable/ellips2"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            />
-
-
-        <com.airbnb.lottie.LottieAnimationView
-            android:id="@+id/lottieAnimation"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:scaleX="0.8"
-            android:scaleY="0.8"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:lottie_fileName="pulsator.json"
-            android:layout_marginBottom="54dp"
-            android:scaleType="fitXY"
-            app:lottie_loop="true"
-            android:alpha="0.8"
-            app:lottie_speed="0.7"
-            android:visibility="gone"
-            />
+        android:background="#fafafa"
+        android:configChanges="locale|orientation|screenSize|keyboard"
+        android:windowSoftInputMode="adjustResize"
+        tools:context=".ui.main.MainActivity">
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/pointerLayout"
-            android:layout_width="48dp"
-            android:layout_height="wrap_content"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintBottom_toBottomOf="@id/imageViewPointerShadow"
-            android:layout_marginBottom="13dp"
-            >
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <com.mapbox.mapboxsdk.maps.MapView
+                android:id="@+id/mapView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                >
+
+            </com.mapbox.mapboxsdk.maps.MapView>
 
 
 
             <ImageView
-                android:id="@+id/pointerCircle"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:src="@drawable/pointer_circle"
+                android:id="@+id/imageViewCloudTop"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:scaleType="fitXY"
+                android:src="@drawable/ic_cloud_top"
+                app:layout_constraintBottom_toTopOf="@id/guideline"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layout_constraintGuide_percent="0.25" />
+
+
+            <RelativeLayout
+                android:id="@+id/rvMenu"
+                android:layout_width="54dp"
+                android:layout_height="54dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="24dp"
+                android:background="@drawable/bc_btn_menu"
+                android:clickable="true"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="13dp"
+                    android:layout_centerInParent="true"
+                    android:src="@drawable/ic_menu" />
+
+            </RelativeLayout>
+
+
+            <com.romainpiel.shimmer.ShimmerTextView
+                android:id="@+id/textViewCurrentAddress"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="12dp"
+                android:layout_marginRight="12dp"
+                android:fontFamily="@font/g_bold"
+                android:gravity="center"
+                android:textColor="@color/purple_200"
+                android:textSize="16sp"
+                app:layout_constraintBottom_toBottomOf="@id/lottieWeather"
+                app:layout_constraintLeft_toRightOf="@id/rvMenu"
+                app:layout_constraintRight_toLeftOf="@id/lottieWeather"
+                app:layout_constraintTop_toTopOf="@id/lottieWeather"
+                app:reflectionColor="@color/white" />
+
+
+            <com.airbnb.lottie.LottieAnimationView
+                android:id="@+id/lottieWeather"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:layout_marginTop="24dp"
+                android:layout_marginEnd="16dp"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:lottie_autoPlay="true"
+                app:lottie_fileName="weather_clear_sky.json"
+                app:lottie_loop="true" />
+
+            <TextView
+                android:id="@+id/textViewTemperature"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="10dp"
+                android:layout_marginBottom="8dp"
+                android:fontFamily="@font/g_semi_bold"
+                android:text="..."
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                app:layout_constraintBottom_toBottomOf="@id/lottieWeather"
+                app:layout_constraintLeft_toLeftOf="@id/lottieWeather"
+                app:layout_constraintRight_toRightOf="@id/lottieWeather" />
+
+            <TextView
+                android:id="@+id/textViewCelcium"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="1dp"
+                android:layout_marginTop="2dp"
+                android:fontFamily="@font/g_semi_bold"
+                android:text="°C"
+                android:textColor="@color/white"
+                android:textSize="8sp"
+                app:layout_constraintLeft_toRightOf="@id/textViewTemperature"
+                app:layout_constraintTop_toTopOf="@id/textViewTemperature" />
+
+
+            <ImageView
+                android:id="@+id/imageViewPointerShadow"
+                android:layout_width="36dp"
+                android:layout_height="24dp"
+                android:scaleType="fitXY"
+                android:src="@drawable/ellips2"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+
+            <com.airbnb.lottie.LottieAnimationView
+                android:id="@+id/lottieAnimation"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="54dp"
+                android:alpha="0.8"
+                android:scaleType="fitXY"
+                android:scaleX="0.8"
+                android:scaleY="0.8"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                />
+                app:lottie_fileName="pulsator.json"
+                app:lottie_loop="true"
+                app:lottie_speed="0.7" />
 
-            <ImageView
-                android:id="@+id/pointerRectangle"
-                android:layout_width="9dp"
-                android:layout_height="9dp"
-                android:src="@drawable/pointer_rectangle"
-                app:layout_constraintLeft_toLeftOf="@id/pointerCircle"
-                app:layout_constraintRight_toRightOf="@id/pointerCircle"
-                app:layout_constraintTop_toTopOf="@id/pointerCircle"
-                app:layout_constraintBottom_toBottomOf="@id/pointerCircle"
-                />
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/pointerLayout"
+                android:layout_width="48dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="13dp"
+                app:layout_constraintBottom_toBottomOf="@id/imageViewPointerShadow"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent">
 
-            <View
-                android:id="@+id/imageViewPointerFoot"
-                android:visibility="visible"
-                android:layout_width="3dp"
-                android:layout_height="24dp"
+
+                <ImageView
+                    android:id="@+id/pointerCircle"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:src="@drawable/pointer_circle"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <ImageView
+                    android:id="@+id/pointerRectangle"
+                    android:layout_width="9dp"
+                    android:layout_height="9dp"
+                    android:src="@drawable/pointer_rectangle"
+                    app:layout_constraintBottom_toBottomOf="@id/pointerCircle"
+                    app:layout_constraintLeft_toLeftOf="@id/pointerCircle"
+                    app:layout_constraintRight_toRightOf="@id/pointerCircle"
+                    app:layout_constraintTop_toTopOf="@id/pointerCircle" />
+
+                <View
+                    android:id="@+id/imageViewPointerFoot"
+                    android:layout_width="3dp"
+                    android:layout_height="24dp"
+                    android:layout_marginTop="12dp"
+                    android:background="#330246"
+                    android:scaleType="fitXY"
+                    android:visibility="visible"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/pointerRectangle" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+            <com.airbnb.lottie.LottieAnimationView
+                android:id="@+id/lottieTerrain"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginBottom="208dp"
+                android:scaleType="centerCrop"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.airbnb.lottie.LottieAnimationView
+                android:id="@+id/lottieSeason"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:scaleType="centerCrop"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/pointerRectangle"
-                android:background="#330246"
-                android:layout_marginTop="12dp"
-                android:scaleType="fitXY"
-                />
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/textViewDistance"
+                android:visibility="gone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bc_item_car"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/frameReady"
+                android:layout_marginBottom="4dp"
+                android:text="0.0 km"
+                android:paddingLeft="12dp"
+                android:paddingRight="12dp"
+                android:paddingBottom="4dp"
+                android:paddingTop="4dp"
+                android:textColor="@color/black"
+                android:fontFamily="@font/g_bold"
+                >
+
+
+
+            </TextView>
+
+            <FrameLayout
+                android:id="@+id/frameReady"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent">
+
+                <androidx.cardview.widget.CardView
+                    android:layout_marginTop="6dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:cardCornerRadius="36dp"
+                    app:cardElevation="24dp"
+                    android:layout_marginBottom="-36dp"
+                    >
+
+                    <RelativeLayout
+                        android:visibility="gone"
+                        android:id="@+id/rvReady"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        app:layout_constraintRight_toLeftOf="@id/rvCall"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/divider2"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginEnd="18dp"
+                        android:layout_marginStart="18dp"
+                        android:layout_marginBottom="42dp"
+                        android:background="@drawable/bc_button_purple"
+                        android:clickable="true"
+                        >
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerInParent="true"
+                            android:text="Готово"
+                            android:fontFamily="@font/g_bold"
+                            android:textColor="@color/white"
+                            android:textSize="16sp"
+                            />
+
+                    </RelativeLayout>
+
+                    <include
+                        android:id="@+id/modeCreateOrder"
+                        android:visibility="gone"
+                        layout="@layout/bottom_sheet_where"
+                        />
+
+                </androidx.cardview.widget.CardView>
+
+
+            </FrameLayout>
+
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="4dp"
+            android:layout_marginBottom="168dp"
+
+            >
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardGPS"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_margin="8dp"
+                app:cardBackgroundColor="@color/purple_200"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="4dp">
+
+                <ImageView
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_gps" />
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+
+                android:id="@+id/cardNext"
+                android:layout_width="84dp"
+                android:layout_height="48dp"
+                android:layout_alignParentEnd="true"
+                android:layout_margin="8dp"
+                android:clickable="true"
+                app:cardBackgroundColor="@color/purple_200"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="4dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:fontFamily="@font/g_bold"
+                    android:text="Далее"
+                    android:textColor="@color/white"
+                    android:textSize="16sp" />
+
+            </com.google.android.material.card.MaterialCardView>
+
+
+        </RelativeLayout>
+
+
+        <FrameLayout
+            android:visibility="gone"
+            android:id="@+id/bottomSheet"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:behavior_hideable="false"
+            app:behavior_peekHeight="168dp"
+            app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
 
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            <include layout="@layout/bottomsheet_map" />
+
+        </FrameLayout>
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
 
-    <FrameLayout
-        android:id="@+id/bottomSheet"
+    <com.google.android.material.navigation.NavigationView
+        android:id="@+id/navigationView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:behavior_hideable="false"
-        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
-        app:behavior_peekHeight="258dp"
-        >
+        android:layout_gravity="start"
+        android:background="@color/white" />
 
-        <include layout="@layout/bottomsheet_map" />
-
-    </FrameLayout>
-
-
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+</androidx.drawerlayout.widget.DrawerLayout>

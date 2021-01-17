@@ -12,9 +12,9 @@ class CarFoundFragment : BaseFragment() {
     }
 
     override fun onViewDidCreate(savedInstanceState: Bundle?) {
-        textViewCancel.setOnClickListener {
-            (activity as MainActivity).onRideStarted()
-        }
+//        textViewCancel.setOnClickListener {
+//            (activity as MainActivity).onRideStarted()
+//        }
     }
 
 }

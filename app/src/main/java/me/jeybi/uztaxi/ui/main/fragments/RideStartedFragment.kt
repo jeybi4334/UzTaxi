@@ -12,9 +12,9 @@ class RideStartedFragment : BaseFragment() {
     }
 
     override fun onViewDidCreate(savedInstanceState: Bundle?) {
-        rvEditRide.setOnClickListener {
-            (activity as MainActivity).editRideClicked()
-        }
+//        rvEditRide.setOnClickListener {
+//            (activity as MainActivity).editRideClicked()
+//        }
     }
 
 }

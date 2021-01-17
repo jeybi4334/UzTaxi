@@ -8,26 +8,29 @@ import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.google.android.gms.common.util.Base64Utils
+import com.mapbox.geojson.Point
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import me.jeybi.uztaxi.model.RegisterFCMRequest
+import me.jeybi.uztaxi.model.*
 import me.jeybi.uztaxi.network.RetrofitHelper
 import me.jeybi.uztaxi.utils.Constants
-import java.nio.charset.StandardCharsets
+import me.jeybi.uztaxi.utils.NaiveHmacSigner
+import me.jeybi.uztaxi.utils.PolyLineUtils
 import java.nio.charset.StandardCharsets.UTF_8
 import java.security.InvalidKeyException
 import java.security.NoSuchAlgorithmException
 import java.text.SimpleDateFormat
-import java.time.format.DateTimeFormatter.RFC_1123_DATE_TIME
 import java.util.*
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
 import kotlin.collections.ArrayList
 
+
 class MainPresenter(val view: MainActivity) : MainController.presenter {
 
     private val REQUEST_PERMISSIONS_REQUEST_CODE = 1
+
 
     override fun checkIfAuthenticated() {
         val token = view.sharedPreferences.getString(Constants.HIVE_USER_TOKEN, "")
@@ -88,78 +91,154 @@ class MainPresenter(val view: MainActivity) : MainController.presenter {
     override fun registerFCMToken(token: String): Disposable {
         var registerTokenDisposable: Disposable? = null
 
-        val DATE_FORMAT = "EEE, dd MMM yyyy HH:mm:ss ZZ"
-        val sdf = SimpleDateFormat(DATE_FORMAT)
-        sdf.timeZone = TimeZone.getTimeZone("UTC")
-        val dateTimeString: String = sdf.format(Date())
-        println(dateTimeString) // current UTC time
-
-        val timeStamp: Long = sdf.parse(dateTimeString).time //current UTC time in milisec
-
-        val cal: Calendar = Calendar.getInstance()
-        cal.setTime(Date(timeStamp))
-        cal.add(Calendar.HOUR_OF_DAY, 5)
-        cal.add(Calendar.MINUTE, 30)
-
-        val DATE = sdf.format(cal.time)
-
-        val HIVE_TOKEN = view.sharedPreferences.getString(Constants.HIVE_USER_TOKEN,"")
-        val HIVE_USER_ID = view.sharedPreferences.getLong(Constants.HIVE_USER_ID,0)
-
-        val secret = Base64Utils.decode(HIVE_TOKEN)
-
-        val nonce = System.currentTimeMillis()
-
-
-        val data = "POST" + "/api/client/mobile/1.0/registration/fcm" + DATE + nonce
-
-
-
-       val digest = Base64Utils.encode(hmac("HmacSHA256",secret,data))
-
-
-
-        Log.d("DASDASDASD","${String.format("hmac %s:%s:%s",HIVE_USER_ID, nonce, digest)}")
-
-
-        registerTokenDisposable = RetrofitHelper.apiService()
-            .registerFCM(Constants.HIVE_PROFILE, null, DATE,  String.format("hmac %s:%s:%s",HIVE_USER_ID, nonce, digest), RegisterFCMRequest(token))
+        registerTokenDisposable = RetrofitHelper.apiService(Constants.BASE_URL)
+            .registerFCM(
+                Constants.HIVE_PROFILE,
+                null,
+                NaiveHmacSigner.DateSignature(),
+                NaiveHmacSigner.AuthSignature(view.HIVE_USER_ID,view.HIVE_TOKEN,"POST","/api/client/mobile/1.0/registration/fcm")
+                , RegisterFCMRequest(token)
+            )
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribe({
-                registerTokenDisposable?.dispose()
-                Log.d("DASDASDASD","${it}")
-
+                if (it.isSuccessful){
+                    view.sharedPreferences.edit().putBoolean(Constants.PREF_FCM_REGISTERED,true).apply()
+                }
+                Log.d("DASDATOKEN", "${it}")
             }, {
-                registerTokenDisposable?.dispose()
+                Log.d("DASDATOKEN", "${it}")
 
             })
 
         return registerTokenDisposable
     }
 
-    override fun findCurrentAddress(latitude: Double, longitude: Double): Disposable {
-        var findAddressDisposable : Disposable? = null
+    override fun getUserAddresses(): Disposable {
 
-        findAddressDisposable = RetrofitHelper.apiService()
-            .getCurrentAddress(Constants.HIVE_PROFILE,"${latitude} ${longitude}")
+        var getAdressesDisposable: Disposable? = null
+
+
+        getAdressesDisposable = RetrofitHelper.apiService(Constants.BASE_URL)
+            .getClientAddresses(
+                Constants.HIVE_PROFILE,
+                NaiveHmacSigner.DateSignature(),
+                NaiveHmacSigner.AuthSignature(view.HIVE_USER_ID,view.HIVE_TOKEN,"GET","/api/client/mobile/3.0/address/client")
+            )
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribe({
 
-                when(it.code()){
-                    Constants.STATUS_SUCCESSFUL->{
-                        if (it.body()!=null)
-                            view.onAddressFound(it.body()!![0].name)
+                Log.d("DASDASDASD", "${it}")
+
+            }, {
+                Log.d("DASDASDASD", "${it}")
+            })
+
+        return getAdressesDisposable
+    }
+
+    override fun findCurrentAddress(latitude: Double, longitude: Double): Disposable {
+        var findAddressDisposable : Disposable? = null
+
+        findAddressDisposable = RetrofitHelper.apiService(Constants.BASE_URL)
+            .getCurrentAddress(Constants.HIVE_PROFILE, "${latitude} ${longitude}")
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io())
+            .subscribe({
+
+                when (it.code()) {
+                    Constants.STATUS_SUCCESSFUL -> {
+                        if (it.body() != null) {
+                            if (it.body()!!.size > 0) {
+                                var address = ""
+                                for (component in it.body()!![0].components!!){
+                                    if (component.level==7)
+                                        address = component.name
+                                    if (component.level==8)
+                                        address += ", ${component.name}"
+                                }
+                                view.onAddressFound(address)
+
+                            }
+                            else
+                                view.onAddressFound("")
+                        }
                     }
 
                 }
-            },{
+            }, {
 
             })
 
         return findAddressDisposable
     }
+
+    override fun getWeather(latitude: Double, longitude: Double): Disposable {
+        return RetrofitHelper.apiService(Constants.BASE_URL_OPENWEATHER)
+            .getWeather(latitude,longitude,Constants.WEATHER_LANG_RU,Constants.OPENWEATHERMAP_API,Constants.WEATHER_UNITS)
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io())
+            .subscribe({
+                if (it.isSuccessful&&it.body()!=null){
+                    view.onWeatherReady(it.body()!!.weather,it.body()!!.main.temp)
+                }
+            },{
+
+            })
+    }
+
+    override fun getRoute(origin: Point, destination: Point): Disposable {
+        val listCoordinates = ArrayList<RouteCoordinates>()
+        listCoordinates.add(RouteCoordinates(origin.latitude(),origin.longitude(),null))
+        listCoordinates.add(RouteCoordinates(destination.latitude(),destination.longitude(),null))
+
+        return RetrofitHelper.apiService(Constants.BASE_URL_MAPZEN)
+            .getRoute(GetRouteRequest(listCoordinates,"auto","ru-RU","none"))
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io())
+            .subscribe({
+                if (it.isSuccessful&&it.body()!=null){
+                    val decoded = PolyLineUtils.decode(it.body()!!.trip.legs[0].shape,6)
+                    view.drawRoute(decoded)
+                }
+            },{
+
+            })
+
+    }
+
+    override fun getAvailableCars(latitude: Double, longitude: Double,tariff : Long): Disposable {
+        return RetrofitHelper.apiService(Constants.BASE_URL)
+            .getAvailableCars(Constants.HIVE_PROFILE,
+                "$latitude $longitude",
+                GetCarsRequest(CarPaymentMethod("cash"),tariff))
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({
+                if (it.isSuccessful){
+                    view.onCarsAvailabe(it.body()!!)
+                }
+            },{
+
+            })
+    }
+
+    override fun getAvailableService(latitude: Double, longitude: Double): Disposable {
+        return RetrofitHelper.apiService(Constants.BASE_URL)
+            .getAvailableService(Constants.HIVE_PROFILE,"$latitude $longitude")
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io())
+            .subscribe({
+                if (it.isSuccessful){
+                    view.onTariffsReady(it.body()!!.tariffs)
+                }
+            },{
+
+            })
+    }
+
+
 
 
     @Throws(NoSuchAlgorithmException::class, InvalidKeyException::class)
@@ -167,7 +246,7 @@ class MainPresenter(val view: MainActivity) : MainController.presenter {
         val mac: Mac = Mac.getInstance(algorithm)
         val spec = SecretKeySpec(secret, algorithm)
         mac.init(spec)
-        return mac.doFinal( data.toByteArray(UTF_8))
+        return mac.doFinal(data.toByteArray(UTF_8))
     }
 
 }

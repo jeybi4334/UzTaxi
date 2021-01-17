@@ -13,9 +13,9 @@ class EditRideFragment : BaseFragment() {
     }
 
     override fun onViewDidCreate(savedInstanceState: Bundle?) {
-        rvCancelRide.setOnClickListener {
-            (activity as MainActivity).onCancelRideClicked()
-        }
+//        rvCancelRide.setOnClickListener {
+//            (activity as MainActivity).onCancelRideClicked()
+//        }
 
     }
 

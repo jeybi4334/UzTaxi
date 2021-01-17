@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    android:id="@+id/bottomSheet"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:behavior_hideable="true"
+    app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:cardCornerRadius="24dp"
+        app:cardElevation="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="-24dp"
+
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            >
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@drawable/bc_search"
+                android:layout_marginTop="16dp"
+                android:layout_marginStart="18dp"
+                android:layout_marginEnd="18dp"
+                >
+
+                <ImageView
+                    android:id="@+id/imageSearch"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:src="@drawable/ic_search"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="20dp"
+                    />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_toLeftOf="@id/imageMap"
+                    android:layout_height="wrap_content"
+                    android:text="Поиск адреса"
+                    android:maxLines="1"
+                    android:imeOptions="actionSearch"
+                    android:inputType="textLongMessage"
+                    android:layout_toRightOf="@id/imageSearch"
+                    android:fontFamily="@font/g_bold"
+                    android:textColor="@color/purple_200"
+                    android:alpha="0.9"
+                    android:textSize="16sp"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="24dp"
+                    />
+
+
+                <ImageView
+                    android:id="@+id/imageMap"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:padding="15dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:src="@drawable/ic_map_small"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginEnd="5dp"
+                    />
+
+            </RelativeLayout>
+
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerViewSearch"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingTop="16dp"
+                android:paddingBottom="36dp"
+                android:clipToPadding="false"
+                />
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+</FrameLayout>

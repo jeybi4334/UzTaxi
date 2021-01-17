@@ -12,9 +12,9 @@ class CarSearchFragment : BaseFragment() {
     }
 
     override fun onViewDidCreate(savedInstanceState: Bundle?) {
-        rvCancel.setOnClickListener {
-            (activity as MainActivity).onCancelSearchClicked()
-        }
+//        rvCancel.setOnClickListener {
+//            (activity as MainActivity).onCancelSearchClicked()
+//        }
     }
 
 
