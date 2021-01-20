@@ -171,7 +171,7 @@
         android:layout_marginRight="16dp"
         app:layout_constraintTop_toTopOf="@id/imageViewFilterCar"
         app:layout_constraintBottom_toBottomOf="@id/imageViewFilterCar"
-        android:background="@drawable/bc_button_purple"
+        android:background="@drawable/bc_button_purple_disabled"
         android:overScrollMode="never"
         android:clickable="true"
         >

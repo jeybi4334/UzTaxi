@@ -63,12 +63,42 @@ class Constants {
         val MODE_SEARCH_WHERE = 1001
         val MODE_DESTINATION_PICK = 1002
         val MODE_CREATE_ORDER = 1003
+        val MODE_CAR_SEARCH = 10004
 
-        val ORDER_STATUS_CREATED = 1
-        val ORDER_STATUS_APPOINTED = 2
-        val ORDER_STATUS_CAR_COMING = 3
-        val ORDER_STATUS_IN_PROCESS = 4
-        val ORDER_STATUS_RESERVED = 7
+
+        val ORDER_STATUS_RECIEVER = "me.jeybi.uztaxi.utils.ORDER_STATUS_RECEIVER"
+
+        val ORDER_STATUS = "order_status"
+        val ORDER_ID = "order_id"
+
+
+        val ORDER_STATUS_CREATED = "order-created"
+        val ORDER_STATUS_CHANGED = "order-changed"
+        val ORDER_STATUS_DRIVER_ASSIGNED = "order-assigned"
+        val ORDER_STATUS_DRIVER_DELAY = "order-driver-delay"
+        val ORDER_STATUS_DRIVER_ARRIVED = "order-driver-arrived"
+        val ORDER_STATUS_EXECUTING = "order-executing"
+        val ORDER_STATUS_DRIVER_UNASSIGNED = "order-unassigned"
+        val ORDER_STATUS_ORDER_COMPLETED = "order-completed"
+        val ORDER_STATUS_BONUS_ADDED = "order-bonus-deposit"
+        val ORDER_STATUS_BONUS_WITHDRAWN = "order-bonus-withdrawal"
+        val ORDER_STATUS_CANCELLED = "order-cancelled"
+        val ORDER_STATUS_PAID_WAITING_BEGAN = "order-payed-waiting"
+        val ORDER_STATUS_CHAT_REQUEST = "chat-join-request"
+
+
+        val ORDER_STATE_CREATED = 1
+        val ORDER_STATE_ASSIGNED = 2
+        val ORDER_STATE_DRIVER_CAME = 3
+        val ORDER_STATE_EXECUTING = 4
+        val ORDER_STATE_COMPLETED = 5
+        val ORDER_STATE_CANCELLED = 6
+        val ORDER_STATE_BOOKED = 7
+
+
+
+
+
 
         val CAR_TYPE_SPARK = "carType_1"
         val CAR_TYPE_4 = "carType_4"

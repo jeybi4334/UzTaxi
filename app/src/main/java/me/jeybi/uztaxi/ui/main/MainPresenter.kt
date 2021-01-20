@@ -96,14 +96,19 @@ class MainPresenter(val view: MainActivity) : MainController.presenter {
                 Constants.HIVE_PROFILE,
                 null,
                 NaiveHmacSigner.DateSignature(),
-                NaiveHmacSigner.AuthSignature(view.HIVE_USER_ID,view.HIVE_TOKEN,"POST","/api/client/mobile/1.0/registration/fcm")
-                , RegisterFCMRequest(token)
+                NaiveHmacSigner.AuthSignature(
+                    view.HIVE_USER_ID,
+                    view.HIVE_TOKEN,
+                    "POST",
+                    "/api/client/mobile/1.0/registration/fcm"
+                ), RegisterFCMRequest(token)
             )
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribe({
-                if (it.isSuccessful){
-                    view.sharedPreferences.edit().putBoolean(Constants.PREF_FCM_REGISTERED,true).apply()
+                if (it.isSuccessful) {
+                    view.sharedPreferences.edit().putBoolean(Constants.PREF_FCM_REGISTERED, true)
+                        .apply()
                 }
                 Log.d("DASDATOKEN", "${it}")
             }, {
@@ -123,7 +128,12 @@ class MainPresenter(val view: MainActivity) : MainController.presenter {
             .getClientAddresses(
                 Constants.HIVE_PROFILE,
                 NaiveHmacSigner.DateSignature(),
-                NaiveHmacSigner.AuthSignature(view.HIVE_USER_ID,view.HIVE_TOKEN,"GET","/api/client/mobile/3.0/address/client")
+                NaiveHmacSigner.AuthSignature(
+                    view.HIVE_USER_ID,
+                    view.HIVE_TOKEN,
+                    "GET",
+                    "/api/client/mobile/3.0/address/client"
+                )
             )
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
@@ -139,7 +149,7 @@ class MainPresenter(val view: MainActivity) : MainController.presenter {
     }
 
     override fun findCurrentAddress(latitude: Double, longitude: Double): Disposable {
-        var findAddressDisposable : Disposable? = null
+        var findAddressDisposable: Disposable? = null
 
         findAddressDisposable = RetrofitHelper.apiService(Constants.BASE_URL)
             .getCurrentAddress(Constants.HIVE_PROFILE, "${latitude} ${longitude}")
@@ -152,16 +162,15 @@ class MainPresenter(val view: MainActivity) : MainController.presenter {
                         if (it.body() != null) {
                             if (it.body()!!.size > 0) {
                                 var address = ""
-                                for (component in it.body()!![0].components!!){
-                                    if (component.level==7)
+                                for (component in it.body()!![0].components!!) {
+                                    if (component.level == 7)
                                         address = component.name
-                                    if (component.level==8)
+                                    if (component.level == 8)
                                         address += ", ${component.name}"
                                 }
                                 view.onAddressFound(address)
 
-                            }
-                            else
+                            } else
                                 view.onAddressFound("")
                         }
                     }
@@ -176,69 +185,167 @@ class MainPresenter(val view: MainActivity) : MainController.presenter {
 
     override fun getWeather(latitude: Double, longitude: Double): Disposable {
         return RetrofitHelper.apiService(Constants.BASE_URL_OPENWEATHER)
-            .getWeather(latitude,longitude,Constants.WEATHER_LANG_RU,Constants.OPENWEATHERMAP_API,Constants.WEATHER_UNITS)
+            .getWeather(
+                latitude,
+                longitude,
+                Constants.WEATHER_LANG_RU,
+                Constants.OPENWEATHERMAP_API,
+                Constants.WEATHER_UNITS
+            )
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribe({
-                if (it.isSuccessful&&it.body()!=null){
-                    view.onWeatherReady(it.body()!!.weather,it.body()!!.main.temp)
+                if (it.isSuccessful && it.body() != null) {
+                    view.onWeatherReady(it.body()!!.weather, it.body()!!.main.temp)
                 }
-            },{
+            }, {
 
             })
     }
 
     override fun getRoute(origin: Point, destination: Point): Disposable {
         val listCoordinates = ArrayList<RouteCoordinates>()
-        listCoordinates.add(RouteCoordinates(origin.latitude(),origin.longitude(),null))
-        listCoordinates.add(RouteCoordinates(destination.latitude(),destination.longitude(),null))
+        listCoordinates.add(RouteCoordinates(origin.latitude(), origin.longitude(), null))
+        listCoordinates.add(RouteCoordinates(destination.latitude(), destination.longitude(), null))
 
         return RetrofitHelper.apiService(Constants.BASE_URL_MAPZEN)
-            .getRoute(GetRouteRequest(listCoordinates,"auto","ru-RU","none"))
+            .getRoute(GetRouteRequest(listCoordinates, "auto", "ru-RU", "none"))
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribe({
-                if (it.isSuccessful&&it.body()!=null){
-                    val decoded = PolyLineUtils.decode(it.body()!!.trip.legs[0].shape,6)
+                if (it.isSuccessful && it.body() != null) {
+                    val decoded = PolyLineUtils.decode(it.body()!!.trip.legs[0].shape, 6)
                     view.drawRoute(decoded)
                 }
-            },{
+            }, {
 
             })
 
     }
 
-    override fun getAvailableCars(latitude: Double, longitude: Double,tariff : Long): Disposable {
+    override fun getAvailableCars(latitude: Double, longitude: Double, tariff: Long): Disposable {
         return RetrofitHelper.apiService(Constants.BASE_URL)
-            .getAvailableCars(Constants.HIVE_PROFILE,
+            .getAvailableCars(
+                Constants.HIVE_PROFILE,
                 "$latitude $longitude",
-                GetCarsRequest(CarPaymentMethod("cash"),tariff))
+                GetCarsRequest(CarPaymentMethod("cash"), tariff)
+            )
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
-                if (it.isSuccessful){
+                if (it.isSuccessful) {
                     view.onCarsAvailabe(it.body()!!)
                 }
-            },{
+            }, {
 
             })
     }
 
     override fun getAvailableService(latitude: Double, longitude: Double): Disposable {
         return RetrofitHelper.apiService(Constants.BASE_URL)
-            .getAvailableService(Constants.HIVE_PROFILE,"$latitude $longitude")
+            .getAvailableService(Constants.HIVE_PROFILE, "$latitude $longitude")
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribe({
-                if (it.isSuccessful){
+                if (it.isSuccessful) {
                     view.onTariffsReady(it.body()!!.tariffs)
                 }
-            },{
+            }, {
 
             })
     }
 
+    override fun getPaymentMethods(latitude: Double, longitude: Double): Disposable {
+        return RetrofitHelper.apiService(Constants.BASE_URL)
+            .getPaymentOptions(Constants.HIVE_PROFILE, "$latitude $longitude")
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io())
+            .subscribe({
+                if (it.isSuccessful && it.body() != null) {
+                    view.onPaymentMethodsReady(it.body()!!)
+                }
+            }, {
 
+            })
+    }
+
+    override fun createOrder(createOrderRequest: CreateOrderRequest): Disposable {
+        return RetrofitHelper.apiService(Constants.BASE_URL)
+            .createOrder(
+                Constants.HIVE_PROFILE,
+                NaiveHmacSigner.DateSignature(),
+                NaiveHmacSigner.AuthSignature(
+                    view.HIVE_USER_ID,
+                    view.HIVE_TOKEN,
+                    "POST",
+                    "/api/client/mobile/4.0/orders"
+                ),
+                createOrderRequest
+            )
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io())
+            .subscribe({
+                if (it.isSuccessful && it.body() != null) {
+                    Log.d("DASDASDASDSADS", "${it.body()}")
+                    view.onOrderCreated(it.body()!!.id)
+                }
+            }, {
+                Log.d("DASDASDASDSADS", "${it}")
+            })
+    }
+
+    override fun getOngoingOrder(): Disposable {
+        return RetrofitHelper.apiService(Constants.BASE_URL)
+            .getClientOrders(
+                Constants.HIVE_PROFILE,
+                NaiveHmacSigner.DateSignature(),
+                NaiveHmacSigner.AuthSignature(
+                    view.HIVE_USER_ID,
+                    view.HIVE_TOKEN,
+                    "GET",
+                    "/api/client/mobile/2.0/orders"
+                )
+            )
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io())
+            .subscribe({
+                if (it.isSuccessful && it.body() != null) {
+                    if (it.body()!!.size>0){
+                        view.onOnGoingOrderFound(it.body()!![0])
+                    }
+                }
+            }, {
+
+            })
+    }
+
+    override fun getOrderInfo(): Disposable {
+        TODO("Not yet implemented")
+    }
+
+    override fun cancelOrder(orderID: Long): Disposable {
+        return RetrofitHelper.apiService(Constants.BASE_URL)
+            .cancelOrder(
+                Constants.HIVE_PROFILE,
+                NaiveHmacSigner.DateSignature(),
+                NaiveHmacSigner.AuthSignature(
+                    view.HIVE_USER_ID,
+                    view.HIVE_TOKEN,
+                    "DELETE",
+                    "/api/client/mobile/1.0/orders/$orderID"
+                ),
+                orderID
+            ).observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io())
+            .subscribe({
+                if (it.isSuccessful) {
+                    view.onOrderCancelled()
+                }
+            }, {
+
+            })
+
+    }
 
 
     @Throws(NoSuchAlgorithmException::class, InvalidKeyException::class)

@@ -24,8 +24,10 @@ import me.jeybi.uztaxi.ui.adapters.SearchAdapter
 import me.jeybi.uztaxi.ui.main.MainActivity
 import me.jeybi.uztaxi.ui.main.MainController
 import me.jeybi.uztaxi.utils.Constants
+import me.jeybi.uztaxi.utils.NaiveHmacSigner
 
-class SearchFragment : BaseFragment(), SearchAdapter.SearchItemClickListener,MainController.SearchCancelListener{
+class SearchFragment : BaseFragment(), SearchAdapter.SearchItemClickListener,
+    MainController.SearchCancelListener {
 
     override fun setLayoutId(): Int {
         return R.layout.bottom_sheet_search
@@ -38,6 +40,7 @@ class SearchFragment : BaseFragment(), SearchAdapter.SearchItemClickListener,Mai
 
         recyclerViewSearchHistory.layoutManager = LinearLayoutManager(activity)
 
+        loadOrdersHistory()
 
         rvWhereTo.setOnClickListener {
             editTextSearch.isFocusable = true
@@ -52,15 +55,48 @@ class SearchFragment : BaseFragment(), SearchAdapter.SearchItemClickListener,Mai
 
         }
 
+
+        rvDelivery.setOnClickListener {
+            Log.d("DASDASDASDASDA", "${NaiveHmacSigner.DateSignature()}")
+            Log.d(
+                "DASDASDASDASDA",
+                "${
+                    NaiveHmacSigner.AuthSignature(
+                        (activity as MainActivity).HIVE_USER_ID,
+                        (activity as MainActivity).HIVE_TOKEN,
+                        "POST",
+                        "/api/client/mobile/4.0/orders"
+                    )
+                }"
+            )
+            Log.d("DASDASDASDASDA", "${NaiveHmacSigner.DateSignature()}")
+            Log.d(
+                "DASDASDASDASDA",
+                "${
+                    NaiveHmacSigner.AuthSignature(
+                        (activity as MainActivity).HIVE_USER_ID,
+                        (activity as MainActivity).HIVE_TOKEN,
+                        "DELETE",
+                        "/api/client/mobile/1.0/orders/63000340293148"
+                    )
+                }"
+            )
+
+
+        }
 //        fillRecyclerViewWithDemoData()
 
-        editTextSearch.addTextChangedListener(object : TextWatcher{
+        rvAddAddress.setOnClickListener {
+            (activity as MainActivity).onAddAddressClicked()
+        }
+
+        editTextSearch.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
 
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                if (count>1&&s!=null){
+                if (count > 1 && s != null) {
                     searchGeocode(s.toString())
                 }
             }
@@ -96,6 +132,42 @@ class SearchFragment : BaseFragment(), SearchAdapter.SearchItemClickListener,Mai
 
     }
 
+    private fun loadOrdersHistory() {
+        progressBarSearch.visibility = View.VISIBLE
+        searchDisposables.add(
+            RetrofitHelper.apiService(Constants.BASE_URL)
+                .getAddressHistory(
+                    Constants.HIVE_PROFILE,
+                    NaiveHmacSigner.DateSignature(),
+                    NaiveHmacSigner.AuthSignature(
+                        (activity as MainActivity).HIVE_USER_ID,
+                        (activity as MainActivity).HIVE_TOKEN,
+                        "GET",
+                        "/api/client/mobile/2.0/history"
+                    )
+                )
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe({
+                    if (it.isSuccessful&&it.body()!=null) {
+                        textViewNoAddress.visibility = View.GONE
+                        val addresses = ArrayList<SearchedAddress>()
+                        for (item in it.body()!!){
+                            for (address in item.route){
+                                addresses.add(address)
+                            }
+                        }
+                        recyclerViewSearchHistory.adapter = SearchAdapter(addresses,this)
+                    }
+                    progressBarSearch.visibility = View.GONE
+//                    textViewNoAddress.visibility = View.GONE
+                }, {
+                    progressBarSearch.visibility = View.GONE
+//                    textViewNoAddress.visibility = View.GONE
+                })
+        )
+    }
+
     private fun searchGeocode(keyWord: String) {
         progressBarSearch.visibility = View.VISIBLE
         textViewNoAddress.visibility = View.GONE
@@ -112,15 +184,15 @@ class SearchFragment : BaseFragment(), SearchAdapter.SearchItemClickListener,Mai
                 .subscribe({
                     when (it.code()) {
                         Constants.STATUS_SUCCESSFUL -> {
-                            Log.d("ADASD","SUCCESS ")
-                            if (it.body()!=null&&it.body()!!.size>0){
+                            Log.d("ADASD", "SUCCESS ")
+                            if (it.body() != null && it.body()!!.size > 0) {
                                 progressBarSearch.visibility = View.GONE
-                                recyclerViewSearchHistory.adapter = SearchAdapter(it.body()!!,this)
-                            }else{
+                                recyclerViewSearchHistory.adapter = SearchAdapter(it.body()!!, this)
+                            } else {
                                 onCouldntFindAnything()
                             }
                         }
-                        Constants.STATUS_BAD_REQUEST->{
+                        Constants.STATUS_BAD_REQUEST -> {
                             onCouldntFindAnything()
                         }
                     }
@@ -132,7 +204,7 @@ class SearchFragment : BaseFragment(), SearchAdapter.SearchItemClickListener,Mai
 
     }
 
-    private fun onCouldntFindAnything(){
+    private fun onCouldntFindAnything() {
         progressBarSearch.visibility = View.GONE
         textViewNoAddress.visibility = View.VISIBLE
         textViewNoAddress.text = "Мы не смогли найти ничего по вашему запросу :("
@@ -147,9 +219,8 @@ class SearchFragment : BaseFragment(), SearchAdapter.SearchItemClickListener,Mai
     }
 
 
-
-    override fun onSearchClicked(latitude: Double, longitude: Double,title : String) {
-        (activity as MainActivity).onBottomSheetSearchItemClicked(latitude,longitude,title)
+    override fun onSearchClicked(latitude: Double, longitude: Double, title: String) {
+        (activity as MainActivity).onBottomSheetSearchItemClicked(latitude, longitude, title)
     }
 
     override fun onSearchCancel() {

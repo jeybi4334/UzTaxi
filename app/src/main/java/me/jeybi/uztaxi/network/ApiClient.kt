@@ -47,7 +47,7 @@ interface ApiClient {
     @Headers("Accept-Language: ru")
     fun getPaymentOptions(@Header("Hive-Profile") hive_profile : String,
                             @Header("X-Hive-GPS-Position") hive_gps : String?
-    ): Single<ArrayList<PaymentMethod>>
+    ): Single<Response<ArrayList<PaymentMethod>>>
 
     @GET("client/mobile/1.0/account")
     @Headers("Accept-Language: ru")
@@ -71,23 +71,6 @@ interface ApiClient {
                      @Header("Authentication") hmac : String,
                      @Body promocodeRequest: PromocodeRequest
     ): Single<Response<PromocodeResponse>>
-
-    @POST("client/mobile/4.2/orders")
-    @Headers("Accept-Language: ru")
-    fun createOrder(@Header("Hive-Profile") hive_profile : String,
-                     @Header("Date") date : String,
-                     @Header("Authentication") hmac : String,
-                     @Body createOrderRequest: CreateOrderRequest
-    ): Single<Response<CreateOrderResponse>>
-
-    @GET("client/mobile/2.2/orders")
-    @Headers("Accept-Language: ru","Content-Type: application/json; charset=utf-8")
-    fun getClientOrders(@Header("Hive-Profile") hive_profile : String,
-                           @Header("Date") date : String,
-                           @Header("Authentication") hmac : String
-    ): Single<Response<ArrayList<ShortOrderInfo>>>
-
-
 
     @POST("client/mobile/2.0/drivers")
     @Headers("Accept-Language: ru")
@@ -136,8 +119,44 @@ interface ApiClient {
 
 
 
+    @POST("client/mobile/4.0/orders")
+    @Headers("Accept-Language: ru")
+    fun createOrder(@Header("Hive-Profile") hive_profile : String,
+                    @Header("Date") date : String,
+                    @Header("Authentication") hmac : String,
+                    @Body createOrderRequest: CreateOrderRequest
+    ): Single<Response<CreateOrderResponse>>
+
+    @DELETE("client/mobile/1.0/orders/{id}")
+    @Headers("Accept-Language: ru")
+    fun cancelOrder(@Header("Hive-Profile") hive_profile : String,
+                    @Header("Date") date : String,
+                    @Header("Authentication") hmac : String,
+                    @Path("id") id : Long
+    ): Single<Response<EmptyModel>>
 
 
+    @GET("client/mobile/2.0/orders")
+    @Headers("Accept-Language: ru","Content-Type: application/json; charset=utf-8")
+    fun getClientOrders(@Header("Hive-Profile") hive_profile : String,
+                        @Header("Date") date : String,
+                        @Header("Authentication") hmac : String
+    ): Single<Response<ArrayList<ShortOrderInfo>>>
+
+
+    @GET("client/mobile/2.0/history?offset=0&length=16")
+    @Headers("Accept-Language: ru","Content-Type: application/json; charset=utf-8")
+    fun getAddressHistory(@Header("Hive-Profile") hive_profile : String,
+                        @Header("Date") date : String,
+                        @Header("Authentication") hmac : String,
+    ): Single<Response<ArrayList<ShortOrderInfo>>>
+
+    @GET("client/mobile/2.1/bonuses")
+    @Headers("Accept-Language: ru","Content-Type: application/json; charset=utf-8")
+    fun getBonuses(@Header("Hive-Profile") hive_profile : String,
+                        @Header("Date") date : String,
+                        @Header("Authentication") hmac : String,
+    ): Single<Response<BonusResponse>>
 
 
 

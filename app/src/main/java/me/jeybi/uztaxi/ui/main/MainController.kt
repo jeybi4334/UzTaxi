@@ -28,7 +28,18 @@ interface MainController {
 
         fun onTariffsReady(tariffs : ArrayList<ServiceTariff>)
 
+        fun onPaymentMethodsReady(paymentMethods : ArrayList<PaymentMethod>)
+
         fun onCarsAvailabe(data : ArrayList<GetCarResponse>)
+
+        fun onAddAddressClicked()
+
+        fun onOrderCreated(orderID : Long)
+
+        fun onOrderCancelled()
+
+        fun onOnGoingOrderFound(shortOrderInfo: ShortOrderInfo)
+
     }
     interface presenter{
 
@@ -48,8 +59,15 @@ interface MainController {
 
         fun getAvailableService(latitude: Double,longitude: Double) : Disposable
 
-//        fun estimateRoute(startPoint : Point,endPoint : Point) : Disposable
+        fun getPaymentMethods(latitude: Double,longitude: Double) : Disposable
 
+        fun createOrder(createOrderRequest: CreateOrderRequest) : Disposable
+
+        fun getOngoingOrder() : Disposable
+
+        fun getOrderInfo() : Disposable
+
+        fun cancelOrder(orderID: Long) : Disposable
     }
 
     interface SearchCancelListener{

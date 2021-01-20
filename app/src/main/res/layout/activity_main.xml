@@ -300,6 +300,12 @@
                         layout="@layout/bottom_sheet_where"
                         />
 
+                    <include
+                        android:id="@+id/modeSearchCar"
+                        android:visibility="gone"
+                        layout="@layout/bottom_sheet_car_search"
+                        />
+
                 </androidx.cardview.widget.CardView>
 
 

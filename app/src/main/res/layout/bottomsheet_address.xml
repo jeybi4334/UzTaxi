@@ -3,10 +3,11 @@
     android:id="@+id/bottomSheet"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     app:behavior_hideable="true"
-    app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+    app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
+    >
 
 
     <androidx.cardview.widget.CardView
@@ -43,11 +44,13 @@
                     android:layout_marginStart="20dp"
                     />
 
-                <TextView
+                <EditText
+                    android:id="@+id/editTextSearch"
                     android:layout_width="match_parent"
                     android:layout_toLeftOf="@id/imageMap"
                     android:layout_height="wrap_content"
-                    android:text="Поиск адреса"
+                    android:background="@android:color/transparent"
+                    android:hint="Поиск адреса"
                     android:maxLines="1"
                     android:imeOptions="actionSearch"
                     android:inputType="textLongMessage"
@@ -57,7 +60,7 @@
                     android:alpha="0.9"
                     android:textSize="16sp"
                     android:layout_centerVertical="true"
-                    android:layout_marginStart="24dp"
+                    android:layout_marginStart="12dp"
                     />
 
 
@@ -74,6 +77,27 @@
                     />
 
             </RelativeLayout>
+
+            <TextView
+                android:id="@+id/textViewNoAddress"
+                android:visibility="gone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="32dp"
+                android:text="Адрес не найден"
+                android:fontFamily="@font/g_regular"
+                android:textColor="@color/black"
+                />
+
+            <ProgressBar
+                android:id="@+id/progressBarSearch"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_gravity="center"
+                android:layout_marginTop="32dp"
+                android:visibility="gone"
+                />
 
 
             <androidx.recyclerview.widget.RecyclerView

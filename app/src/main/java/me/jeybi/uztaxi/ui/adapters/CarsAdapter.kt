@@ -15,6 +15,7 @@ import kotlinx.android.synthetic.main.item_car.view.*
 import me.jeybi.uztaxi.R
 import me.jeybi.uztaxi.model.SearchItemModel
 import me.jeybi.uztaxi.model.ServiceTariff
+import me.jeybi.uztaxi.model.TariffOption
 import me.jeybi.uztaxi.utils.Constants
 import java.text.DecimalFormat
 
@@ -28,6 +29,7 @@ class CarsAdapter(val items : ArrayList<ServiceTariff>, val listener : TariffCli
     }
 
     override fun onBindViewHolder(holder: CarsHolder, position: Int) {
+        holder.itemView.tag = "${position}"
         val item = items[position]
 
         holder.textViewTarrifName.text = item.name
@@ -55,8 +57,10 @@ class CarsAdapter(val items : ArrayList<ServiceTariff>, val listener : TariffCli
 
         holder.textViewPrice.text = "от ${decimalFormat.format(item.minCost)} сум"
         holder.itemView.setOnClickListener {
-            listener.onTariffChosen(item.id,shimmer,holder.textViewPrice)
+
+            listener.onTariffChosen(item.id,shimmer,holder.textViewPrice,item.options)
             shimmer.start(holder.textViewPrice)
+
 
             holder.itemView.setBackgroundResource(R.drawable.bc_item_car_selected)
             holder.itemView.textViewTarrifName.setTextColor(Color.BLACK)
@@ -64,7 +68,7 @@ class CarsAdapter(val items : ArrayList<ServiceTariff>, val listener : TariffCli
 
             holder.textViewPrice.text = "Оценивает..."
 
-            if (previousItem!=null){
+            if (previousItem!=null&& previousItem!!.tag != holder.itemView.tag){
                 previousItem!!.setBackgroundResource(R.drawable.bc_item_car)
                 previousItem!!.findViewById<TextView>(R.id.textViewTarrifName).setTextColor(Color.parseColor("#B1B1B1"))
                 previousItem!!.findViewById<TextView>(R.id.textViewPrice).setTextColor(Color.parseColor("#B1B1B1"))
@@ -86,6 +90,6 @@ class CarsAdapter(val items : ArrayList<ServiceTariff>, val listener : TariffCli
     }
 
     interface TariffClickListener{
-        fun onTariffChosen(tariffID : Long,shimmer: Shimmer,textViewPrice : ShimmerTextView)
+        fun onTariffChosen(tariffID : Long ,shimmer: Shimmer,textViewPrice : ShimmerTextView, options : ArrayList<TariffOption>)
     }
 }

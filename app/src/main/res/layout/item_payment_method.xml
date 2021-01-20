@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:background="?attr/selectableItemBackground"
+    android:id="@+id/parentPaymentMethod"
+    >
+
+    <ImageView
+        android:id="@+id/imageViewPaymentMethod"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/recyclerViewCars"
+        android:layout_marginTop="4dp"
+        android:layout_marginStart="12dp"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:src="@drawable/ic_cash"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:clickable="true"
+        />
+
+    <TextView
+        android:id="@+id/textViewPaymentType"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="wrap_content"
+        android:text="Наличные"
+        android:textSize="18sp"
+        android:textColor="#303030"
+        android:fontFamily="@font/g_semi_bold"
+        android:gravity="start"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:layout_marginStart="12dp"
+        />
+
+    <ImageView
+        android:id="@+id/imageViewDone"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginEnd="8dp"
+        android:src="@drawable/ic_done"
+        android:padding="12dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:clickable="true"
+        />
+
+</LinearLayout>
