@@ -183,6 +183,30 @@ class MainPresenter(val view: MainActivity) : MainController.presenter {
         return findAddressDisposable
     }
 
+    override fun getBonuses(latitude: Double, longitude: Double): Disposable {
+        return RetrofitHelper.apiService(Constants.BASE_URL)
+            .getBonuses(
+                "${latitude} ${longitude}",
+                Constants.HIVE_PROFILE,
+                NaiveHmacSigner.DateSignature(),
+                NaiveHmacSigner.AuthSignature(
+                    view.HIVE_USER_ID,
+                    view.HIVE_TOKEN,
+                    "GET",
+                    "/api/client/mobile/2.1/bonuses"
+                )
+            )
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io())
+            .subscribe({
+                if (it.isSuccessful&&it.body()!=null){
+                    view.onBonusReady(it.body()!!.balance)
+                }
+            }, {
+
+            })
+    }
+
     override fun getWeather(latitude: Double, longitude: Double): Disposable {
         return RetrofitHelper.apiService(Constants.BASE_URL_OPENWEATHER)
             .getWeather(
@@ -203,7 +227,7 @@ class MainPresenter(val view: MainActivity) : MainController.presenter {
             })
     }
 
-    override fun getRoute(origin: Point, destination: Point): Disposable {
+    override fun getRoute(origin: Point, destination: Point, driverRoute: Boolean): Disposable {
         val listCoordinates = ArrayList<RouteCoordinates>()
         listCoordinates.add(RouteCoordinates(origin.latitude(), origin.longitude(), null))
         listCoordinates.add(RouteCoordinates(destination.latitude(), destination.longitude(), null))
@@ -215,10 +239,15 @@ class MainPresenter(val view: MainActivity) : MainController.presenter {
             .subscribe({
                 if (it.isSuccessful && it.body() != null) {
                     val decoded = PolyLineUtils.decode(it.body()!!.trip.legs[0].shape, 6)
-                    view.drawRoute(decoded)
+                    if (!driverRoute)
+                        view.drawRoute(decoded)
+                    else if (driverRoute&&it.body()!!.trip.summary.length>1.0)
+                        view.drawDriverRoute(decoded,origin)
+                }else{
+                    view.onErrorGetRoute()
                 }
             }, {
-
+                view.onErrorGetRoute()
             })
 
     }
@@ -242,6 +271,7 @@ class MainPresenter(val view: MainActivity) : MainController.presenter {
     }
 
     override fun getAvailableService(latitude: Double, longitude: Double): Disposable {
+
         return RetrofitHelper.apiService(Constants.BASE_URL)
             .getAvailableService(Constants.HIVE_PROFILE, "$latitude $longitude")
             .observeOn(AndroidSchedulers.mainThread())
@@ -288,9 +318,11 @@ class MainPresenter(val view: MainActivity) : MainController.presenter {
                 if (it.isSuccessful && it.body() != null) {
                     Log.d("DASDASDASDSADS", "${it.body()}")
                     view.onOrderCreated(it.body()!!.id)
+                }else{
+                    view.onErrorCreateOrder()
                 }
             }, {
-                Log.d("DASDASDASDSADS", "${it}")
+                view.onErrorCreateOrder()
             })
     }
 
@@ -310,8 +342,10 @@ class MainPresenter(val view: MainActivity) : MainController.presenter {
             .subscribeOn(Schedulers.io())
             .subscribe({
                 if (it.isSuccessful && it.body() != null) {
-                    if (it.body()!!.size>0){
+                    if (it.body()!!.size > 0) {
                         view.onOnGoingOrderFound(it.body()!![0])
+                    }else{
+                        view.onNoGoingOrder()
                     }
                 }
             }, {
@@ -319,9 +353,46 @@ class MainPresenter(val view: MainActivity) : MainController.presenter {
             })
     }
 
-    override fun getOrderInfo(): Disposable {
-        TODO("Not yet implemented")
+    override fun notifyDriver(orderID : Long): Disposable {
+        return RetrofitHelper.apiService(Constants.BASE_URL)
+            .notifyDriver(Constants.HIVE_PROFILE,
+                NaiveHmacSigner.DateSignature(),
+                NaiveHmacSigner.AuthSignature(
+                    view.HIVE_USER_ID,
+                    view.HIVE_TOKEN,
+                    "GET",
+                    "/api/client/mobile/1.0/orders/$orderID/coming"),
+                orderID
+                ).observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io())
+            .subscribe({
+
+            },{
+
+            })
     }
+
+
+    override fun notifyDriver(orderID : Long,rateOrderBody: RateOrderBody): Disposable {
+        return RetrofitHelper.apiService(Constants.BASE_URL)
+            .rateOrder(Constants.HIVE_PROFILE,
+                NaiveHmacSigner.DateSignature(),
+                NaiveHmacSigner.AuthSignature(
+                    view.HIVE_USER_ID,
+                    view.HIVE_TOKEN,
+                    "POST",
+                    "/api/client/mobile/1.1/orders/$orderID/feedback"),
+                orderID,
+                rateOrderBody
+            ).observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io())
+            .subscribe({
+
+            },{
+
+            })
+    }
+
 
     override fun cancelOrder(orderID: Long): Disposable {
         return RetrofitHelper.apiService(Constants.BASE_URL)

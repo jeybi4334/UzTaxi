@@ -151,12 +151,56 @@ interface ApiClient {
                         @Header("Authentication") hmac : String,
     ): Single<Response<ArrayList<ShortOrderInfo>>>
 
+   @GET("client/mobile/2.2/orders/{id}")
+    @Headers("Accept-Language: ru","Content-Type: application/json; charset=utf-8")
+    fun getOrderDetails(@Header("Hive-Profile") hive_profile : String,
+                        @Header("Date") date : String,
+                        @Header("Authentication") hmac : String,
+                        @Path("id") id : Long
+    ): Single<Response<OrderInfo>>
+
+    @GET("client/mobile/1.0/orders/{id}/coming")
+    @Headers("Accept-Language: ru","Content-Type: application/json; charset=utf-8")
+    fun notifyDriver(@Header("Hive-Profile") hive_profile : String,
+                        @Header("Date") date : String,
+                        @Header("Authentication") hmac : String,
+                        @Path("id") id : Long
+    ): Single<Response<EmptyModel>>
+
+    @POST("client/mobile/1.1/orders/{id}/feedback")
+    @Headers("Accept-Language: ru","Content-Type: application/json; charset=utf-8")
+    fun rateOrder(@Header("Hive-Profile") hive_profile : String,
+                        @Header("Date") date : String,
+                        @Header("Authentication") hmac : String,
+                        @Path("id") id : Long,
+                        @Body rateOrderBody: RateOrderBody
+    ): Single<Response<EmptyModel>>
+
+
+
+
+
     @GET("client/mobile/2.1/bonuses")
     @Headers("Accept-Language: ru","Content-Type: application/json; charset=utf-8")
-    fun getBonuses(@Header("Hive-Profile") hive_profile : String,
+    fun getBonuses(
+        @Header("X-Hive-GPS-Position") hive_gps : String,
+        @Header("Hive-Profile") hive_profile : String,
                         @Header("Date") date : String,
                         @Header("Authentication") hmac : String,
     ): Single<Response<BonusResponse>>
+
+
+    @GET("client/mobile/2.1/history?offset=0&length=16")
+    @Headers("Accept-Language: ru","Content-Type: application/json; charset=utf-8")
+    fun getOrderHistory(
+        @Header("X-Hive-GPS-Position") hive_gps : String,
+        @Header("Hive-Profile") hive_profile : String,
+        @Header("Date") date : String,
+        @Header("Authentication") hmac : String,
+    ): Single<Response<BonusResponse>>
+
+
+
 
 
 

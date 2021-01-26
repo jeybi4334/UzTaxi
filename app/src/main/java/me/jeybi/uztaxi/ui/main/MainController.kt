@@ -12,6 +12,8 @@ interface MainController {
         fun onUserApproved()
         fun buildAlertMessageNoGps()
 
+        fun onBonusReady(bonus : Double)
+
         fun onAddressFound(name : String)
 
         fun onSearchClicked(searchCancelListener: SearchCancelListener)
@@ -38,7 +40,16 @@ interface MainController {
 
         fun onOrderCancelled()
 
+        fun onNoGoingOrder()
+
         fun onOnGoingOrderFound(shortOrderInfo: ShortOrderInfo)
+
+        fun drawDriverRoute(route: ArrayList<Point>,origin : Point)
+
+
+
+        fun onErrorGetRoute()
+        fun onErrorCreateOrder()
 
     }
     interface presenter{
@@ -51,9 +62,11 @@ interface MainController {
 
         fun findCurrentAddress(latitude : Double, longitude : Double) : Disposable
 
+        fun getBonuses(latitude: Double, longitude: Double) : Disposable
+
         fun getWeather(latitude : Double, longitude : Double) : Disposable
 
-        fun getRoute(origin: Point, destination: Point) : Disposable
+        fun getRoute(origin: Point, destination: Point,driverRoute : Boolean) : Disposable
 
         fun getAvailableCars(latitude: Double,longitude: Double,tariff : Long) : Disposable
 
@@ -65,9 +78,11 @@ interface MainController {
 
         fun getOngoingOrder() : Disposable
 
-        fun getOrderInfo() : Disposable
+        fun notifyDriver(orderID: Long) : Disposable
 
         fun cancelOrder(orderID: Long) : Disposable
+
+        fun notifyDriver(orderID : Long,rateOrderBody: RateOrderBody): Disposable
     }
 
     interface SearchCancelListener{

@@ -25,21 +25,18 @@ class IntroType1(val position : Int) : Fragment() {
         when(position){
             1->{
                 imageViewIntro.setImageResource(R.drawable.page_2)
-                textViewIntroTitle.text = "Confirm Your Driver"
-                textViewIntroContent.text = "Huge drivers network helps you find\n" +
-                        "comforable, safe and cheap ride"
+                textViewIntroTitle.text = "Примите лучшие варианты"
+                textViewIntroContent.text = "Широкий выбор тарифов и водителей позволит вам подобрать оптимальную поездку для вашего пункта назначения."
             }
             2->{
                 imageViewIntro.setImageResource(R.drawable.page_3)
-                textViewIntroTitle.text = "The Best Drivers"
-                textViewIntroContent.text = "We choose special drivers for each ride\n" +
-                        "based on your preferences and communication type"
+                textViewIntroTitle.text = "Лучшие водители в вашем регионе"
+                textViewIntroContent.text = "Мы нанимаем каждого водителя, проходя специальное собеседование, и выбираем его для вашей поездки на основе их поведения."
             }
             3->{
                 imageViewIntro.setImageResource(R.drawable.page_4)
-                textViewIntroTitle.text = "Any Payment Method"
-                textViewIntroContent.text = "Add your UzCard or HumoCard\n" +
-                        "to pay for a ride and get immediate cash-back"
+                textViewIntroTitle.text = "Любой метод оплаты"
+                textViewIntroContent.text = "Вы можете добавить свою карту UzCard или HumoCard, чтобы оплатить поездку и получать кэшбэк в реальном времени с каждой успешной поездки."
             }
         }
     }

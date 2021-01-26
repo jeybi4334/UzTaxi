@@ -177,13 +177,23 @@
         >
 
         <TextView
+            android:id="@+id/textOrder"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:text="Order"
+            android:text="Заказать"
             android:textColor="@color/white"
             android:fontFamily="@font/g_bold"
-            android:textSize="18sp"
+            android:textSize="16sp"
+            />
+
+        <ProgressBar
+            android:visibility="gone"
+            android:id="@+id/progressOrder"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:indeterminateTint="@color/white"
+            android:layout_centerInParent="true"
             />
 
     </RelativeLayout>

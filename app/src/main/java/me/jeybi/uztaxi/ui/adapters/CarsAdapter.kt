@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.romainpiel.shimmer.Shimmer
@@ -29,7 +30,7 @@ class CarsAdapter(val items : ArrayList<ServiceTariff>, val listener : TariffCli
     }
 
     override fun onBindViewHolder(holder: CarsHolder, position: Int) {
-        holder.itemView.tag = "${position}"
+        holder.rvCar.tag = "${position}"
         val item = items[position]
 
         holder.textViewTarrifName.text = item.name
@@ -56,15 +57,16 @@ class CarsAdapter(val items : ArrayList<ServiceTariff>, val listener : TariffCli
         }
 
         holder.textViewPrice.text = "от ${decimalFormat.format(item.minCost)} сум"
-        holder.itemView.setOnClickListener {
+
+        holder.rvCar.setOnClickListener {
 
             listener.onTariffChosen(item.id,shimmer,holder.textViewPrice,item.options)
             shimmer.start(holder.textViewPrice)
 
 
-            holder.itemView.setBackgroundResource(R.drawable.bc_item_car_selected)
-            holder.itemView.textViewTarrifName.setTextColor(Color.BLACK)
-            holder.itemView.textViewPrice.setTextColor(Color.BLACK)
+            holder.rvCar.setBackgroundResource(R.drawable.bc_item_car_selected)
+            holder.textViewTarrifName.setTextColor(Color.BLACK)
+            holder.textViewPrice.setTextColor(Color.BLACK)
 
             holder.textViewPrice.text = "Оценивает..."
 
@@ -74,7 +76,8 @@ class CarsAdapter(val items : ArrayList<ServiceTariff>, val listener : TariffCli
                 previousItem!!.findViewById<TextView>(R.id.textViewPrice).setTextColor(Color.parseColor("#B1B1B1"))
             }
 
-            previousItem = holder.itemView
+            previousItem = holder.rvCar
+
         }
     }
 
@@ -86,7 +89,7 @@ class CarsAdapter(val items : ArrayList<ServiceTariff>, val listener : TariffCli
         val imageViewCar = view.findViewById<ImageView>(R.id.imageViewCar)
         val textViewTarrifName = view.findViewById<TextView>(R.id.textViewTarrifName)
         val textViewPrice = view.findViewById<ShimmerTextView>(R.id.textViewPrice)
-
+        val rvCar = view.findViewById<RelativeLayout>(R.id.rvCar)
     }
 
     interface TariffClickListener{

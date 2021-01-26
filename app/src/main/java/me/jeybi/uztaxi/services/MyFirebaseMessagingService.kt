@@ -65,7 +65,8 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
                 intent.putExtra(Constants.ORDER_STATUS,Constants.ORDER_STATUS_DRIVER_UNASSIGNED )
             }
             Constants.ORDER_STATUS_ORDER_COMPLETED -> {
-                smallText = "Маршрут завершен!"
+//                smallText = "Маршрут завершен!"
+                smallText = "${remoteMessage.data.get("text")}"
                 intent.putExtra(Constants.ORDER_STATUS,Constants.ORDER_STATUS_ORDER_COMPLETED )
             }
             Constants.ORDER_STATUS_BONUS_ADDED -> {
@@ -77,7 +78,8 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
                 intent.putExtra(Constants.ORDER_STATUS,Constants.ORDER_STATUS_BONUS_WITHDRAWN )
             }
             Constants.ORDER_STATUS_CANCELLED -> {
-                smallText = "Заказ отменен!"
+//                smallText = "Заказ отменен!"
+                smallText = "${remoteMessage.data.get("text")}"
                 intent.putExtra(Constants.ORDER_STATUS,Constants.ORDER_STATUS_CANCELLED )
             }
             Constants.ORDER_STATUS_PAID_WAITING_BEGAN -> {
@@ -92,7 +94,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         }
 
         sendBroadcast(intent)
-        sendNotification(smallText, "${remoteMessage.data.get("text")}")
+        sendNotification(smallText, smallText)
 
 
     }
@@ -110,7 +112,6 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
         val notificationBuilder = NotificationCompat.Builder(this, channelId)
             .setSmallIcon(R.drawable.logo)
-
             .setContentTitle("UZ TAXI™")
             .setContentText(smallText)
             .setAutoCancel(true)

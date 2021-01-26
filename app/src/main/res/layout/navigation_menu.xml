@@ -1,26 +1,169 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    android:background="@color/white"
-    >
+    android:background="@color/white">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:orientation="vertical"
         android:layout_weight="0.7"
+        android:gravity="center"
+        android:layout_marginTop="24dp"
         >
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            >
+
+            <com.airbnb.lottie.LottieAnimationView
+                android:id="@+id/lottieProfile"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                app:lottie_fileName="profile_male.json"
+                android:scaleType="centerCrop"
+                android:layout_marginStart="12dp"
+                />
+
+            <com.airbnb.lottie.LottieAnimationView
+                android:id="@+id/lottieCoin"
+                app:layout_constraintLeft_toLeftOf="@id/textViewBonus"
+                android:layout_marginTop="-8dp"
+                app:layout_constraintTop_toTopOf="@id/textViewBonus"
+                android:layout_width="82dp"
+                app:lottie_progress="0"
+                android:layout_marginEnd="0dp"
+                android:layout_height="42dp"
+                app:layout_constraintBottom_toBottomOf="@id/textViewBonus"
+                app:lottie_fileName="bonus.json"
+                android:scaleType="centerCrop"
+                />
+
+
+
+            <TextView
+                android:id="@+id/textViewBonus"
+                android:paddingLeft="62dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintRight_toRightOf="parent"
+                android:layout_marginEnd="18dp"
+                app:layout_constraintTop_toTopOf="@id/lottieProfile"
+                app:layout_constraintBottom_toBottomOf="@id/lottieProfile"
+                android:textColor="@color/black"
+                android:text="0 сум"
+                android:fontFamily="@font/g_bold"
+                android:textSize="16sp"
+                />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <TextView
+            android:id="@+id/textNavigation0"
+            android:background="?attr/selectableItemBackground"
+            android:layout_width="match_parent"
+            android:paddingStart="18dp"
+            android:gravity="center"
+            android:maxLines="1"
+            android:layout_height="52dp"
+            android:text="История поездок"
+            android:textSize="18sp"
+            android:fontFamily="@font/g_bold"
+            android:textColor="@color/black"
+            />
+
+        <TextView
+            android:id="@+id/textNavigation1"
+            android:background="?attr/selectableItemBackground"
+            android:layout_width="match_parent"
+            android:paddingStart="18dp"
+            android:gravity="center"
+            android:maxLines="1"
+            android:layout_height="52dp"
+            android:text="Мои адреса"
+            android:textSize="18sp"
+            android:fontFamily="@font/g_bold"
+            android:textColor="@color/black"
+            />
+
+        <TextView
+            android:id="@+id/textNavigation2"
+            android:background="?attr/selectableItemBackground"
+            android:layout_width="match_parent"
+            android:paddingStart="18dp"
+            android:gravity="center"
+            android:maxLines="1"
+            android:layout_height="52dp"
+            android:text="Настройки"
+            android:textSize="18sp"
+            android:fontFamily="@font/g_bold"
+            android:textColor="@color/black"
+            />
+
+
+        <TextView
+            android:id="@+id/textNavigation3"
+            android:background="?attr/selectableItemBackground"
+            android:layout_width="match_parent"
+            android:paddingStart="18dp"
+            android:gravity="center"
+            android:maxLines="1"
+            android:layout_height="52dp"
+            android:text="Служба поддержки"
+            android:textSize="18sp"
+            android:fontFamily="@font/g_bold"
+            android:textColor="@color/black"
+            />
+
+
+
+        <TextView
+            android:id="@+id/textNavigation4"
+            android:background="?attr/selectableItemBackground"
+            android:layout_width="match_parent"
+            android:paddingStart="18dp"
+            android:gravity="center"
+            android:maxLines="1"
+            android:layout_height="52dp"
+            android:text="Информация"
+            android:textSize="18sp"
+            android:fontFamily="@font/g_bold"
+            android:textColor="@color/black"
+            />
+
+        <TextView
+            android:layout_marginTop="24dp"
+            android:id="@+id/textNavigation5"
+            android:background="?attr/selectableItemBackground"
+            android:layout_width="match_parent"
+            android:paddingStart="18dp"
+            android:gravity="center"
+            android:maxLines="1"
+            android:layout_height="52dp"
+            android:text="Выйти"
+            android:textSize="18sp"
+            android:fontFamily="@font/g_regular"
+            android:textColor="@color/black"
+            />
+
+
+
+
 
     </LinearLayout>
 
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="0.3"
-        android:src="@drawable/nav_bottom"
+        android:layout_weight="0.4"
+        android:src="@drawable/nav_pic"
         android:padding="48dp"
         />
 

@@ -22,6 +22,8 @@ class Constants {
 
         const val TABLE_ADDRESS = "table_address"
 
+        const val CALL_CENTER_NUMBER = "1191"
+
         val PREF_AUTHENTICATED = "intro_shown"
 
         val PREF_FCM_REGISTERED = "firebase_register"
@@ -41,6 +43,9 @@ class Constants {
 
         val HIVE_PROFILE = "2a3ae3c1da9c04320737424a4dbd2683"
 
+
+        val LAST_KNOWN_LATITUDE = "last_lat"
+        val LAST_KNOWN_LONGITUDE = "last_lon"
 
 
 
@@ -64,6 +69,9 @@ class Constants {
         val MODE_DESTINATION_PICK = 1002
         val MODE_CREATE_ORDER = 1003
         val MODE_CAR_SEARCH = 10004
+        val MODE_CAR_FOUND = 10005
+        val MODE_DRIVER_CAME = 10006
+        val MODE_RIDE_STARTED = 10007
 
 
         val ORDER_STATUS_RECIEVER = "me.jeybi.uztaxi.utils.ORDER_STATUS_RECEIVER"
@@ -86,7 +94,7 @@ class Constants {
         val ORDER_STATUS_PAID_WAITING_BEGAN = "order-payed-waiting"
         val ORDER_STATUS_CHAT_REQUEST = "chat-join-request"
 
-
+        val ORDER_STATE_NOT_CREATED = 0
         val ORDER_STATE_CREATED = 1
         val ORDER_STATE_ASSIGNED = 2
         val ORDER_STATE_DRIVER_CAME = 3
@@ -95,7 +103,19 @@ class Constants {
         val ORDER_STATE_CANCELLED = 6
         val ORDER_STATE_BOOKED = 7
 
+        val ASSIGNE_CALL_DIRECT = "direct"
+        val ASSIGNE_CALL_SERVER = "via server"
+        val ASSIGNE_CALL_NOT = "no"
 
+        val COST_TYPE_TOTAL = "total"
+        val COST_TYPE_APPROXIMATE = "approximate"
+        val COST_TYPE_MINIMAL = "minimum"
+
+        val CAR_ALIAS_LACETTI = "Lacetti"
+        val CAR_ALIAS_NEXIA = "Nexia"
+        val CAR_ALIAS_MATIZ = "Matiz"
+        val CAR_ALIAS_SPARK = "Spark"
+        val CAR_ALIAS_GENTRA = "Gentra"
 
 
 
@@ -183,8 +203,8 @@ class Constants {
 
 
         fun getRotation(start: LatLng, end: LatLng): Float {
-            val latDifference: Double = abs(start.latitude - end.latitude)
-            val lngDifference: Double = abs(start.longitude - end.longitude)
+            val latDifference: Double = kotlin.math.abs(start.latitude - end.latitude)
+            val lngDifference: Double = kotlin.math.abs(start.longitude - end.longitude)
             var rotation = -1F
             when {
                 start.latitude < end.latitude && start.longitude < end.longitude -> {
@@ -204,11 +224,6 @@ class Constants {
             return rotation
         }
 
-        fun RotateBitmap(source: Bitmap, angle: Float): Bitmap? {
-            val matrix = Matrix()
-            matrix.postRotate(angle)
-            return Bitmap.createBitmap(source, 0, 0, source.width, source.height, matrix, true)
-        }
 
         fun roundAvoid(value: Double, places: Int): Double {
             val scale = Math.pow(10.0, places.toDouble())

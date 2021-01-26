@@ -7,39 +7,12 @@
     android:windowSoftInputMode="adjustResize"
     android:background="@color/white">
 
-
-    <RelativeLayout
-        android:id="@+id/rvConfirm"
-        android:layout_width="0dp"
-        android:layout_height="48dp"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginBottom="88dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="18dp"
-        android:layout_marginStart="18dp"
-        android:background="@drawable/bc_button_purple"
-        android:clickable="true"
-        >
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:text="Confirm"
-            android:fontFamily="@font/g_bold"
-            android:textColor="@color/white"
-            android:textSize="16sp"
-            />
-
-    </RelativeLayout>
-
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
         >
+
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -50,10 +23,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                android:fontFamily="@font/g_bold"
-                android:text="Ride Finished"
+                android:fontFamily="@font/g_black"
+                android:text="Поездка завершена"
                 android:textColor="@color/purple_200"
-                android:textSize="22sp"
+                android:textSize="26sp"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -65,7 +38,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
                 android:fontFamily="@font/g_semi_bold"
-                android:text="Your bill is :"
+                android:text="Плата за поездку :"
                 android:textColor="@color/purple_200"
                 android:textSize="16sp"
                 app:layout_constraintLeft_toLeftOf="parent"
@@ -79,7 +52,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
                 android:fontFamily="@font/g_black"
-                android:text="15 400"
+                android:text=""
                 android:textColor="@color/purple_200"
                 android:textSize="50sp"
                 app:layout_constraintLeft_toLeftOf="parent"
@@ -92,7 +65,7 @@
                 android:layout_marginLeft="8dp"
                 android:layout_marginBottom="12dp"
                 android:fontFamily="@font/g_bold"
-                android:text="so'm"
+                android:text="сум"
                 android:textColor="@color/purple_200"
                 android:textSize="16sp"
                 app:layout_constraintBottom_toBottomOf="@id/textViewBillAmount"
@@ -113,7 +86,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:fontFamily="@font/g_bold"
-                android:text="Your bonus :"
+                android:text="Ваш бонус :"
                 android:layout_marginEnd="8dp"
                 android:textColor="@color/purple_200"
                 android:textSize="18sp"
@@ -128,7 +101,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:fontFamily="@font/g_bold"
-                android:text="+2000 so'm"
+                android:text=""
                 android:textColor="#FFAA00"
                 android:textSize="18sp"
                 app:layout_constraintLeft_toRightOf="@id/guideline"
@@ -143,7 +116,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:fontFamily="@font/g_semi_bold"
-                android:text="October 21, 2020 at 10:30 a.m."
+                android:text=""
                 android:layout_marginEnd="8dp"
                 android:textColor="@color/purple_200"
                 android:textSize="16sp"
@@ -171,7 +144,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
                 android:fontFamily="@font/g_semi_bold"
-                android:text="Rate your driver"
+                android:text="Оцените водителя"
                 android:textColor="@color/purple_200"
                 android:textSize="16sp"
                 app:layout_constraintLeft_toLeftOf="parent"
@@ -179,25 +152,12 @@
                 app:layout_constraintTop_toBottomOf="@id/viewDivider" />
 
 
-            <TextView
-                android:id="@+id/textViewDriverName"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:fontFamily="@font/g_bold"
-                android:text="Soatov Sadulla"
-                android:textColor="@color/purple_200"
-                android:textSize="20sp"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/text4" />
-
             <ImageView
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:id="@+id/imageStar3"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
-                app:layout_constraintTop_toBottomOf="@id/textViewDriverName"
+                app:layout_constraintTop_toBottomOf="@id/text4"
                 app:layout_constraintLeft_toLeftOf="@id/guideline"
                 app:layout_constraintRight_toRightOf="@id/guideline"
                 android:layout_marginTop="24dp"
@@ -209,7 +169,7 @@
                 android:id="@+id/imageStar2"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
-                app:layout_constraintTop_toBottomOf="@id/textViewDriverName"
+                app:layout_constraintTop_toBottomOf="@id/text4"
                 app:layout_constraintRight_toLeftOf="@id/imageStar3"
                 android:layout_marginEnd="16dp"
                 android:layout_marginTop="24dp"
@@ -221,7 +181,7 @@
                 android:id="@+id/imageStar1"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
-                app:layout_constraintTop_toBottomOf="@id/textViewDriverName"
+                app:layout_constraintTop_toBottomOf="@id/text4"
                 app:layout_constraintRight_toLeftOf="@id/imageStar2"
                 android:layout_marginEnd="16dp"
                 android:layout_marginTop="24dp"
@@ -233,7 +193,7 @@
                 android:id="@+id/imageStar4"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
-                app:layout_constraintTop_toBottomOf="@id/textViewDriverName"
+                app:layout_constraintTop_toBottomOf="@id/text4"
                 app:layout_constraintLeft_toRightOf="@id/imageStar3"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="24dp"
@@ -245,7 +205,7 @@
                 android:id="@+id/imageStar5"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
-                app:layout_constraintTop_toBottomOf="@id/textViewDriverName"
+                app:layout_constraintTop_toBottomOf="@id/text4"
                 app:layout_constraintLeft_toRightOf="@id/imageStar4"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="24dp"
@@ -253,6 +213,7 @@
                 />
 
             <EditText
+                android:id="@+id/editTextFeedback"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 app:layout_constraintLeft_toLeftOf="parent"
@@ -263,7 +224,7 @@
                 android:layout_marginTop="32dp"
                 android:paddingLeft="14dp"
                 android:paddingTop="12dp"
-                android:hint="Type your review..."
+                android:hint="Напишите свой отзыв здесь ..."
                 android:textColorHint="#c5cee0"
                 android:inputType="text"
                 android:imeOptions="actionSend|flagNoEnterAction"
@@ -273,6 +234,45 @@
                 android:minHeight="128dp"
                 android:background="@drawable/bc_review"
                 />
+
+            <RelativeLayout
+                android:id="@+id/rvConfirm"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/editTextFeedback"
+                android:layout_marginBottom="88dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="18dp"
+                android:layout_marginStart="18dp"
+                android:background="@drawable/bc_button_purple_disabled"
+                android:clickable="true"
+                >
+
+                <ProgressBar
+                    android:visibility="gone"
+                    android:id="@+id/progressFeedback"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:indeterminateTint="@color/white"
+                    android:layout_centerInParent="true"
+                    />
+
+
+
+                <TextView
+                    android:id="@+id/textConfirm"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:text="Подтвердить"
+                    android:fontFamily="@font/g_bold"
+                    android:textColor="@color/white"
+                    android:textSize="16sp"
+                    />
+
+            </RelativeLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

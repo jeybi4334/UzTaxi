@@ -16,10 +16,15 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.UzTaxi">
-        <activity android:name=".ui.address.AddressActivity"></activity>
+        <activity
+            android:name=".ui.info.InfoActivity"
+            android:label="@string/title_activity_info"
+            android:theme="@style/Theme.UzTaxi.NoActionBar"></activity>
+        <activity android:name=".ui.history.OrderHistoryActivity" />
+        <activity android:name=".ui.address.AddressActivity" />
         <activity
             android:name=".ui.auth.AuthenticationActivity"
-            android:windowSoftInputMode="stateVisible|adjustResize"></activity>
+            android:windowSoftInputMode="stateVisible|adjustResize" />
         <activity android:name=".ui.intro.IntroActivity">
 
             <!-- <intent-filter> -->

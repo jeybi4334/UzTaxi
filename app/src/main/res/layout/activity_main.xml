@@ -262,6 +262,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:cardCornerRadius="36dp"
+                    app:cardBackgroundColor="@color/white"
                     app:cardElevation="24dp"
                     android:layout_marginBottom="-36dp"
                     >
@@ -283,6 +284,7 @@
                         >
 
                         <TextView
+                            android:id="@+id/textReady"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_centerInParent="true"
@@ -290,6 +292,15 @@
                             android:fontFamily="@font/g_bold"
                             android:textColor="@color/white"
                             android:textSize="16sp"
+                            />
+
+                        <ProgressBar
+                            android:visibility="gone"
+                            android:id="@+id/progressReady"
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:indeterminateTint="@color/white"
+                            android:layout_centerInParent="true"
                             />
 
                     </RelativeLayout>
@@ -305,6 +316,13 @@
                         android:visibility="gone"
                         layout="@layout/bottom_sheet_car_search"
                         />
+
+                    <include
+                        android:id="@+id/modeCarFound"
+                        android:visibility="gone"
+                        layout="@layout/bottom_edit_ride"
+                        />
+
 
                 </androidx.cardview.widget.CardView>
 
@@ -335,10 +353,21 @@
                 app:cardElevation="4dp">
 
                 <ImageView
+                    android:id="@+id/imageGPS"
                     android:layout_width="18dp"
                     android:layout_height="18dp"
                     android:layout_gravity="center"
                     android:src="@drawable/ic_gps" />
+
+                <ProgressBar
+                    android:visibility="gone"
+                    android:layout_gravity="center"
+                    android:id="@+id/progressGPS"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:indeterminateTint="@color/white"
+                    android:layout_centerInParent="true"
+                    />
 
             </com.google.android.material.card.MaterialCardView>
 

@@ -12,23 +12,34 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.15" />
+        app:layout_constraintGuide_percent="0.1" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.4" />
 
     <ImageView
         android:id="@+id/imageViewIntro"
-        android:layout_width="248dp"
-        android:layout_height="248dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:src="@drawable/page_1"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/guideline2"
         app:layout_constraintTop_toBottomOf="@id/guideline"
         />
 
     <TextView
         android:id="@+id/textViewIntroTitle"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Request Ride"
+        android:layout_marginLeft="24dp"
+        android:layout_marginRight="24dp"
+        android:text="Запросите поездку в любое время в любом месте"
+        android:gravity="center"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/imageViewIntro"
@@ -40,9 +51,11 @@
 
     <TextView
         android:id="@+id/textViewIntroContent"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
+        android:layout_marginLeft="24dp"
+        android:layout_marginRight="24dp"
         android:layout_height="wrap_content"
-        android:text="Request a ride get picked up by a\nnearby community driver"
+        android:text="Запросите поездку, и вас встретит ближайший водитель за минимальное время."
         android:gravity="center"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"

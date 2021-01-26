@@ -3,7 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-
     android:background="@color/white">
 
 
@@ -53,11 +52,12 @@
                android:id="@+id/text1"
                android:layout_width="match_parent"
                android:layout_height="wrap_content"
-               android:text="Verification"
+               android:text="SMS подтверждение"
                android:gravity="center"
                android:textColor="#1A1A1A"
+               android:lineSpacingExtra="-14dp"
                android:fontFamily="@font/g_bold"
-               android:textSize="50sp"
+               android:textSize="32sp"
                android:layout_marginTop="12dp"
                android:layout_marginStart="18dp"
                android:layout_marginEnd="18dp"
@@ -72,7 +72,7 @@
                android:layout_marginEnd="18dp"
                android:fontFamily="@font/g_regular"
                android:gravity="center"
-               android:text="We texted you a code to verify\nyour phone number"
+               android:text="Мы отправили вам код для подтверждения \n вашего номера телефона"
                android:textColor="#1a1a1a"
                android:textSize="14sp" />
 
@@ -155,7 +155,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Did not receive code?"
+                android:text="Не получили код?"
                 android:textColor="#0A1B72"
                 android:layout_centerVertical="true"
                 android:fontFamily="@font/g_regular"
@@ -167,7 +167,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
-                android:text="SEND AGAIN"
+                android:text="ОТПРАВИТЬ СНОВА"
                 android:textColor="#0A1B72"
                 android:fontFamily="@font/g_semi_bold"
                 android:padding="12dp"
@@ -224,7 +224,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Confirm"
+            android:text="Подтвердить"
             android:fontFamily="@font/g_bold"
             android:layout_centerInParent="true"
             android:textColor="@color/white"

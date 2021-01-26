@@ -8,7 +8,7 @@
     >
 
 
-    <TextView
+    <com.romainpiel.shimmer.ShimmerTextView
         android:id="@+id/textSearching"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -16,10 +16,10 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginTop="18dp"
-        android:text="Searching for Driver..."
+        android:text="Ищем водителей вокруг ..."
         android:textColor="@color/purple_200"
         android:fontFamily="@font/g_bold"
-        android:textSize="22sp"
+        android:textSize="20sp"
         />
 
     <RelativeLayout

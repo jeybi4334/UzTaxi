@@ -3,6 +3,9 @@
 
     <string name="mapbox_access_token">pk.eyJ1IjoiamV5YmkyNCIsImEiOiJja2lyYmx1bHcwMzg2MnNwZGFxa3I2cWk4In0.VhJb6YeTGBbI4hwITbZl4A</string>
 
-    <string name="terms_of_service">By Logging in, I accept the terms\n<a href="https://uz.taxi/user-agreement-for-client/">User agreement </a> and processing of my personal data\nin terms <a href="https://uz.taxi/app-client-privacy-policy/">Privacy policy</a></string>
+    <string name="terms_of_service">Авторизуясь, я принимаю условия\n<a href="https://uz.taxi/user-agreement-for-client/">Пользовательское Соглашение </a> и обработка моих личных данных с точки зрения <a href="https://uz.taxi/app-client-privacy-policy/">Политика конфиденциальности</a></string>
+    <string name="title_activity_info">InfoActivity</string>
+    <string name="tab_text_1">Tab 1</string>
+    <string name="tab_text_2">Tab 2</string>
 
 </resources>
