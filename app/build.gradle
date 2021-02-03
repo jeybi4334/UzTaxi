@@ -56,7 +56,7 @@ dependencies {
     implementation 'com.mapbox.mapboxsdk:mapbox-android-sdk:9.5.0'
     implementation 'com.mapbox.mapboxsdk:mapbox-android-gestures:0.7.0'
     implementation 'com.mapbox.mapboxsdk:mapbox-sdk-services:5.7.0'
-//    implementation "com.mapbox.search:mapbox-search-android:1.0.0-beta.1"
+    implementation 'com.mapbox.mapboxsdk:mapbox-android-plugin-building-v9:0.7.0'
 
 //    implementation 'com.mapzen:mapzen-android-sdk:1.6.1'
 
@@ -81,7 +81,7 @@ dependencies {
 
 
     /////REMOVE BEFORE RELEASE
-    implementation 'com.squareup.okhttp3:logging-interceptor:4.7.2'
+    implementation 'com.squareup.okhttp3:logging-interceptor:4.9.0'
 
     //// LOTTIE FOR ANIMATIONS
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"

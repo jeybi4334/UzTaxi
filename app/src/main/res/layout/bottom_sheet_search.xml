@@ -57,7 +57,7 @@
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:background="@drawable/bc_search"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="20dp"
         android:layout_marginStart="18dp"
         android:layout_marginEnd="18dp"
         >

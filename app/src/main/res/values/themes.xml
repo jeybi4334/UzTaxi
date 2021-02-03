@@ -1,8 +1,9 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Theme.UzTaxi" parent="Theme.MaterialComponents.NoActionBar">
+    <style name="Theme.UzTaxi" parent="Theme.MaterialComponents.Light.NoActionBar">
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/purple_500</item>
+        <item name="colorPrimaryDark">@color/white</item>
         <item name="colorPrimaryVariant">@color/purple_700</item>
         <item name="colorOnPrimary">@color/white</item>
         <!-- Secondary brand color. -->
@@ -12,8 +13,17 @@
         <item name="colorOnSecondary">@color/black</item>
         <!-- Status bar color. -->
 
+<!--        <item name="android:windowContentOverlay">@null</item>-->
+
+
+<!--        <item name="android:windowTranslucentNavigation">false</item>-->
+<!--        <item name="android:windowDrawsSystemBarBackgrounds">false</item>-->
+
+        <!--        <item name="android:windowTranslucentStatus">true</item>-->
+
         <item name="android:statusBarColor">@color/white</item>
 
+        <item name="colorControlHighlight">#FCEFFF</item>
 
         <item name="android:windowLightStatusBar" tools:targetApi="m">true</item>
 

@@ -165,7 +165,11 @@ class MainPresenter(val view: MainActivity) : MainController.presenter {
                                 for (component in it.body()!![0].components!!) {
                                     if (component.level == 7)
                                         address = component.name
+                                    if (address == ""&&component.level == 9)
+                                        address = component.name
                                     if (component.level == 8)
+                                        address += ", ${component.name}"
+                                    if (address != ""&&component.level == 9)
                                         address += ", ${component.name}"
                                 }
                                 view.onAddressFound(address)

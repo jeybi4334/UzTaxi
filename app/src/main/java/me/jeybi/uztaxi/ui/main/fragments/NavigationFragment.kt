@@ -13,6 +13,7 @@ import me.jeybi.uztaxi.ui.auth.AuthenticationActivity
 import me.jeybi.uztaxi.ui.history.OrderHistoryActivity
 import me.jeybi.uztaxi.ui.info.InfoActivity
 import me.jeybi.uztaxi.ui.main.MainActivity
+import me.jeybi.uztaxi.ui.settings.SettingsActivity
 import me.jeybi.uztaxi.utils.Constants
 
 class NavigationFragment : BaseFragment() {
@@ -27,6 +28,10 @@ class NavigationFragment : BaseFragment() {
             activity?.startActivity(Intent(activity, OrderHistoryActivity::class.java))
         }
 
+        textNavigation2.setOnClickListener {
+            activity?.startActivity(Intent(activity, SettingsActivity::class.java))
+        }
+
         textNavigation3.setOnClickListener {
             val dialIntent = Intent(Intent.ACTION_DIAL)
             dialIntent.data = Uri.parse("tel:" + Constants.CALL_CENTER_NUMBER)
@@ -36,6 +41,7 @@ class NavigationFragment : BaseFragment() {
         textNavigation4.setOnClickListener {
             activity?.startActivity(Intent(activity, InfoActivity::class.java))
         }
+
 
 
         textNavigation5.setOnClickListener {

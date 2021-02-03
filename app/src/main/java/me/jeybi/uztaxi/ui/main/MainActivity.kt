@@ -1,12 +1,12 @@
 package me.jeybi.uztaxi.ui.main
 
 import android.Manifest
+import android.R.style
 import android.animation.ObjectAnimator
 import android.animation.TypeEvaluator
 import android.animation.ValueAnimator
 import android.animation.ValueAnimator.AnimatorUpdateListener
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -14,6 +14,7 @@ import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.location.Criteria
 import android.location.Location
 import android.location.LocationListener
@@ -27,25 +28,19 @@ import android.view.animation.AccelerateInterpolator
 import android.view.animation.DecelerateInterpolator
 import android.view.animation.LinearInterpolator
 import android.view.animation.OvershootInterpolator
-import android.view.inputmethod.InputMethodManager
 import android.widget.RelativeLayout
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.LottieDrawable
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.firebase.iid.FirebaseInstanceId
 import com.google.firebase.messaging.FirebaseMessaging
-import com.mapbox.android.core.permissions.PermissionsListener
-import com.mapbox.android.core.permissions.PermissionsManager
 import com.mapbox.android.gestures.MoveGestureDetector
 import com.mapbox.geojson.Feature
 import com.mapbox.geojson.FeatureCollection
@@ -61,25 +56,25 @@ import com.mapbox.mapboxsdk.location.modes.CameraMode
 import com.mapbox.mapboxsdk.location.modes.RenderMode
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.Style
+import com.mapbox.mapboxsdk.plugins.building.BuildingPlugin
 import com.mapbox.mapboxsdk.style.expressions.Expression.*
 import com.mapbox.mapboxsdk.style.layers.*
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory.*
 import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
+import com.mapbox.mapboxsdk.utils.BitmapUtils
 import com.romainpiel.shimmer.Shimmer
 import com.romainpiel.shimmer.ShimmerTextView
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
-import io.reactivex.functions.Predicate
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.bottom_edit_ride.*
 import kotlinx.android.synthetic.main.bottom_sheet_car_search.*
 import kotlinx.android.synthetic.main.bottom_sheet_search.*
 import kotlinx.android.synthetic.main.bottom_sheet_where.*
-import kotlinx.android.synthetic.main.bottom_sheet_where.textViewStartAddress
 import kotlinx.android.synthetic.main.bottomsheet_map.*
 import kotlinx.android.synthetic.main.item_search.*
 import me.jeybi.uztaxi.R
@@ -92,17 +87,15 @@ import me.jeybi.uztaxi.ui.main.bottomsheet.*
 import me.jeybi.uztaxi.ui.main.fragments.*
 import me.jeybi.uztaxi.utils.Constants
 import me.jeybi.uztaxi.utils.NaiveHmacSigner
-import retrofit2.http.OPTIONS
 import java.text.DecimalFormat
+import java.text.SimpleDateFormat
+import java.util.*
 import java.util.concurrent.TimeUnit
+import kotlin.collections.ArrayList
 
 
 class MainActivity : BaseActivity(), MainController.view,
     LocationListener {
-
-//    private val REQUEST_PERMISSIONS_REQUEST_CODE = 1
-//
-//    private var permissionsManager: PermissionsManager = PermissionsManager(this)
 
     lateinit var presenter: MainPresenter
 
@@ -139,6 +132,7 @@ class MainActivity : BaseActivity(), MainController.view,
     var START_POINT_NAME = ""
     var END_POINT_NAME = ""
 
+    var TILT_MAP = Constants.DEFAULT_TILT_MAP
 
     override fun setLayoutId(): Int {
         return R.layout.activity_main
@@ -151,7 +145,6 @@ class MainActivity : BaseActivity(), MainController.view,
 
         mLocationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager?
         presenter.checkIfAuthenticated()
-//        onUserApproved()
 
     }
 
@@ -234,7 +227,36 @@ class MainActivity : BaseActivity(), MainController.view,
             {
                 mapBoxStyle = it
                 mapboxMap.uiSettings.isRotateGesturesEnabled = false
+                mapboxMap.uiSettings.isLogoEnabled = false
+                mapboxMap.uiSettings.isTiltGesturesEnabled = false
+                mapboxMap.uiSettings.isAttributionEnabled = false
+
+
+                if (sharedPreferences.getBoolean(Constants.SETTINGS_MAP_3D, false)) {
+                    TILT_MAP = 90.0
+//                    val buildingPlugin = BuildingPlugin(mapView, mapboxMap, it)
+//                    buildingPlugin.setColor(Color.LTGRAY)
+//                    buildingPlugin.setOpacity(0.6f)
+//                    buildingPlugin.setMinZoomLevel(15f)
+//                    buildingPlugin.setVisibility(true)
+                }
+
+                mapboxMap.addOnMapClickListener {
+//                    val position = CameraPosition.Builder()
+//                        .target(it)
+//                        .zoom(16.0)
+//                        .tilt(TILT_MAP)
+//                        .build()
+//
+//                    mapboxMap.easeCamera(CameraUpdateFactory.newCameraPosition(position), 1000)
+
+                    addCar(it.latitude, it.longitude)
+
+                    true
+                }
+
                 enableLocationComponent(it)
+
                 registerFirebaseReceiver()
 
                 mainDisposables.add(presenter.getOngoingOrder())
@@ -246,7 +268,7 @@ class MainActivity : BaseActivity(), MainController.view,
                     val position = CameraPosition.Builder()
                         .target(LatLng(lat.toDouble(), lon.toDouble()))
                         .zoom(16.0)
-                        .tilt(20.0)
+                        .tilt(TILT_MAP)
                         .build()
 
                     mapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(position))
@@ -254,7 +276,7 @@ class MainActivity : BaseActivity(), MainController.view,
                     val position = CameraPosition.Builder()
                         .target(LatLng(41.31122086155292, 69.27967758784646))
                         .zoom(16.0)
-                        .tilt(20.0)
+                        .tilt(TILT_MAP)
                         .build()
 
                     mapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(position))
@@ -300,17 +322,7 @@ class MainActivity : BaseActivity(), MainController.view,
                     )!!
                 )
 
-                val carImageBigger = Bitmap.createScaledBitmap(
-                    BitmapFactory.decodeResource(resources, R.drawable.car_black),
-                    72,
-                    144,
-                    true
-                )
-
-
-                mapBoxStyle.addImage(
-                    "demo-i-id", carImageBigger
-                )
+                addCarImages()
 
             }
 
@@ -319,8 +331,6 @@ class MainActivity : BaseActivity(), MainController.view,
             var translationY = 0f
 
             var DIRECTION_CURRENT = 0
-
-
 
             mapboxMap.addOnMoveListener(object : MapboxMap.OnMoveListener {
                 override fun onMoveBegin(detector: MoveGestureDetector) {
@@ -334,6 +344,12 @@ class MainActivity : BaseActivity(), MainController.view,
 
                         textViewCurrentAddress.text = "уточняем адрес..."
                         shimmer.start(textViewCurrentAddress)
+                    }
+
+                    if (CURRENT_MODE == Constants.MODE_SEARCH_WHERE) {
+                        PEEK_HEIGHT = bottomSheetBehaviour.peekHeight
+                        bottomSheetBehaviour.setPeekHeight(PEEK_HEIGHT / 4, true)
+                        bottomSheetBehaviour.state = BottomSheetBehavior.STATE_COLLAPSED
                     }
 
                 }
@@ -400,6 +416,13 @@ class MainActivity : BaseActivity(), MainController.view,
 
 
                 override fun onMoveEnd(detector: MoveGestureDetector) {
+
+                    if (CURRENT_MODE == Constants.MODE_SEARCH_WHERE) {
+                        bottomSheetBehaviour.setPeekHeight(PEEK_HEIGHT, true)
+                        bottomSheetBehaviour.state = BottomSheetBehavior.STATE_COLLAPSED
+                    }
+
+
                     imageViewCloudTop.animate().translationY(0f).alpha(1f)
                         .setInterpolator(DecelerateInterpolator()).setDuration(600).start()
                     // user stopped moving the map
@@ -448,10 +471,11 @@ class MainActivity : BaseActivity(), MainController.view,
                 }
             })
 
-
         }
 
     }
+
+
 
     lateinit var receiver: BroadcastReceiver
 
@@ -469,7 +493,7 @@ class MainActivity : BaseActivity(), MainController.view,
 
                     when (intent.extras!!.get(Constants.ORDER_STATUS)) {
                         Constants.ORDER_STATUS_CREATED -> {
-                            showFoundCarInfo(ORDER_ID)
+//                            showFoundCarInfo(ORDER_ID)
                         }
                         Constants.ORDER_STATUS_CHANGED -> {
                             showFoundCarInfo(ORDER_ID)
@@ -483,7 +507,7 @@ class MainActivity : BaseActivity(), MainController.view,
                         }
                         Constants.ORDER_STATUS_DRIVER_ARRIVED -> {
                             CURRENT_MODE = Constants.MODE_DRIVER_CAME
-                            showDriverCameDialog(ORDER_ID)
+//                            showDriverCameDialog(ORDER_ID)
 //                            removeDriverRoute()
                         }
                         Constants.ORDER_STATUS_EXECUTING -> {
@@ -521,7 +545,6 @@ class MainActivity : BaseActivity(), MainController.view,
     }
 
     fun showDriverCameDialog(orderID: Long) {
-
 
         val position = CameraPosition.Builder()
             .target(
@@ -563,7 +586,7 @@ class MainActivity : BaseActivity(), MainController.view,
         when (shortOrderInfo.state) {
             Constants.ORDER_STATE_CREATED -> {
                 ORDER_STATE = Constants.ORDER_STATE_CREATED
-                if (!ROUTE_DRAWN) {
+                if (!ROUTE_DRAWN && shortOrderInfo.route.size > 1) {
                     mainDisposables.add(
                         presenter.getRoute(
                             Point.fromLngLat(
@@ -624,16 +647,22 @@ class MainActivity : BaseActivity(), MainController.view,
             Constants.ORDER_STATE_ASSIGNED -> {
                 ORDER_STATE = Constants.ORDER_STATE_ASSIGNED
                 CURRENT_MODE = Constants.MODE_CAR_FOUND
-                if (lottieAnimation.visibility== View.VISIBLE)
+                if (lottieAnimation.visibility == View.VISIBLE)
                     showFoundCarInfo(oderID)
-                if (!ROUTE_DRAWN){
-                    mainDisposables.add(presenter.getRoute(
-                        Point.fromLngLat(orderInfo.route[0].address.position!!.lon,
-                            orderInfo.route[0].address.position!!.lat),
-                        Point.fromLngLat(orderInfo.route[1].address.position!!.lon,
-                            orderInfo.route[1].address.position!!.lat),
-                        false
-                        ))
+                if (!ROUTE_DRAWN && orderInfo.route.size > 1) {
+                    mainDisposables.add(
+                        presenter.getRoute(
+                            Point.fromLngLat(
+                                orderInfo.route[0].address.position!!.lon,
+                                orderInfo.route[0].address.position!!.lat
+                            ),
+                            Point.fromLngLat(
+                                orderInfo.route[1].address.position!!.lon,
+                                orderInfo.route[1].address.position!!.lat
+                            ),
+                            false
+                        )
+                    )
                 }
             }
             Constants.ORDER_STATE_DRIVER_CAME -> {
@@ -662,7 +691,7 @@ class MainActivity : BaseActivity(), MainController.view,
             }
             Constants.ORDER_STATE_COMPLETED -> {
                 ORDER_STATE = Constants.ORDER_STATE_COMPLETED
-                if (!FEEDBACK_SHOWED){
+                if (!FEEDBACK_SHOWED) {
                     showFeedbackOrder(oderID, ORDER_COST)
                     FEEDBACK_SHOWED = true
                     showSearchWherePage()
@@ -683,8 +712,6 @@ class MainActivity : BaseActivity(), MainController.view,
     }
 
 
-    lateinit var carPositionDisposable: Disposable
-
     private fun showFoundCarInfo(orderID: Long) {
         lottieAnimation.cancelAnimation()
         lottieAnimation.visibility = View.GONE
@@ -698,89 +725,6 @@ class MainActivity : BaseActivity(), MainController.view,
             mainDisposables.add(presenter.cancelOrder(orderID))
         }
 
-        val decimalFormat = DecimalFormat("###,###")
-
-        carPositionDisposable = Observable.interval(
-            0, 1500,
-            TimeUnit.MILLISECONDS
-        )
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeOn(Schedulers.io())
-            .subscribe({
-                RetrofitHelper.apiService(Constants.BASE_URL)
-                    .getOrderDetails(
-                        Constants.HIVE_PROFILE,
-                        NaiveHmacSigner.DateSignature(),
-                        NaiveHmacSigner.AuthSignature(
-                            HIVE_USER_ID,
-                            HIVE_TOKEN,
-                            "GET",
-                            "/api/client/mobile/2.2/orders/$orderID"
-                        ),
-                        orderID
-                    )
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribeOn(Schedulers.io())
-                    .subscribe({
-
-                        if (it.isSuccessful && it.body() != null) {
-                            onOnGoingOrderChange(orderID, it.body()!!)
-                            ORDER_COST = decimalFormat.format(it.body()!!.cost.amount)
-
-                            if (textViewRate.text == "" ||textViewCarNumber.text.contains("null")) {
-                                textViewCarName.text =
-                                    "${it.body()!!.assignee?.car?.brand} ${it.body()!!.assignee?.car?.model} - ${it.body()!!.assignee?.car?.color}"
-                                textViewCarNumber.text = "${it.body()!!.assignee?.car?.regNum}"
-
-                                textViewRate.text =
-                                    "$ORDER_COST сум"
-                                if (it.body()!!.assignee!=null)
-                                when(it.body()!!.assignee!!.car.alias){
-                                    Constants.CAR_ALIAS_NEXIA->{
-                                        imageViewAssignedCar.setImageResource(R.drawable.nexia)
-                                    }
-                                    Constants.CAR_ALIAS_LACETTI->{
-                                        imageViewAssignedCar.setImageResource(R.drawable.lacetti)
-                                    }
-                                    Constants.CAR_ALIAS_MATIZ->{
-                                        imageViewAssignedCar.setImageResource(R.drawable.matiz)
-                                    }
-                                    Constants.CAR_ALIAS_SPARK->{
-                                        imageViewAssignedCar.setImageResource(R.drawable.spark_2)
-                                    }
-
-
-                                }
-
-
-                                textView0Address.text = "${it.body()!!.route[0].address.name}"
-                                textView1Address.text = "${it.body()!!.route[1].address.name}"
-                            }
-
-                            if (it.body()!!.route[0].address.position != null) {
-                                START_POINT_LAT = it.body()!!.route[0].address.position!!.lat
-                                START_POINT_LON = it.body()!!.route[0].address.position!!.lon
-
-                                if (it.body()!!.assignee?.location != null) {
-                                    addCar(
-                                        it.body()!!.assignee?.location!!.lat,
-                                        it.body()!!.assignee?.location!!.lon
-                                    )
-                                }
-                            }
-
-
-                        }
-
-                    }, {
-
-                    })
-
-            },
-                {
-
-                }
-            )
 
     }
 
@@ -797,40 +741,76 @@ class MainActivity : BaseActivity(), MainController.view,
 
     override fun onWeatherReady(weather: ArrayList<WeatherType>, temperature: Int) {
 
+        val showSeason = sharedPreferences.getBoolean(Constants.SETTINGS_WEATHER_ANIMATION, true)
+
+        val currentTime: String = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
+
+        val hour = currentTime.split(":")[0].toInt()
+
+
         if (weather.size > 0) {
             WEATHER_READY = true
             when (weather[0].id) {
                 in 500..599 -> { //// WEATHER_RAIN
-                    playLottie(lottieWeather, "weather_rain.json", true, REVERSE = false)
-                    playLottie(lottieSeason, "rain.json", true, REVERSE = false)
-                    playLottie(lottieTerrain, "cloud.json", true, REVERSE = false)
+                    if (hour in 7..18) {
+                        playLottie(lottieWeather, "day_rain.json", true, REVERSE = false)
+                    } else {
+                        playLottie(lottieWeather, "weather_rain.json", true, REVERSE = false)
+                    }
+                    if (showSeason) {
+                        playLottie(lottieSeason, "rain.json", true, REVERSE = false)
+                        playLottie(lottieTerrain, "cloud.json", true, REVERSE = false)
+                    }
                 }
                 in 600..699 -> {  //// WEATHER SNOW
-                    playLottie(lottieWeather, "weather_snow.json", true, REVERSE = false)
-                    playLottie(lottieSeason, "winter.json", true, REVERSE = false)
-                    playLottie(lottieTerrain, "cloud.json", true, REVERSE = false)
+                    if (hour in 7..18) {
+                        playLottie(lottieWeather, "day_snow.json", true, REVERSE = false)
+                    } else {
+                        playLottie(lottieWeather, "weather_snow.json", true, REVERSE = false)
+                    }
+                    if (showSeason) {
+                        playLottie(lottieSeason, "winter.json", true, REVERSE = false)
+                        playLottie(lottieTerrain, "cloud.json", true, REVERSE = false)
+                    }
                 }
                 in 700..710 -> { //// MIST AND FOG
-                    playLottie(lottieWeather, "weather_cloudy.json", true, REVERSE = false)
-//                    playLottie(lottieSeason,"winter.json",true, REVERSE = false)
-                    playLottie(lottieTerrain, "cloud.json", true, REVERSE = false)
+                    if (hour in 7..18) {
+                        playLottie(lottieWeather, "day_cloudy.json", true, REVERSE = false)
+                    } else {
+                        playLottie(lottieWeather, "weather_cloudy.json", true, REVERSE = false)
+                    }
+                    if (showSeason)
+                        playLottie(lottieTerrain, "cloud.json", true, REVERSE = false)
                 }
                 800 -> { /// WEATHER_CLEAR
-                    playLottie(lottieWeather, "weather_clear_sky.json", true, REVERSE = false)
-//                    playLottie(lottieSeason,"winter.json",true, REVERSE = false)
-//                    playLottie(lottieTerrain,"cloud.json",true, REVERSE = false)
+                    if (hour in 7..18) {
+                        playLottie(lottieWeather, "day_clear.json", true, REVERSE = false)
+                    } else {
+                        playLottie(
+                            lottieWeather,
+                            "weather_clear_sky.json",
+                            true,
+                            REVERSE = false
+                        )
+                    }
                 }
-                in 801..801 -> {  //// CLOUDS
-                    playLottie(lottieWeather, "weather_cloudy.json", true, REVERSE = false)
-//                    playLottie(lottieSeason,"winter.json",true, REVERSE = false)
-//                    playLottie(lottieTerrain, "cloud.json", true, REVERSE = false)
+                in 801..900 -> {  //// CLOUDS
+                    if (hour in 7..18) {
+                        playLottie(
+                            lottieWeather,
+                            "day_cloudy.json",
+                            true,
+                            REVERSE = false
+                        )
+                    } else {
+                        playLottie(lottieWeather, "weather_cloudy.json", true, REVERSE = false)
+                    }
                 }
             }
         }
+
         textViewTemperature.text = "$temperature"
     }
-
-//    var PEEK_HEIGHT = 0
 
     override fun onDestinationPickClicked() {
         showDestinationPickPage()
@@ -862,14 +842,25 @@ class MainActivity : BaseActivity(), MainController.view,
 
         ROUTE_DRAWN = true
 
-        if (ORDER_STATE==Constants.ORDER_STATE_NOT_CREATED) {
+
+
+
+        if (ORDER_STATE == Constants.ORDER_STATE_NOT_CREATED) {
 
             textReady.visibility = View.VISIBLE
             progressReady.visibility = View.GONE
 
+            bottomSheetBehaviour.peekHeight = 0
+            bottomSheetBehaviour.state = BottomSheetBehavior.STATE_COLLAPSED
+
             CURRENT_MODE = Constants.MODE_CREATE_ORDER
             rvReady.visibility = View.GONE
+            rvReady.animate().translationY(100f).setDuration(200)
+                .setInterpolator(AccelerateInterpolator()).start()
+
             modeCreateOrder.visibility = View.VISIBLE
+
+
             cardGPS.visibility = View.GONE
             cardNext.visibility = View.GONE
             imageViewPointerShadow.visibility = View.GONE
@@ -883,116 +874,139 @@ class MainActivity : BaseActivity(), MainController.view,
             textViewStartAddress.text = START_POINT_NAME
             textViewDestination.text = END_POINT_NAME
 
-            val routeLines = ArrayList<LatLng>()
 
-            for (point in route) {
-                routeLines.add(LatLng(point.latitude(), point.longitude()))
+            recyclerViewCars.postDelayed({
+                if (recyclerViewCars.getChildAt(0) != null) {
+                    Log.d("DASDSADADAS", "CHILD HAS")
+                    recyclerViewCars.getChildAt(0)
+                        .findViewById<RelativeLayout>(R.id.rvCar)
+                        .performClick()
+                } else {
+                    Log.d("DASDSADADAS", "NO CHILD")
+                }
+            }, 500)
+
+
+
+            if (route.size > 0) {
+                val routeLines = ArrayList<LatLng>()
+
+                for (point in route) {
+                    routeLines.add(LatLng(point.latitude(), point.longitude()))
+                }
+
+                val latLngBounds = LatLngBounds.Builder()
+                    .includes(routeLines)
+                    .build()
+                if (END_POINT_LAT != 0.0) {
+                    cardViewShowRoute.visibility = View.VISIBLE
+                    cardViewShowRoute.setOnClickListener {
+
+                        mapboxMap.animateCamera(
+                            CameraUpdateFactory.newLatLngBounds(
+                                latLngBounds, 0
+                            ), 600, object : MapboxMap.CancelableCallback {
+                                override fun onCancel() {
+
+                                }
+
+                                override fun onFinish() {
+                                    mapboxMap.animateCamera(
+                                        CameraUpdateFactory.zoomTo(mapboxMap.cameraPosition.zoom - 0.7),
+                                        800
+                                    )
+
+                                }
+
+                            }
+                        )
+                    }
+                    cardViewShowRoute.performClick()
+                }
+
+
             }
 
-            val latLngBounds = LatLngBounds.Builder()
-                .includes(routeLines)
-                .build()
-
-            mapboxMap.animateCamera(
-                CameraUpdateFactory.newLatLngBounds(
-                    latLngBounds, 0
-                ), 600, object : MapboxMap.CancelableCallback {
-                    override fun onCancel() {
-
-                    }
-
-                    override fun onFinish() {
-                        mapboxMap.animateCamera(
-                            CameraUpdateFactory.zoomTo(mapboxMap.cameraPosition.zoom - 0.5),
-                            800
-                        )
-                        if (recyclerViewCars.getChildAt(0)!=null)
-                            recyclerViewCars.getChildAt(0).findViewById<RelativeLayout>(R.id.rvCar)
-                                .performClick()
-                    }
-
-                }
-            )
 
         }
 
 
 
+        if (route.size > 0) {
 
 
-
-        routeLineSource = GeoJsonSource(
-            "line-source",
-            FeatureCollection.fromFeatures(
-                arrayOf(
-                    Feature.fromGeometry(
-                        LineString.fromLngLats(route)
+            routeLineSource = GeoJsonSource(
+                "line-source",
+                FeatureCollection.fromFeatures(
+                    arrayOf(
+                        Feature.fromGeometry(
+                            LineString.fromLngLats(route)
+                        )
                     )
-                )
-            ), GeoJsonOptions().withLineMetrics(true)
-        )
+                ), GeoJsonOptions().withLineMetrics(true)
+            )
 
-        mapBoxStyle.addSource(routeLineSource)
+            mapBoxStyle.addSource(routeLineSource)
 
 
-        mapBoxStyle.addLayerBelow(
-            LineLayer("line-layer", "line-source").withProperties(
+            mapBoxStyle.addLayerBelow(
+                LineLayer("line-layer", "line-source").withProperties(
 //                lineDasharray(arrayOf(0.01f, 2f)),
-                lineCap(Property.LINE_CAP_ROUND),
-                lineJoin(Property.LINE_JOIN_ROUND),
-                lineWidth(7f),
-                lineColor(
-                    (rgb(112, 223, 125))
-                )
+                    lineCap(Property.LINE_CAP_ROUND),
+                    lineJoin(Property.LINE_JOIN_ROUND),
+                    lineWidth(7f),
+                    lineColor(
+                        (rgb(112, 223, 125))
+                    )
+                ), "demo-l-id"
             )
-            , "demo-l-id"
-        )
 
 
-        mapBoxStyle.addSource(
-            GeoJsonSource(
-                "start-source", Feature.fromGeometry(
-                    Point.fromLngLat(
-                        route[0].longitude(),
-                        route[0].latitude()
+            mapBoxStyle.addSource(
+                GeoJsonSource(
+                    "start-source", Feature.fromGeometry(
+                        Point.fromLngLat(
+                            route[0].longitude(),
+                            route[0].latitude()
+                        )
                     )
                 )
             )
-        )
 
 
 
 
-        mapBoxStyle.addSource(
-            GeoJsonSource(
-                "finish-source", Feature.fromGeometry(
-                    Point.fromLngLat(
-                        route[route.size - 1].longitude(),
-                        route[route.size - 1].latitude()
+            mapBoxStyle.addSource(
+                GeoJsonSource(
+                    "finish-source", Feature.fromGeometry(
+                        Point.fromLngLat(
+                            route[route.size - 1].longitude(),
+                            route[route.size - 1].latitude()
+                        )
                     )
                 )
             )
-        )
 
-        mapBoxStyle.addLayer(
-            SymbolLayer(
-                "start-layer",
-                "start-source"
-            ).withProperties(
-                iconImage("start-image"),
-                iconOffset(arrayOf(0f, -8f))
+            mapBoxStyle.addLayer(
+                SymbolLayer(
+                    "start-layer",
+                    "start-source"
+                ).withProperties(
+                    iconImage("start-image"),
+                    iconOffset(arrayOf(0f, -8f))
+                )
             )
-        )
-        mapBoxStyle.addLayer(
-            SymbolLayer(
-                "finish-layer",
-                "finish-source"
-            ).withProperties(
-                iconImage("finish-image"),
-                iconOffset(arrayOf(0f, -8f))
+            mapBoxStyle.addLayer(
+                SymbolLayer(
+                    "finish-layer",
+                    "finish-source"
+                ).withProperties(
+                    iconImage("finish-image"),
+                    iconOffset(arrayOf(0f, -8f))
+                )
             )
-        )
 
+        }
     }
 
     val paymentMethods = ArrayList<PaymentMethod>()
@@ -1009,144 +1023,168 @@ class MainActivity : BaseActivity(), MainController.view,
     }
 
     override fun onTariffsReady(tariffs: ArrayList<ServiceTariff>) {
-        TARIFF_ID = tariffs[0].id
-        recyclerViewCars.layoutManager = LinearLayoutManager(
-            this,
-            LinearLayoutManager.HORIZONTAL,
-            false
-        )
-        val decimalFormat = DecimalFormat("###,###")
 
-        if (paymentMethods.isEmpty()) {
-            presenter.getPaymentMethods(START_POINT_LAT, START_POINT_LON)
-        }
+        if (TARIFF_ID != tariffs[0].id) {
 
+            TARIFF_ID = tariffs[0].id
+            recyclerViewCars.layoutManager = LinearLayoutManager(
+                this,
+                LinearLayoutManager.HORIZONTAL,
+                false
+            )
+            val decimalFormat = DecimalFormat("###,###")
 
-        recyclerViewCars.adapter = CarsAdapter(tariffs, object : CarsAdapter.TariffClickListener {
-            override fun onTariffChosen(
-                tariffID: Long,
-                shimmer: Shimmer,
-                textViewPrice: ShimmerTextView,
-                options: ArrayList<TariffOption>
-            ) {
-                COMMENT = ""
-                TARIF_OPTIONS.clear()
+            if (paymentMethods.isEmpty()) {
+                presenter.getPaymentMethods(START_POINT_LAT, START_POINT_LON)
+            }
 
-                val routePoints = ArrayList<RouteCoordinates>()
-                routePoints.add(RouteCoordinates(START_POINT_LAT, START_POINT_LON, null))
-                routePoints.add(RouteCoordinates(END_POINT_LAT, END_POINT_LON, null))
+            recyclerViewCars.adapter = CarsAdapter(
+                tariffs,
+                object : CarsAdapter.TariffClickListener {
+                    override fun onTariffChosen(
+                        tariffID: Long,
+                        shimmer: Shimmer,
+                        textViewPrice: ShimmerTextView,
+                        options: ArrayList<TariffOption>
+                    ) {
+                        Log.d("DASDSADADAS", "TARIF CLICK")
 
-                var price = 0.0
+                        COMMENT = ""
+                        TARIF_OPTIONS.clear()
 
-                mainDisposables.add(
-                    RetrofitHelper.apiService(Constants.BASE_URL)
-                        .getEstimatedRide(
-                            Constants.HIVE_PROFILE,
-                            EstimateRideRequest(
-                                PaymentMethod("cash", null, null, null),
-                                tariffID,
-                                null,
-                                routePoints
-                            )
+                        val routePoints = ArrayList<RouteCoordinates>()
+                        routePoints.add(RouteCoordinates(START_POINT_LAT, START_POINT_LON, null))
+                        if (END_POINT_LAT != 0.0)
+                            routePoints.add(RouteCoordinates(END_POINT_LAT, END_POINT_LON, null))
+
+                        var price = 0.0
+
+                        mainDisposables.add(
+                            RetrofitHelper.apiService(Constants.BASE_URL)
+                                .getEstimatedRide(
+                                    Constants.HIVE_PROFILE,
+                                    EstimateRideRequest(
+                                        PaymentMethod("cash", null, null, null),
+                                        tariffID,
+                                        null,
+                                        routePoints
+                                    )
+                                )
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribeOn(Schedulers.io())
+                                .subscribe({
+                                    if (it.isSuccessful) {
+                                        shimmer.cancel()
+                                        if (it.body() != null) {
+                                            price = it.body()!!.cost.amount
+                                            textViewPrice.text =
+                                                "${decimalFormat.format(it.body()!!.cost.amount)} сум"
+
+                                            if (END_POINT_LAT != 0.0) {
+                                                textViewDistance.visibility = View.VISIBLE
+                                                textViewDistance.text = "${
+                                                    Constants.roundAvoid(
+                                                        it.body()!!.distance / 1000,
+                                                        2
+                                                    )
+                                                } км"
+                                            }
+
+                                        }
+                                    }
+                                }, {
+
+                                })
                         )
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribeOn(Schedulers.io())
-                        .subscribe({
-                            if (it.isSuccessful) {
-                                shimmer.cancel()
-                                if (it.body() != null) {
-                                    price = it.body()!!.cost.amount
+
+                        val optionChosenListener =
+                            object : BottomSheetOrderFilter.OptionsChosenListener {
+                                override fun onOptionsChosen(
+                                    comment: String,
+                                    options: ArrayList<Long>,
+                                    optionsValue: Double
+                                ) {
+                                    OPTIONS_VALUE = optionsValue
+                                    TARIF_OPTIONS = options
+
+                                    COMMENT = comment
+
                                     textViewPrice.text =
-                                        "${decimalFormat.format(it.body()!!.cost.amount)} сум"
-                                    textViewDistance.visibility = View.VISIBLE
-                                    textViewDistance.text =
-                                        "${Constants.roundAvoid(it.body()!!.distance / 1000, 2)} км"
+                                        "${decimalFormat.format(price + optionsValue)} сум"
+
                                 }
                             }
-                        }, {
 
-                        })
-                )
+                        imageViewFilterCar.setOnClickListener {
+                            BottomSheetOrderFilter(
+                                options,
+                                COMMENT,
+                                TARIF_OPTIONS,
+                                OPTIONS_VALUE,
+                                optionChosenListener
+                            ).show(
+                                supportFragmentManager,
+                                "filter"
+                            )
+                        }
+                        rvOrder.setBackgroundResource(R.drawable.bc_button_purple)
 
-                val optionChosenListener = object : BottomSheetOrderFilter.OptionsChosenListener {
-                    override fun onOptionsChosen(
-                        comment: String,
-                        options: ArrayList<Long>,
-                        optionsValue: Double
-                    ) {
-                        OPTIONS_VALUE = optionsValue
-                        TARIF_OPTIONS = options
+                        rvOrder.setOnClickListener {
 
-                        COMMENT = comment
+                            if (progressOrder.visibility == View.GONE) {
 
-                        textViewPrice.text =
-                            "${decimalFormat.format(price + optionsValue)} сум"
+                                progressOrder.visibility = View.VISIBLE
+                                textOrder.visibility = View.GONE
 
-                    }
-                }
-
-                imageViewFilterCar.setOnClickListener {
-                    BottomSheetOrderFilter(
-                        options,
-                        COMMENT,
-                        TARIF_OPTIONS,
-                        OPTIONS_VALUE,
-                        optionChosenListener
-                    ).show(
-                        supportFragmentManager,
-                        "filter"
-                    )
-                }
-                rvOrder.setBackgroundResource(R.drawable.bc_button_purple)
-
-                rvOrder.setOnClickListener {
-
-                    if (progressOrder.visibility == View.GONE) {
-
-                        progressOrder.visibility = View.VISIBLE
-                        textOrder.visibility = View.GONE
-
-                        val createOrderRequest = CreateOrderRequest(
-                            CHOSEN_PAYMENT_METHOD,
-                            tariffID,
-                            TARIF_OPTIONS,
-                            arrayListOf(
-                                ClientAddress(
-                                    SearchedAddress(
-                                        START_POINT_NAME, null, null,
-                                        SearchPosition(START_POINT_LAT, START_POINT_LON)
-                                    ), null, null, null, null
-                                ),
-                                ClientAddress(
-                                    SearchedAddress(
-                                        END_POINT_NAME,
-                                        null,
-                                        null,
-                                        SearchPosition(END_POINT_LAT, END_POINT_LON)
-                                    ), null, null, null, null
+                                val routeORDER = ArrayList<ClientAddress>()
+                                routeORDER.add(
+                                    ClientAddress(
+                                        SearchedAddress(
+                                            START_POINT_NAME, null, null,
+                                            SearchPosition(START_POINT_LAT, START_POINT_LON)
+                                        ), null, null, null, null
+                                    )
                                 )
-                            ),
-                            null,
-                            COMMENT,
-                            null,
-                            null,
-                            null,
-                            null,
-                            true,
-                            null
-                        )
+                                if (END_POINT_LAT != 0.0) {
+                                    routeORDER.add(
+                                        ClientAddress(
+                                            SearchedAddress(
+                                                END_POINT_NAME,
+                                                null,
+                                                null,
+                                                SearchPosition(END_POINT_LAT, END_POINT_LON)
+                                            ), null, null, null, null
+                                        )
+                                    )
+                                }
 
-                        mainDisposables.add(presenter.createOrder(createOrderRequest))
+                                val createOrderRequest = CreateOrderRequest(
+                                    CHOSEN_PAYMENT_METHOD,
+                                    tariffID,
+                                    TARIF_OPTIONS,
+                                    routeORDER,
+                                    null,
+                                    COMMENT,
+                                    null,
+                                    null,
+                                    null,
+                                    null,
+                                    true,
+                                    null
+                                )
+
+                                mainDisposables.add(presenter.createOrder(createOrderRequest))
+
+                            }
+
+
+                        }
 
                     }
+                })
 
+        }
 
-                }
-
-            }
-        })
-//        val helper: SnapHelper = GravitySnapHelper(Gravity.START)
-//        helper.attachToRecyclerView(recyclerViewCars)
     }
 
     var COMMENT = ""
@@ -1156,6 +1194,9 @@ class MainActivity : BaseActivity(), MainController.view,
     var PEEK_HEIGHT = 0
 
     fun showSearchWherePage() {
+
+        END_POINT_LAT = 0.0
+        END_POINT_LON = 0.0
 
         if (ActivityCompat.checkSelfPermission(
                 this,
@@ -1182,6 +1223,8 @@ class MainActivity : BaseActivity(), MainController.view,
         modeSearchCar.visibility = View.GONE
         modeCreateOrder.visibility = View.GONE
 
+
+
         CURRENT_MODE = Constants.MODE_SEARCH_WHERE
         textViewCurrentAddress.visibility = View.VISIBLE
 
@@ -1192,9 +1235,13 @@ class MainActivity : BaseActivity(), MainController.view,
         cardNext.visibility = View.VISIBLE
 
         rvReady.visibility = View.GONE
+        rvReady.animate().translationY(100f).setDuration(200)
+            .setInterpolator(AccelerateInterpolator()).start()
         textViewDistance.visibility = View.GONE
 
         ROUTE_DRAWN = false
+
+
     }
 
     fun showDestinationPickPage() {
@@ -1203,13 +1250,16 @@ class MainActivity : BaseActivity(), MainController.view,
 
         if (CURRENT_MODE == Constants.MODE_CREATE_ORDER) {
 
-            val position = CameraPosition.Builder()
-                .target(LatLng(END_POINT_LAT, END_POINT_LON))
-                .zoom(16.0)
-                .tilt(20.0)
-                .build()
+            if (END_POINT_LAT != 0.0) {
+                val position = CameraPosition.Builder()
+                    .target(LatLng(END_POINT_LAT, END_POINT_LON))
+                    .zoom(16.0)
+                    .tilt(TILT_MAP)
+                    .build()
 
-            mapboxMap.easeCamera(CameraUpdateFactory.newCameraPosition(position), 1000)
+                mapboxMap.easeCamera(CameraUpdateFactory.newCameraPosition(position), 1000)
+            }
+
             rvOrder.setBackgroundResource(R.drawable.bc_button_purple_disabled)
             rvOrder.setOnClickListener(null)
             removeRoute()
@@ -1217,10 +1267,24 @@ class MainActivity : BaseActivity(), MainController.view,
 
         CURRENT_MODE = Constants.MODE_DESTINATION_PICK
 
+        val mapLatLng = mapboxMap.cameraPosition.target
+        val mapLat = mapLatLng.latitude
+        val mapLong = mapLatLng.longitude
+
+        val position = CameraPosition.Builder()
+            .target(LatLng(mapLat + 0.0005, mapLong))
+            .tilt(TILT_MAP)
+            .build()
+
+        mapboxMap.easeCamera(CameraUpdateFactory.newCameraPosition(position), 500)
+
+
         bottomSheetBehaviour.peekHeight = 0
         bottomSheetBehaviour.state = BottomSheetBehavior.STATE_COLLAPSED
         cardNext.visibility = View.GONE
         rvReady.visibility = View.VISIBLE
+        rvReady.animate().translationY(0f).setDuration(200)
+            .setInterpolator(DecelerateInterpolator()).start()
         imageViewPointerFoot.visibility = View.VISIBLE
         textViewDistance.visibility = View.GONE
 
@@ -1242,7 +1306,7 @@ class MainActivity : BaseActivity(), MainController.view,
 
         ROUTE_DRAWN = false
 
-        rvReady.visibility = View.VISIBLE
+
         modeCreateOrder.visibility = View.GONE
         cardGPS.visibility = View.VISIBLE
         cardNext.visibility = View.GONE
@@ -1260,6 +1324,7 @@ class MainActivity : BaseActivity(), MainController.view,
     }
 
     private fun removeRoute() {
+        cardViewShowRoute.visibility = View.GONE
         for (layer in mapBoxStyle.layers) {
             if (layer.id.startsWith("line-") || layer.id.startsWith("start-") || layer.id.startsWith(
                     "finish-"
@@ -1306,6 +1371,8 @@ class MainActivity : BaseActivity(), MainController.view,
 
     fun showCarSearchPage(orderID: Long) {
 
+        cardViewShowRoute.visibility = View.GONE
+
         CURRENT_MODE = Constants.MODE_CAR_SEARCH
 
         modeCreateOrder.visibility = View.GONE
@@ -1326,8 +1393,10 @@ class MainActivity : BaseActivity(), MainController.view,
 
     }
 
+    lateinit var carPositionDisposable: Disposable
 
     override fun onOrderCreated(orderID: Long) {
+
         showCarSearchPage(orderID)
         textSearching.text = "Ищем водителей вокруг ..."
         shimmer = Shimmer()
@@ -1337,6 +1406,93 @@ class MainActivity : BaseActivity(), MainController.view,
             textSearching.text = "Отмена заказа"
             mainDisposables.add(presenter.cancelOrder(orderID))
         }
+
+        carPositionDisposable = Observable.interval(
+            0, 1500,
+            TimeUnit.MILLISECONDS
+        )
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io())
+            .subscribe({
+                RetrofitHelper.apiService(Constants.BASE_URL)
+                    .getOrderDetails(
+                        Constants.HIVE_PROFILE,
+                        NaiveHmacSigner.DateSignature(),
+                        NaiveHmacSigner.AuthSignature(
+                            HIVE_USER_ID,
+                            HIVE_TOKEN,
+                            "GET",
+                            "/api/client/mobile/2.2/orders/$orderID"
+                        ),
+                        orderID
+                    )
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeOn(Schedulers.io())
+                    .subscribe({
+
+                        if (it.isSuccessful && it.body() != null) {
+                            val decimalFormat = DecimalFormat("###,###")
+
+                            onOnGoingOrderChange(orderID, it.body()!!)
+                            ORDER_COST = decimalFormat.format(it.body()!!.cost.amount)
+
+                            if (textViewRate.text == "" || textViewCarNumber.text.contains("null")) {
+                                textViewCarName.text =
+                                    "${it.body()!!.assignee?.car?.brand} ${it.body()!!.assignee?.car?.model} - ${it.body()!!.assignee?.car?.color}"
+                                textViewCarNumber.text = "${it.body()!!.assignee?.car?.regNum}"
+
+                                textViewRate.text =
+                                    "$ORDER_COST сум"
+                                if (it.body()!!.assignee != null)
+                                    when (it.body()!!.assignee!!.car.alias) {
+                                        Constants.CAR_ALIAS_NEXIA -> {
+                                            imageViewAssignedCar.setImageResource(R.drawable.nexia)
+                                        }
+                                        Constants.CAR_ALIAS_LACETTI -> {
+                                            imageViewAssignedCar.setImageResource(R.drawable.lacetti)
+                                        }
+                                        Constants.CAR_ALIAS_MATIZ -> {
+                                            imageViewAssignedCar.setImageResource(R.drawable.matiz)
+                                        }
+                                        Constants.CAR_ALIAS_SPARK -> {
+                                            imageViewAssignedCar.setImageResource(R.drawable.spark_2)
+                                        }
+
+
+                                    }
+
+
+                                textView0Address.text = "${it.body()!!.route[0].address.name}"
+                                if (it.body()!!.route.size > 1)
+                                    textView1Address.text = "${it.body()!!.route[1].address.name}"
+                            }
+
+                            if (it.body()!!.route[0].address.position != null) {
+                                START_POINT_LAT = it.body()!!.route[0].address.position!!.lat
+                                START_POINT_LON = it.body()!!.route[0].address.position!!.lon
+
+                                if (it.body()!!.assignee?.location != null) {
+                                    addCar(
+                                        it.body()!!.assignee?.location!!.lat,
+                                        it.body()!!.assignee?.location!!.lon
+                                    )
+                                }
+                            }
+
+
+                        }
+
+                    }, {
+
+                    })
+
+            },
+                {
+
+                }
+            )
+
+
     }
 
     override fun onOrderCancelled() {
@@ -1423,17 +1579,22 @@ class MainActivity : BaseActivity(), MainController.view,
 
             val LAYER_ID = "layer-${car.id}"
 
+            val rotation =  Constants.getRotation(
+                LatLng(car.location.lat, car.location.lon),
+                lastCarLatLng
+            )
+
             val carLayer = SymbolLayer(LAYER_ID, SOURCE_ID)
                 .withProperties(
-                    iconImage(IMAGE_ID),
+                    iconImage(Constants.getCarIcon(rotation)),
                     iconIgnorePlacement(true),
                     iconAllowOverlap(true),
-                    iconRotate(
-                        Constants.getRotation(
-                            LatLng(car.location.lat, car.location.lon),
-                            lastCarLatLng
-                        )
-                    )
+//                    iconRotate(
+//                        Constants.getRotation(
+//                            LatLng(car.location.lat, car.location.lon),
+//                            lastCarLatLng
+//                        )
+//                    )
                 )
 
             lastCarLatLng = LatLng(car.location.lat, car.location.lon)
@@ -1548,6 +1709,12 @@ class MainActivity : BaseActivity(), MainController.view,
                 progressGPS.visibility = View.VISIBLE
                 imageGPS.visibility = View.GONE
             }
+        }
+
+        cardNext.setOnClickListener {
+
+            drawRoute(arrayListOf())
+
         }
     }
 
@@ -1740,7 +1907,7 @@ class MainActivity : BaseActivity(), MainController.view,
         val position = CameraPosition.Builder()
             .target(LatLng(location.latitude, location.longitude))
             .zoom(16.0)
-            .tilt(20.0)
+            .tilt(TILT_MAP)
             .build()
 
 
@@ -1792,73 +1959,23 @@ class MainActivity : BaseActivity(), MainController.view,
 
         if (::geoJsonSource.isInitialized) {
 
+//
+            if (animator != null) {
 
-            if (animator != null && !animator!!.isRunning) {
+                animator!!.removeAllUpdateListeners()
+                animator!!.removeAllListeners()
+                animator!!.cancel()
                 moveCar(latitude, longitude)
-
             } else if (animator == null) {
                 moveCar(latitude, longitude)
             }
 
-            if (CURRENT_MODE == Constants.MODE_CAR_FOUND) {
-
-//                if (::driwerLineSource.isInitialized) {
-//                    val carPoint = Location("carPoint")
-//                    carPoint.latitude = latitude
-//                    carPoint.longitude = longitude
-//                    for (routePoint in driwerRoute) {
-//                        val linePoint = Location("linePoint")
-//                        linePoint.latitude = routePoint.latitude()
-//                        linePoint.longitude = routePoint.longitude()
-//
-//                        val distance = linePoint.distanceTo(carPoint)
-//                        if (distance < 15) {
-//                            driwerRoute.remove(routePoint)
-//                        }
-//                    }
-//                    driwerLineSource.setGeoJson(
-//                        Feature.fromGeometry(
-//                            LineString.fromLngLats(
-//                                driwerRoute
-//                            )
-//                        )
-//                    )
-//                }
-
-            }
-
-            if (CURRENT_MODE == Constants.MODE_RIDE_STARTED) {
-
-                if (::routeLineSource.isInitialized) {
-
-                    val carPoint = Location("APoint")
-                    carPoint.latitude = latitude
-                    carPoint.longitude = longitude
-                    for (routePoint in routeLineData) {
-                        val linePoint = Location("BPoint")
-                        linePoint.latitude = routePoint.latitude()
-                        linePoint.longitude = routePoint.longitude()
-
-                        val distance = linePoint.distanceTo(carPoint)
-                        if (distance < 15) {
-                            routeLineData.remove(routePoint)
-                        }
-                    }
-                    routeLineSource.setGeoJson(
-                        Feature.fromGeometry(
-                            LineString.fromLngLats(
-                                routeLineData
-                            )
-                        )
-                    )
-                }
-
-            }
-
-
         } else {
+
             if (CURRENT_MODE == Constants.MODE_CAR_FOUND)
                 showDriverRoute(latitude, longitude)
+            if (END_POINT_LAT != 0.0)
+                cardViewShowRoute.visibility = View.GONE
 
             carPosition = LatLng(latitude, longitude)
 
@@ -1876,11 +1993,11 @@ class MainActivity : BaseActivity(), MainController.view,
 
             val carLayer = SymbolLayer("demo-l-id", "demo-s-id")
                 .withProperties(
-                    iconImage("demo-i-id")
+                    iconImage("fleet-0")
                 )
 
             mapBoxStyle.addLayer(
-             carLayer
+                carLayer
             )
 
         }
@@ -1897,47 +2014,99 @@ class MainActivity : BaseActivity(), MainController.view,
         carPointNEW.latitude = latitude
         carPointNEW.longitude = longitude
 
-                        val distance = carPointOLD.distanceTo(carPointNEW)
-                        if (distance > 10) {
+        val distance = carPointOLD.distanceTo(carPointNEW)
 
-                            var rotation = Constants.getRotation(carPosition, LatLng(latitude, longitude))
+        if (distance > 5) {
 
-                            if (!rotation.isNaN()) {
+            var rotation = Constants.getRotation(carPosition, LatLng(latitude, longitude))
 
-                                if (kotlin.math.abs(rotation - OLD_ROTATION) > 180) {
-                                    rotation -= 360
-                                }
+            if (!rotation.isNaN()) {
 
-                                iconSpinningAnimator = ValueAnimator.ofFloat(OLD_ROTATION, rotation)
-                                iconSpinningAnimator!!.duration = 600
-                                iconSpinningAnimator!!.interpolator = LinearInterpolator()
-
-                                iconSpinningAnimator!!.addUpdateListener { valueAnimator -> // Retrieve the new animation number to use as the map camera bearing value
-                                    val newIconRotateValue = valueAnimator.animatedValue as Float
-                                    OLD_ROTATION = newIconRotateValue
-                                    mapboxMap.getStyle { style ->
-                                        val iconSymbolLayer: Layer? = style.getLayerAs("demo-l-id")
-                                        iconSymbolLayer?.setProperties(
-                                            iconRotate(newIconRotateValue)
-                                        )
-                                    }
-                                }
-
-                                iconSpinningAnimator!!.start()
-                            }
+                if (kotlin.math.abs(rotation - OLD_ROTATION) > 180) {
+                    rotation -= 360
+                }
 
 
-                            animator = ObjectAnimator
-                                .ofObject(latLngEvaluator, carPosition, LatLng(latitude, longitude))
-                                .setDuration(6000)
-                            animator!!.interpolator = LinearInterpolator()
-                            animator!!.addUpdateListener(animatorUpdateListener)
-                            animator!!.start()
 
-                            carPosition = LatLng(latitude, longitude)
+                Log.d("DASDASDSAAADS", "$rotation")
 
-                        }
+                iconSpinningAnimator = ValueAnimator.ofFloat(OLD_ROTATION, rotation)
+                iconSpinningAnimator!!.duration = 600
+                iconSpinningAnimator!!.interpolator = LinearInterpolator()
+
+                iconSpinningAnimator!!.addUpdateListener { valueAnimator -> // Retrieve the new animation number to use as the map camera bearing value
+                    var newIconRotateValue = valueAnimator.animatedValue as Float
+                    OLD_ROTATION = newIconRotateValue
+
+                    if(newIconRotateValue<0)
+                        newIconRotateValue += 360
+
+                    val rotateFormatter = DecimalFormat("#.#")
+
+                    Log.d("DSADASDASDSADASDASAA","${kotlin.math.abs(rotateFormatter.format(newIconRotateValue).toFloat())}")
+
+                    mapboxMap.getStyle { style ->
+                        val iconSymbolLayer: Layer? = style.getLayerAs("demo-l-id")
+                        iconSymbolLayer?.setProperties(
+//                            iconRotate(newIconRotateValue),
+                            iconImage(Constants.getCarIcon(kotlin.math.abs(rotateFormatter.format(newIconRotateValue).toFloat())))
+                        )
+                    }
+                }
+
+                iconSpinningAnimator!!.start()
+            }
+        }
+
+        val animatorUpdateListener =
+            AnimatorUpdateListener { valueAnimator ->
+                val animatedPosition = valueAnimator.animatedValue as LatLng
+                carPosition = animatedPosition
+                geoJsonSource.setGeoJson(
+                    Point.fromLngLat(
+                        animatedPosition.longitude,
+                        animatedPosition.latitude
+                    )
+                )
+
+                val position = CameraPosition.Builder()
+                    .target(
+                        LatLng(
+                            animatedPosition.latitude,
+                            animatedPosition.longitude
+                        )
+                    )
+//                    .zoom(16.0)
+                    .build()
+//
+                mapboxMap.easeCamera(CameraUpdateFactory.newCameraPosition(position))
+
+
+            }
+
+        val latLngEvaluator: TypeEvaluator<LatLng> = object : TypeEvaluator<LatLng> {
+            private val latLng = LatLng()
+            override fun evaluate(fraction: Float, startValue: LatLng, endValue: LatLng): LatLng {
+                latLng.latitude = (startValue.latitude
+                        + (endValue.latitude - startValue.latitude) * fraction)
+                latLng.longitude = (startValue.longitude
+                        + (endValue.longitude - startValue.longitude) * fraction)
+                return latLng
+            }
+        }
+
+        animator = ObjectAnimator
+            .ofObject(latLngEvaluator, carPosition, LatLng(latitude, longitude))
+            .setDuration(5000)
+        animator!!.interpolator = LinearInterpolator()
+        animator!!.addUpdateListener(animatorUpdateListener)
+        animator!!.start()
+
+        carPosition = LatLng(latitude, longitude)
+
+
     }
+
 
     private fun showDriverRoute(latitude: Double, longitude: Double) {
         val position = CameraPosition.Builder()
@@ -1952,13 +2121,7 @@ class MainActivity : BaseActivity(), MainController.view,
 //
         mapboxMap.easeCamera(CameraUpdateFactory.newCameraPosition(position), 1000)
 
-//        mainDisposables.add(
-//            presenter.getRoute(
-//                Point.fromLngLat(longitude, latitude),
-//                Point.fromLngLat(START_POINT_LON, START_POINT_LAT),
-//                true
-//            )
-//        )
+
     }
 
     fun showFeedbackOrder(orderID: Long, cost: String) {
@@ -2020,30 +2183,6 @@ class MainActivity : BaseActivity(), MainController.view,
     }
 
 
-    private val animatorUpdateListener =
-        AnimatorUpdateListener { valueAnimator ->
-            val animatedPosition = valueAnimator.animatedValue as LatLng
-            geoJsonSource.setGeoJson(
-                Point.fromLngLat(
-                    animatedPosition.longitude,
-                    animatedPosition.latitude
-                )
-            )
-        }
-
-    // Class is used to interpolate the marker animation.
-    private val latLngEvaluator: TypeEvaluator<LatLng> = object : TypeEvaluator<LatLng> {
-        private val latLng = LatLng()
-        override fun evaluate(fraction: Float, startValue: LatLng, endValue: LatLng): LatLng {
-            latLng.latitude = (startValue.latitude
-                    + (endValue.latitude - startValue.latitude) * fraction)
-            latLng.longitude = (startValue.longitude
-                    + (endValue.longitude - startValue.longitude) * fraction)
-            return latLng
-        }
-    }
-
-
 // Required functions
 
     override fun onProviderEnabled(provider: String) {
@@ -2085,7 +2224,15 @@ class MainActivity : BaseActivity(), MainController.view,
                 .foregroundTintColor(ResourcesCompat.getColor(resources, R.color.white, null))
                 .accuracyColor(ContextCompat.getColor(this, R.color.purple_500))
                 .build()
-
+//
+//
+//            val customLocationComponentOptions = LocationComponentOptions.builder(this)
+//                .elevation(5f)
+//                .accuracyAlpha(.6f)
+//                .accuracyColor(ContextCompat.getColor(this, R.color.purple_500))
+//                .foregroundDrawable(R.drawable.find)
+//                .build()
+//
             val locationComponentActivationOptions = LocationComponentActivationOptions.builder(
                 this,
                 loadedMapStyle
@@ -2139,7 +2286,10 @@ class MainActivity : BaseActivity(), MainController.view,
                     showSearchWherePage()
                 }
                 Constants.MODE_CREATE_ORDER -> {
-                    showDestinationPickPage()
+                    if (END_POINT_LAT != 0.0)
+                        showDestinationPickPage()
+                    else
+                        showSearchWherePage()
                 }
                 Constants.MODE_CAR_SEARCH -> {
 
@@ -2171,17 +2321,599 @@ class MainActivity : BaseActivity(), MainController.view,
 
     }
 
-    fun hideKeyboard(activity: Activity) {
-        val imm: InputMethodManager =
-            activity.getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-        //Find the currently focused view, so we can grab the correct window token from it.
-        var view = activity.currentFocus
-        //If no view currently has focus, create a new one, just so we can grab a window token from it
-        if (view == null) {
-            view = View(activity)
+
+    override fun onRestart() {
+        super.onRestart()
+        if (!sharedPreferences.getBoolean(Constants.SETTINGS_WEATHER_ANIMATION, true)) {
+            lottieTerrain.cancelAnimation()
+            lottieTerrain.visibility = View.GONE
+            lottieSeason.cancelAnimation()
+            lottieSeason.visibility = View.GONE
+        } else {
+            lottieTerrain.playAnimation()
+            lottieTerrain.visibility = View.VISIBLE
+            lottieSeason.playAnimation()
+            lottieSeason.visibility = View.VISIBLE
         }
-        imm.hideSoftInputFromWindow(view.windowToken, 0)
     }
 
+
+
+
+    private fun addCarImages() {
+
+        mapBoxStyle.addImage(
+            "fleet-0", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.car_0),
+                168, 168,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-5", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.car_5),
+                168, 168,
+                true)
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-10",
+            Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.car_10),
+                168, 168,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-15", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.car_15),
+                168, 168,
+                true)
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-20",
+            Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.car_20),
+                168, 168,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-25", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.car_25),
+                168, 168,
+                true)
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-30",
+            Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.car_30),
+                168, 168,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-35", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.car_35),
+                168, 168,
+                true)
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-40",
+            Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.car_40),
+                168, 168,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-45", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.car_45),
+                168, 168,
+                true)
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-50",
+            Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.car_50),
+                168, 168,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-55", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.car_55),
+                168, 168,
+                true)
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-60",
+            Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.car_60),
+                168, 168,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-65", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.car_65),
+                168, 168,
+                true)
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-70",
+            Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.car_70),
+                168, 168,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-75", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.car_75),
+                168, 168,
+                true)
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-80",
+            Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.car_80),
+                168, 168,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-85", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.car_85),
+                168, 168,
+                true)
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-90",
+            Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.car_90),
+                168, 168,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-95", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.car_95),
+                168, 168,
+                true)
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-100", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.car_100),
+                168, 168,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-105", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.car_105),
+                168, 168,
+                true)
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-110",
+            Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.car_110),
+                168, 168,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-115", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.car_115),
+                168, 168,
+                true)
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-120",
+            Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.car_120),
+                168, 168,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-125", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.car_125),
+                168, 168,
+                true)
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-130",
+            Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.car_130),
+                168, 168,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-135", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.car_135),
+                168, 168,
+                true)
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-140",
+            Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.car_140),
+                168, 168,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-145", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.car_145),
+                168, 168,
+                true)
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-150",
+            Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.car_150),
+                168, 168,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-155", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.car_155),
+                168, 168,
+                true)
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-160",
+            Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.car_160),
+                168, 168,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-165", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.car_165),
+                168, 168,
+                true)
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-170",
+            Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.car_170),
+                168, 168,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-175", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.car_175),
+                168, 168,
+                true)
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-180",
+            Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.car_180),
+                168, 168,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-185", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.car_185),
+                168, 168,
+                true)
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-190", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.car_190),
+                168, 168,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-195", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.car_195),
+                168, 168,
+                true)
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-200",
+            Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.car_200),
+                168, 168,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-205", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.car_205),
+                168, 168,
+                true)
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-210",
+            Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.car_210),
+                168, 168,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-215", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.car_215),
+                168, 168,
+                true)
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-220",
+            Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.car_220),
+                168, 168,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-225", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.car_225),
+                168, 168,
+                true)
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-230",
+            Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.car_230),
+                168, 168,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-235", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.car_235),
+                168, 168,
+                true)
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-240",
+            Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.car_240),
+                168, 168,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-245", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.car_245),
+                168, 168,
+                true)
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-250",
+            Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.car_250),
+                168, 168,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-255", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.car_255),
+                168, 168,
+                true)
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-260",
+            Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.car_260),
+                168, 168,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-265", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.car_265),
+                168, 168,
+                true)
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-270",
+            Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.car_270),
+                168, 168,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-275", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.car_275),
+                168, 168,
+                true)
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-280",
+            Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.car_280),
+                168, 168,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-285", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.car_285),
+                168, 168,
+                true)
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-290", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.car_290),
+                168, 168,
+                true
+            )
+        )
+        mapBoxStyle.addImage(
+            "fleet-295", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.car_295),
+                168, 168,
+                true)
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-300",
+            Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.car_300),
+                168, 168,
+                true
+            )
+        )
+        mapBoxStyle.addImage(
+            "fleet-305", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.car_305),
+                168, 168,
+                true)
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-310",
+            Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.car_310),
+                168, 168,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-315", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.car_315),
+                168, 168,
+                true)
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-320",
+            Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.car_320),
+                168, 168,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-325", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.car_325),
+                168, 168,
+                true)
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-330",
+            Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.car_330),
+                168, 168,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-335", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.car_335),
+                168, 168,
+                true)
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-340",
+            Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.car_340),
+                168, 168,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-345", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.car_345),
+                168, 168,
+                true)
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-350",
+            Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.car_350),
+                168, 168,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-355", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.car_355),
+                168, 168,
+                true)
+        )
+
+
+
+    }
 
 }

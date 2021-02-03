@@ -14,7 +14,7 @@
         android:layout_width="54dp"
         android:layout_height="54dp"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="52dp"
         android:background="@drawable/bc_btn_menu"
         android:clickable="true"
         app:layout_constraintLeft_toLeftOf="parent"

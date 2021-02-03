@@ -7,7 +7,21 @@
     android:layout_height="match_parent"
     tools:context=".ui.info.InfoActivity">
 
-    
+    <androidx.viewpager.widget.ViewPager
+        android:id="@+id/viewPagerInfo"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tab_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            app:tabTextColor="@color/purple_200"
+            app:tabSelectedTextColor="@color/black"
+            />
+
+    </androidx.viewpager.widget.ViewPager>
 
 
 
