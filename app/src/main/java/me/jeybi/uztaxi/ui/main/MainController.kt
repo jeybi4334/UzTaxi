@@ -46,6 +46,7 @@ interface MainController {
 
         fun drawDriverRoute(route: ArrayList<Point>,origin : Point)
 
+        fun onHasGPS()
 
 
         fun onErrorGetRoute()

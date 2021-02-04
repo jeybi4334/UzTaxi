@@ -83,6 +83,8 @@ class MainPresenter(val view: MainActivity) : MainController.presenter {
         )
         if (!provider.contains("gps")) {
             view.buildAlertMessageNoGps()
+        }else{
+            view.onHasGPS()
         }
 
 
