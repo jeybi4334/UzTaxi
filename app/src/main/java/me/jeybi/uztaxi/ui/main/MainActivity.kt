@@ -229,7 +229,9 @@ class MainActivity : BaseActivity(), MainController.view,
         mapView?.getMapAsync { mapboxMap ->
             this.mapboxMap = mapboxMap
             mapboxMap.setStyle(
-                Style.Builder().fromUri("mapbox://styles/jeybi24/ckiyh6njc4oxw19o2lh0n9rtl")
+//                Style.Builder().fromUri("mapbox://styles/jeybi24/ckiyh6njc4oxw19o2lh0n9rtl")
+                Style.Builder().fromUri("mapbox://styles/jeybi24/ckkqszy7a145h17pmoy1le5tv")
+//                Style.MAPBOX_STREETS
             )
             {
                 mapBoxStyle = it
@@ -250,15 +252,15 @@ class MainActivity : BaseActivity(), MainController.view,
                 }
 
                 mapboxMap.addOnMapClickListener {
-                    val position = CameraPosition.Builder()
-                        .target(it)
-                        .zoom(16.0)
-                        .tilt(TILT_MAP)
-                        .build()
+//                    val position = CameraPosition.Builder()
+//                        .target(it)
+//                        .zoom(16.0)
+//                        .tilt(TILT_MAP)
+//                        .build()
+//
+//                    mapboxMap.easeCamera(CameraUpdateFactory.newCameraPosition(position), 1000)
 
-                    mapboxMap.easeCamera(CameraUpdateFactory.newCameraPosition(position), 1000)
-
-//                    addCar(it.latitude, it.longitude)
+                    addCar(it.latitude, it.longitude)
 
                     true
                 }
@@ -2005,7 +2007,10 @@ class MainActivity : BaseActivity(), MainController.view,
 
             val carLayer = SymbolLayer("demo-l-id", "demo-s-id")
                 .withProperties(
-                    iconImage("fleet-0")
+                    iconImage("fleet-0"),
+                    iconAllowOverlap(true),
+                    iconIgnorePlacement(true),
+                    iconKeepUpright(true)
                 )
 
             mapBoxStyle.addLayer(
@@ -2085,6 +2090,7 @@ class MainActivity : BaseActivity(), MainController.view,
             AnimatorUpdateListener { valueAnimator ->
                 val animatedPosition = valueAnimator.animatedValue as LatLng
                 carPosition = animatedPosition
+                Log.d("DASDSADSADASDSA","${animatedPosition.latitude}   ,   ${ animatedPosition.longitude}")
                 geoJsonSource.setGeoJson(
                     Point.fromLngLat(
                         animatedPosition.longitude,
@@ -2099,11 +2105,8 @@ class MainActivity : BaseActivity(), MainController.view,
                             animatedPosition.longitude
                         )
                     )
-//                    .zoom(16.0)
                     .build()
-//
                 mapboxMap.easeCamera(CameraUpdateFactory.newCameraPosition(position))
-
 
             }
 
