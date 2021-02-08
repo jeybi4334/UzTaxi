@@ -1192,7 +1192,10 @@ class MainActivity : BaseActivity(), MainController.view,
                                 createOrder(0.0,tariffID)
                             }else{
 
-                                UserBonusSheet(BONUS,tariffID).show(supportFragmentManager,"bonus")
+                                val useBonusSheet = UserBonusSheet(BONUS,tariffID)
+                                useBonusSheet.dialog?.setOnDismissListener { createOrder(0.0, tariffID) }
+                                    useBonusSheet.show(supportFragmentManager,"bonus")
+
 
                             }
 

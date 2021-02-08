@@ -75,7 +75,7 @@ class UserBonusSheet(val balance: Double,val tariffID : Long) : BottomSheetDialo
         textOrderWithoutBonus.setOnClickListener(this)
         rvOrder.setOnClickListener(this)
 
-        dialog?.setOnDismissListener { (activity as MainActivity).createOrder(0.0, tariffID) }
+
     }
 
     override fun onClick(v: View?) {
@@ -117,6 +117,7 @@ class UserBonusSheet(val balance: Double,val tariffID : Long) : BottomSheetDialo
             }
             R.id.textOrderWithoutBonus->{
                 (activity as MainActivity).createOrder(0.0,tariffID)
+                dismiss()
             }
             R.id.rvOrder->{
                 var bon = 0.0
