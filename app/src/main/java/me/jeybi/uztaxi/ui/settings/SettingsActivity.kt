@@ -19,6 +19,8 @@ class SettingsActivity : BaseActivity() {
         switchComment.isChecked = sharedPreferences.getBoolean(Constants.SETTINGS_DEFAULT_COMMENT,false)
         switchWeatherAnimation.isChecked = sharedPreferences.getBoolean(Constants.SETTINGS_WEATHER_ANIMATION,true)
         switchMap3d.isChecked = sharedPreferences.getBoolean(Constants.SETTINGS_MAP_3D,false)
+        switchDemoCar.isChecked = sharedPreferences.getBoolean(Constants.SETTINGS_DEMO_CAR,false)
+
 
         rvBack.setOnClickListener {
             onBackPressed()
@@ -49,6 +51,13 @@ class SettingsActivity : BaseActivity() {
             sharedPreferences.edit().putBoolean(Constants.SETTINGS_MAP_3D,!switchMap3d.isChecked).apply()
             switchMap3d.isChecked = !switchMap3d.isChecked
         }
+
+        rvDemoCar.setOnClickListener {
+            sharedPreferences.edit().putBoolean(Constants.SETTINGS_DEMO_CAR,!switchDemoCar.isChecked).apply()
+            switchDemoCar.isChecked = !switchDemoCar.isChecked
+        }
+
+
 
 
     }

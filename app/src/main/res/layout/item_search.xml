@@ -11,8 +11,10 @@
         android:id="@+id/iconSearchItem"
         android:layout_width="32dp"
         android:layout_height="32dp"
+        android:padding="10dp"
+        android:alpha="0.7"
         android:layout_marginStart="16dp"
-        android:src="@drawable/s_default"
+        android:src="@drawable/icon_start"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -30,12 +32,12 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintLeft_toRightOf="@id/iconSearchItem"
-        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintRight_toLeftOf="@id/textViewSearchDistance"
         android:maxLines="1"
         app:layout_constraintBottom_toTopOf="@id/guideline"
         android:fontFamily="@font/g_semi_bold"
-        android:layout_marginRight="12dp"
-        android:layout_marginLeft="16dp"
+        android:layout_marginEnd="12dp"
+        android:layout_marginStart="16dp"
         android:textSize="17sp"
         android:textColor="@color/black"
         android:ellipsize="end"
@@ -59,13 +61,31 @@
         android:alpha="0.7"
         />
 
+    <TextView
+        android:id="@+id/textViewSearchDistance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@id/textViewSearchTitle"
+        app:layout_constraintRight_toRightOf="parent"
+        android:maxLines="1"
+        android:text=""
+        android:fontFamily="@font/g_regular"
+        android:layout_marginEnd="18dp"
+        android:textSize="14sp"
+        android:textColor="#623571"
+        android:ellipsize="end"
+        />
+
+
     <View
         android:layout_width="0dp"
-        android:layout_height="0.1dp"
+        android:layout_height="0.2dp"
+        android:alpha="0.4"
         android:background="@color/purple_200"
-        app:layout_constraintLeft_toLeftOf="@id/textViewSearchTitle"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginStart="18dp"
         app:layout_constraintRight_toRightOf="parent"
-        android:layout_marginRight="16dp"
+        android:layout_marginEnd="16dp"
         app:layout_constraintTop_toBottomOf="@id/textViewSearchAddress"
         android:layout_marginTop="12dp"
         />

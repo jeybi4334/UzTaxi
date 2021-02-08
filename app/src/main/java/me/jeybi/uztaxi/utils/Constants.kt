@@ -7,6 +7,7 @@ import android.graphics.drawable.Drawable
 import android.util.DisplayMetrics
 import com.mapbox.mapboxsdk.geometry.LatLng
 import java.text.DecimalFormat
+import java.util.*
 
 
 class Constants {
@@ -37,16 +38,28 @@ class Constants {
 
         val BASE_URL_MAPZEN = "https://api.stadiamaps.com/"
 
+        val BASE_URL_NOMINATIM = "https://nominatim.openstreetmap.org/"
+
+        val BASE_URL_GEOCODE = "https://api.geocode.earth/v1/"
 
         val HIVE_MILLENIUM = "2e4129784c2e080a5b19bc01c495496d"
 
         val HIVE_PROFILE = "2a3ae3c1da9c04320737424a4dbd2683"
 
+        val GEOCODE_TOKEN = "ge-8f137223ed5b405d"
+        val GEOCODE_COUNTRY = "UZB"
+        val GEOCODE_LIMIT = 15
+        val GEOCODE_SOURCE = "osm"
+        val GEOCODE_RADIUS = 40
 
         val LAST_KNOWN_LATITUDE = "last_lat"
         val LAST_KNOWN_LONGITUDE = "last_lon"
 
 
+        val NOMINATIM_ZOOM_LVL = 18
+        val NOMINATIM_ZOOM_FORMAT = "jsonv2"
+
+        val NOMINATIM_LANGUAGE = "nominatim_language"
 
         val HIVE_USER_ID = "user_id"
         val HIVE_USER_TOKEN = "user_token"
@@ -156,6 +169,7 @@ class Constants {
         val SETTINGS_DEFAULT_COMMENT = "settings_default_comment"
         val SETTINGS_WEATHER_ANIMATION = "settings_weather_animation"
         val SETTINGS_MAP_3D = "settings_map_3d"
+        val SETTINGS_DEMO_CAR = "settings_demo_car"
 
         //// DEFAULT VALUES
         val DEFAULT_TILT_MAP = 20.0
@@ -239,7 +253,7 @@ class Constants {
         }
 
 
-        fun transliterate(message: String): String? {
+        fun transliterate(message: String): String {
             val abcCyr = charArrayOf(
                 ' ',
                 'а',
@@ -493,6 +507,15 @@ class Constants {
             return builder.toString()
         }
 
+        fun getFormattedPrice(price : Double) : String{
+            val decimalFormat = DecimalFormat("###,###")
+            return decimalFormat.format(price)
+        }
+
+        fun getRandomIcon() : String{
+            val random = Random()
+           return getCarIcon(random.nextInt(350).toFloat()  )
+        }
 
         fun getCarIcon(rotation : Float) : String{
             val rotateFormatter = DecimalFormat("#.#")

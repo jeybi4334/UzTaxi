@@ -437,7 +437,69 @@
 
         </RelativeLayout>
 
+        <RelativeLayout
+            android:id="@+id/rvDemoCar"
+            android:layout_width="match_parent"
+            android:layout_height="72dp"
 
+            android:background="?attr/selectableItemBackground"
+            >
+
+            <Space
+                android:id="@+id/spaceView7"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_centerInParent="true"
+                />
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_above="@id/spaceView7"
+                android:text="Demo Car"
+                android:textColor="@color/purple_200"
+                android:fontFamily="@font/g_semi_bold"
+                android:layout_marginStart="18dp"
+                android:textSize="18sp"
+                />
+
+            <TextView
+                android:layout_below="@id/spaceView7"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Adds a car and moves it upon clicks"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="@color/purple_200"
+                android:fontFamily="@font/g_regular"
+                android:layout_marginStart="18dp"
+                android:textSize="15sp"
+                />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/switchDemoCar"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="false"
+                android:focusable="false"
+                android:clickable="false"
+                android:layout_gravity="center_vertical"
+                android:layout_marginEnd="16dp"
+                android:thumb="@drawable/thumb_selector"
+                app:track="@drawable/track_selector"
+                />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp"
+                android:layout_alignParentBottom="true"
+                android:background="#DCDCDC"
+                />
+
+        </RelativeLayout>
 
     </LinearLayout>
 

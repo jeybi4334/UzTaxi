@@ -83,13 +83,34 @@
                 android:layout_marginRight="12dp"
                 android:fontFamily="@font/g_bold"
                 android:gravity="center"
+                android:maxLines="1"
+                android:ellipsize="end"
                 android:textColor="@color/purple_200"
-                android:textSize="16sp"
-                app:layout_constraintBottom_toBottomOf="@id/lottieWeather"
+                android:textSize="17sp"
                 app:layout_constraintLeft_toRightOf="@id/rvMenu"
                 app:layout_constraintRight_toLeftOf="@id/lottieWeather"
                 app:layout_constraintTop_toTopOf="@id/lottieWeather"
-                app:reflectionColor="@color/white" />
+                android:layout_marginTop="8dp"
+                app:reflectionColor="@color/white"
+                />
+
+            <TextView
+                android:id="@+id/textViewCurrentAddressDetails"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintLeft_toRightOf="@id/rvMenu"
+                app:layout_constraintRight_toLeftOf="@id/lottieWeather"
+                app:layout_constraintTop_toBottomOf="@id/textViewCurrentAddress"
+                android:gravity="center"
+                android:maxLines="2"
+                android:ellipsize="end"
+                android:layout_marginLeft="12dp"
+                android:layout_marginRight="12dp"
+                android:textColor="@color/purple_200"
+                android:alpha="0.6"
+                android:textSize="13sp"
+                android:fontFamily="@font/g_semi_bold"
+                />
 
 
             <com.airbnb.lottie.LottieAnimationView

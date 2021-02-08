@@ -1,0 +1,475 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    android:id="@+id/bottomSheet"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:behavior_hideable="true"
+    app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:cardCornerRadius="24dp"
+        app:cardBackgroundColor="@color/white"
+        app:cardElevation="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="-24dp"
+        >
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:overScrollMode="never"
+            android:paddingBottom="42dp"
+            >
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                >
+
+                <TextView
+                    android:id="@+id/text1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Бонусы"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:layout_marginTop="24dp"
+                    android:fontFamily="@font/g_bold"
+                    android:textColor="@color/purple_200"
+                    android:textSize="22sp"
+                    />
+
+                <TextView
+                    android:id="@+id/text2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Ваши бонусы"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/text1"
+                    android:layout_marginLeft="32dp"
+                    android:layout_marginTop="16dp"
+                    android:fontFamily="@font/g_bold"
+                    android:textColor="@color/purple_200"
+                    android:textSize="18sp"
+                    />
+
+
+                <TextView
+                    android:id="@+id/textViewBonus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/text2"
+                    android:layout_marginLeft="32dp"
+                    android:layout_marginTop="8dp"
+                    android:fontFamily="@font/g_black"
+                    android:textColor="@color/purple_200"
+                    android:textSize="42sp"
+                    />
+
+                <TextView
+                    android:id="@+id/text4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="UZS"
+                    app:layout_constraintLeft_toRightOf="@id/textViewBonus"
+                    app:layout_constraintBottom_toBottomOf="@id/textViewBonus"
+                    android:layout_marginLeft="12dp"
+                    android:layout_marginBottom="6dp"
+                    android:layout_marginTop="16dp"
+                    android:fontFamily="@font/g_regular"
+                    android:textColor="@color/purple_200"
+                    android:textSize="22sp"
+                    />
+
+                <TextView
+                    android:id="@+id/text5"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="Вы можете оплатить поездку своими бонусами. И вы можете получить больше кэшбэка, когда поездка закончится."
+                    app:layout_constraintRight_toRightOf="parent"
+                    android:layout_marginRight="24dp"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/textViewBonus"
+                    android:layout_marginLeft="32dp"
+                    android:layout_marginTop="8dp"
+                    android:fontFamily="@font/g_regular"
+                    android:textColor="@color/purple_200"
+                    android:textSize="16sp"
+                    />
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="0dp"
+                    android:layout_height="102dp"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/text5"
+                    app:layout_constraintRight_toRightOf="parent"
+                    android:layout_marginTop="24dp"
+                    android:layout_marginStart="42dp"
+                    android:layout_marginEnd="42dp"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="6dp"
+                    app:cardBackgroundColor="@color/white"
+                    >
+
+                </androidx.cardview.widget.CardView>
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cardViewBonus"
+                    android:layout_width="0dp"
+                    android:layout_height="102dp"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/text5"
+                    app:layout_constraintRight_toRightOf="parent"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginEnd="16dp"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="12dp"
+                    >
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/bc_card_bonus"
+                        />
+
+                </androidx.cardview.widget.CardView>
+
+                <TextView
+                    android:id="@+id/textPay"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Оплатите часть поездки бонусами"
+                    android:fontFamily="@font/g_semi_bold"
+                    android:textColor="@color/white"
+                    app:layout_constraintTop_toTopOf="@id/cardViewBonus"
+                    app:layout_constraintLeft_toLeftOf="@id/cardViewBonus"
+                    android:elevation="13dp"
+                    android:textSize="16sp"
+                    android:layout_marginStart="18dp"
+                    android:layout_marginTop="12dp"
+                    />
+
+                <TextView
+                    app:layout_constraintBottom_toBottomOf="@id/cardViewBonus"
+                    android:layout_marginBottom="16dp"
+                    android:layout_width="0dp"
+                    app:layout_constraintRight_toLeftOf="@id/textEnteredBalance"
+                    android:layout_height="wrap_content"
+                    android:text="Пожалуйста, введите сумму:"
+                    android:fontFamily="@font/g_regular"
+                    android:textColor="@color/white"
+                    app:layout_constraintLeft_toLeftOf="@id/cardViewBonus"
+                    android:elevation="13dp"
+                    android:textSize="13sp"
+                    android:layout_marginStart="18dp"
+                    android:layout_marginTop="12dp"
+                    />
+
+                <TextView
+                    android:id="@+id/textuzs"
+                    app:layout_constraintBottom_toBottomOf="@id/cardViewBonus"
+                    android:layout_marginBottom="16dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="UZS"
+                    android:fontFamily="@font/g_regular"
+                    android:textColor="@color/white"
+                    app:layout_constraintRight_toRightOf="@id/cardViewBonus"
+                    android:elevation="13dp"
+                    android:textSize="16sp"
+                    android:layout_marginEnd="18dp"
+                    android:layout_marginTop="12dp"
+                    />
+
+                <TextView
+                    android:id="@+id/textEnteredBalance"
+                    app:layout_constraintBottom_toBottomOf="@id/cardViewBonus"
+                    android:layout_marginBottom="10dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:fontFamily="@font/g_black"
+                    android:textColor="@color/white"
+                    app:layout_constraintRight_toLeftOf="@id/textuzs"
+                    android:elevation="13dp"
+                    android:textSize="28sp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginTop="12dp"
+                    />
+
+                <TextView
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:id="@+id/textViewNumber1"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/cardViewBonus"
+                    app:layout_constraintRight_toLeftOf="@id/textViewNumber2"
+                    android:layout_marginTop="36dp"
+                    android:text="1"
+                    android:gravity="center"
+                    android:fontFamily="@font/g_semi_bold"
+                    android:textColor="@color/purple_200"
+                    android:textSize="28sp"
+                    />
+
+                <TextView
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:id="@+id/textViewNumber2"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    app:layout_constraintTop_toBottomOf="@id/cardViewBonus"
+                    app:layout_constraintLeft_toRightOf="@id/textViewNumber1"
+                    app:layout_constraintRight_toLeftOf="@id/textViewNumber3"
+                    app:layout_constraintTop_toTopOf="@id/textViewNumber1"
+                    android:text="2"
+                    android:gravity="center"
+                    android:fontFamily="@font/g_semi_bold"
+                    android:textColor="@color/purple_200"
+                    android:textSize="28sp"
+                    />
+
+                <TextView
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:id="@+id/textViewNumber3"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    app:layout_constraintTop_toBottomOf="@id/cardViewBonus"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintLeft_toRightOf="@id/textViewNumber2"
+                    app:layout_constraintTop_toTopOf="@id/textViewNumber1"
+                    android:text="3"
+                    android:gravity="center"
+                    android:fontFamily="@font/g_semi_bold"
+                    android:textColor="@color/purple_200"
+                    android:textSize="28sp"
+                    />
+
+                <TextView
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:id="@+id/textViewNumber4"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/textViewNumber1"
+                    app:layout_constraintRight_toLeftOf="@id/textViewNumber2"
+                    android:layout_marginTop="36dp"
+                    android:text="4"
+                    android:gravity="center"
+                    android:fontFamily="@font/g_semi_bold"
+                    android:textColor="@color/purple_200"
+                    android:textSize="28sp"
+                    />
+
+                <TextView
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:id="@+id/textViewNumber5"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    app:layout_constraintTop_toBottomOf="@id/cardViewBonus"
+                    app:layout_constraintLeft_toRightOf="@id/textViewNumber1"
+                    app:layout_constraintRight_toLeftOf="@id/textViewNumber3"
+                    app:layout_constraintTop_toTopOf="@id/textViewNumber4"
+                    android:text="5"
+                    android:gravity="center"
+                    android:fontFamily="@font/g_semi_bold"
+                    android:textColor="@color/purple_200"
+                    android:textSize="28sp"
+                    />
+
+                <TextView
+
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:id="@+id/textViewNumber6"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    app:layout_constraintTop_toBottomOf="@id/cardViewBonus"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintLeft_toRightOf="@id/textViewNumber2"
+                    app:layout_constraintTop_toTopOf="@id/textViewNumber4"
+                    android:text="6"
+                    android:gravity="center"
+                    android:fontFamily="@font/g_semi_bold"
+                    android:textColor="@color/purple_200"
+                    android:textSize="28sp"
+                    />
+
+                <TextView
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:id="@+id/textViewNumber7"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/textViewNumber4"
+                    app:layout_constraintRight_toLeftOf="@id/textViewNumber2"
+                    android:layout_marginTop="36dp"
+                    android:text="7"
+                    android:gravity="center"
+                    android:fontFamily="@font/g_semi_bold"
+                    android:textColor="@color/purple_200"
+                    android:textSize="28sp"
+                    />
+
+                <TextView
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:id="@+id/textViewNumber8"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    app:layout_constraintTop_toBottomOf="@id/cardViewBonus"
+                    app:layout_constraintLeft_toRightOf="@id/textViewNumber1"
+                    app:layout_constraintRight_toLeftOf="@id/textViewNumber3"
+                    app:layout_constraintTop_toTopOf="@id/textViewNumber7"
+                    android:text="8"
+                    android:gravity="center"
+                    android:fontFamily="@font/g_semi_bold"
+                    android:textColor="@color/purple_200"
+                    android:textSize="28sp"
+                    />
+
+                <TextView
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:id="@+id/textViewNumber9"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    app:layout_constraintTop_toBottomOf="@id/cardViewBonus"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintLeft_toRightOf="@id/textViewNumber2"
+                    app:layout_constraintTop_toTopOf="@id/textViewNumber7"
+                    android:text="9"
+                    android:gravity="center"
+                    android:fontFamily="@font/g_semi_bold"
+                    android:textColor="@color/purple_200"
+                    android:textSize="28sp"
+                    />
+
+                <TextView
+                    android:id="@+id/textViewNumber10"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/textViewNumber7"
+                    app:layout_constraintRight_toLeftOf="@id/textViewNumber2"
+                    android:layout_marginTop="36dp"
+                    android:text=""
+                    android:gravity="center"
+                    android:fontFamily="@font/g_semi_bold"
+                    android:textColor="@color/purple_200"
+                    android:textSize="28sp"
+                    />
+
+                <TextView
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:id="@+id/textViewNumber11"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    app:layout_constraintTop_toBottomOf="@id/cardViewBonus"
+                    app:layout_constraintLeft_toRightOf="@id/textViewNumber1"
+                    app:layout_constraintRight_toLeftOf="@id/textViewNumber3"
+                    app:layout_constraintTop_toTopOf="@id/textViewNumber10"
+                    android:text="0"
+                    android:gravity="center"
+                    android:fontFamily="@font/g_semi_bold"
+                    android:textColor="@color/purple_200"
+                    android:textSize="28sp"
+                    />
+
+                <TextView
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:id="@+id/textViewNumber12"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    app:layout_constraintTop_toBottomOf="@id/cardViewBonus"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintLeft_toRightOf="@id/textViewNumber2"
+                    app:layout_constraintTop_toTopOf="@id/textViewNumber10"
+                    android:text="←"
+                    android:gravity="center"
+                    android:fontFamily="@font/g_semi_bold"
+                    android:textColor="@color/purple_200"
+                    android:textSize="28sp"
+                    />
+
+                <TextView
+                    android:id="@+id/textOrderWithoutBonus"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    app:layout_constraintTop_toBottomOf="@id/textViewNumber12"
+                    android:layout_marginTop="24dp"
+                    app:layout_constraintLeft_toRightOf="@id/textViewNumber2"
+                    app:layout_constraintRight_toLeftOf="@id/rvOrder"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    android:text="Заказать без бонусов"
+                    android:gravity="center"
+                    android:fontFamily="@font/g_semi_bold"
+                    android:textColor="@color/purple_200"
+                    android:textSize="14sp"
+                    />
+
+                <RelativeLayout
+                    android:id="@+id/rvOrder"
+                    android:layout_width="0dp"
+                    android:layout_marginTop="24dp"
+                    android:layout_height="52dp"
+                    app:layout_constraintLeft_toRightOf="@id/textOrderWithoutBonus"
+                    app:layout_constraintRight_toRightOf="parent"
+                    android:layout_marginEnd="16dp"
+                    app:layout_constraintTop_toBottomOf="@id/textViewNumber12"
+                    android:background="@drawable/bc_button_purple"
+                    android:overScrollMode="never"
+                    android:clickable="true"
+                    >
+
+                    <TextView
+                        android:id="@+id/textOrder"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:text="Заказать с бонусами"
+                        android:textColor="@color/white"
+                        android:fontFamily="@font/g_bold"
+                        android:textSize="16sp"
+                        />
+
+                    <ProgressBar
+                        android:visibility="gone"
+                        android:id="@+id/progressOrder"
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:indeterminateTint="@color/white"
+                        android:layout_centerInParent="true"
+                        />
+
+                </RelativeLayout>
+
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+
+        </ScrollView>
+
+    </androidx.cardview.widget.CardView>
+
+</FrameLayout>

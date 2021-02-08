@@ -16,8 +16,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.bottom_sheet_search.*
 import me.jeybi.uztaxi.R
-import me.jeybi.uztaxi.model.SearchItemModel
-import me.jeybi.uztaxi.model.SearchedAddress
+import me.jeybi.uztaxi.model.*
 import me.jeybi.uztaxi.network.RetrofitHelper
 import me.jeybi.uztaxi.ui.BaseFragment
 import me.jeybi.uztaxi.ui.adapters.SearchAdapter
@@ -57,34 +56,8 @@ class SearchFragment : BaseFragment(), SearchAdapter.SearchItemClickListener,
 
 
         rvDelivery.setOnClickListener {
-            Log.d("DASDASDASDASDA", "${NaiveHmacSigner.DateSignature()}")
-            Log.d(
-                "DASDASDASDASDA",
-                "${
-                    NaiveHmacSigner.AuthSignature(
-                        (activity as MainActivity).HIVE_USER_ID,
-                        (activity as MainActivity).HIVE_TOKEN,
-                        "POST",
-                        "/api/client/mobile/4.0/orders"
-                    )
-                }"
-            )
-            Log.d("DASDASDASDASDA", "${NaiveHmacSigner.DateSignature()}")
-            Log.d(
-                "DASDASDASDASDA",
-                "${
-                    NaiveHmacSigner.AuthSignature(
-                        (activity as MainActivity).HIVE_USER_ID,
-                        (activity as MainActivity).HIVE_TOKEN,
-                        "DELETE",
-                        "/api/client/mobile/1.0/orders/63000340293148"
-                    )
-                }"
-            )
-
 
         }
-//        fillRecyclerViewWithDemoData()
 
         rvAddAddress.setOnClickListener {
             (activity as MainActivity).onAddAddressClicked()
@@ -109,9 +82,8 @@ class SearchFragment : BaseFragment(), SearchAdapter.SearchItemClickListener,
 
         editTextSearch.setOnEditorActionListener(object : TextView.OnEditorActionListener {
             override fun onEditorAction(v: TextView?, actionId: Int, event: KeyEvent?): Boolean {
-                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                    searchGeocode(editTextSearch.text.toString())
-                    recyclerViewSearchHistory.adapter = null
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    (activity as MainActivity).hideKeyboard()
                     return true
                 }
                 return false
@@ -133,6 +105,7 @@ class SearchFragment : BaseFragment(), SearchAdapter.SearchItemClickListener,
     }
 
     private fun loadOrdersHistory() {
+
         progressBarSearch.visibility = View.VISIBLE
         searchDisposables.add(
             RetrofitHelper.apiService(Constants.BASE_URL)
@@ -151,13 +124,18 @@ class SearchFragment : BaseFragment(), SearchAdapter.SearchItemClickListener,
                 .subscribe({
                     if (it.isSuccessful&&it.body()!=null) {
                         textViewNoAddress.visibility = View.GONE
-                        val addresses = ArrayList<SearchedAddress>()
+
+                        val geocodes = ArrayList<GeocodeFeature>()
                         for (item in it.body()!!){
-                            for (address in item.route){
-                                addresses.add(address)
+                            if (item.route.size>1){
+                                val geocodeFeature = GeocodeFeature("", Geometry("", arrayListOf(item.route[1].position!!.lon,item.route[1].position!!.lat)),
+                                    GeocodeProperty("","",item.route[1].name,null,null,null,null,null)
+                                )
+                                geocodes.add(geocodeFeature)
                             }
                         }
-                        recyclerViewSearchHistory.adapter = SearchAdapter(addresses,this)
+
+                        recyclerViewSearchHistory.adapter = SearchAdapter(geocodes,this)
                     }
                     progressBarSearch.visibility = View.GONE
 //                    textViewNoAddress.visibility = View.GONE
@@ -166,6 +144,7 @@ class SearchFragment : BaseFragment(), SearchAdapter.SearchItemClickListener,
 //                    textViewNoAddress.visibility = View.GONE
                 })
         )
+
     }
 
     private fun searchGeocode(keyWord: String) {
@@ -173,11 +152,20 @@ class SearchFragment : BaseFragment(), SearchAdapter.SearchItemClickListener,
         textViewNoAddress.visibility = View.GONE
         recyclerViewSearchHistory.adapter = null
         searchDisposables.add(
-            RetrofitHelper.apiService(Constants.BASE_URL_MILLENIUM)
-                .geocodePoint(
-                    Constants.HIVE_MILLENIUM,
-                    "${(activity as MainActivity).CURRENT_LATITUDE} ${(activity as MainActivity).CURRENT_LONGITUDE}",
-                    keyWord
+//            RetrofitHelper.apiService(Constants.BASE_URL_MILLENIUM)
+            RetrofitHelper.apiService(Constants.BASE_URL_GEOCODE)
+                .geocode(
+                    keyWord,
+                    (activity as MainActivity).CURRENT_LATITUDE,
+                    (activity as MainActivity).CURRENT_LONGITUDE,
+                    Constants.GEOCODE_RADIUS,
+                    (activity as MainActivity).CURRENT_LATITUDE,
+                    (activity as MainActivity).CURRENT_LONGITUDE,
+                    Constants.GEOCODE_COUNTRY,
+                    Constants.GEOCODE_TOKEN,
+                    Constants.GEOCODE_LIMIT,
+                    (activity as MainActivity).sharedPreferences.getString(Constants.NOMINATIM_LANGUAGE,"ru") ?: "ru",
+                    Constants.GEOCODE_SOURCE
                 )
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
@@ -185,9 +173,9 @@ class SearchFragment : BaseFragment(), SearchAdapter.SearchItemClickListener,
                     when (it.code()) {
                         Constants.STATUS_SUCCESSFUL -> {
                             Log.d("ADASD", "SUCCESS ")
-                            if (it.body() != null && it.body()!!.size > 0) {
+                            if (it.body() != null ) {
                                 progressBarSearch.visibility = View.GONE
-                                recyclerViewSearchHistory.adapter = SearchAdapter(it.body()!!, this)
+                                recyclerViewSearchHistory.adapter = SearchAdapter(it.body()!!.features, this)
                             } else {
                                 onCouldntFindAnything()
                             }
@@ -226,6 +214,7 @@ class SearchFragment : BaseFragment(), SearchAdapter.SearchItemClickListener,
     override fun onSearchCancel() {
         rvFromWhere.visibility = View.GONE
         editTextFromWhere.setText("")
+        (activity as MainActivity).hideKeyboard()
         editTextFromWhere.isFocusable = false
         editTextFromWhere.isFocusableInTouchMode = false
     }

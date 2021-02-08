@@ -104,34 +104,34 @@ class AddresSearchFragment : BottomSheetDialogFragment(), SearchAdapter.SearchIt
         progressBarSearch.visibility = View.VISIBLE
         textViewNoAddress.visibility = View.GONE
         recyclerViewSearch.adapter = null
-        searchDisposables.add(
-            RetrofitHelper.apiService(Constants.BASE_URL_MILLENIUM)
-                .geocodePoint(
-                    Constants.HIVE_MILLENIUM,
-                    "${(activity as MainActivity).CURRENT_LATITUDE} ${(activity as MainActivity).CURRENT_LONGITUDE}",
-                    keyWord
-                )
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
-                .subscribe({
-                    when (it.code()) {
-                        Constants.STATUS_SUCCESSFUL -> {
-                            Log.d("ADASD", "SUCCESS ")
-                            if (it.body() != null && it.body()!!.size > 0) {
-                                progressBarSearch.visibility = View.GONE
-                                recyclerViewSearch.adapter = SearchAdapter(it.body()!!, this)
-                            } else {
-                                onCouldntFindAnything()
-                            }
-                        }
-                        Constants.STATUS_BAD_REQUEST -> {
-                            onCouldntFindAnything()
-                        }
-                    }
-                }, {
-                    onCouldntFindAnything()
-                })
-        )
+//        searchDisposables.add(
+//            RetrofitHelper.apiService(Constants.BASE_URL_MILLENIUM)
+//                .geocodePoint(
+//                    Constants.HIVE_MILLENIUM,
+//                    "${(activity as MainActivity).CURRENT_LATITUDE} ${(activity as MainActivity).CURRENT_LONGITUDE}",
+//                    keyWord
+//                )
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribeOn(Schedulers.io())
+//                .subscribe({
+//                    when (it.code()) {
+//                        Constants.STATUS_SUCCESSFUL -> {
+//                            Log.d("ADASD", "SUCCESS ")
+//                            if (it.body() != null && it.body()!!.size > 0) {
+//                                progressBarSearch.visibility = View.GONE
+//                                recyclerViewSearch.adapter = SearchAdapter(it.body()!!, this)
+//                            } else {
+//                                onCouldntFindAnything()
+//                            }
+//                        }
+//                        Constants.STATUS_BAD_REQUEST -> {
+//                            onCouldntFindAnything()
+//                        }
+//                    }
+//                }, {
+//                    onCouldntFindAnything()
+//                })
+//        )
 
 
     }

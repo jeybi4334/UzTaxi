@@ -1,12 +1,12 @@
 package me.jeybi.uztaxi.ui.main
 
 import android.Manifest
-import android.R.style
 import android.animation.ObjectAnimator
 import android.animation.TypeEvaluator
 import android.animation.ValueAnimator
 import android.animation.ValueAnimator.AnimatorUpdateListener
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -14,7 +14,6 @@ import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.Color
 import android.location.Criteria
 import android.location.Location
 import android.location.LocationListener
@@ -28,6 +27,7 @@ import android.view.animation.AccelerateInterpolator
 import android.view.animation.DecelerateInterpolator
 import android.view.animation.LinearInterpolator
 import android.view.animation.OvershootInterpolator
+import android.view.inputmethod.InputMethodManager
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
@@ -42,10 +42,7 @@ import com.airbnb.lottie.LottieDrawable
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.firebase.messaging.FirebaseMessaging
 import com.mapbox.android.gestures.MoveGestureDetector
-import com.mapbox.geojson.Feature
-import com.mapbox.geojson.FeatureCollection
-import com.mapbox.geojson.LineString
-import com.mapbox.geojson.Point
+import com.mapbox.geojson.*
 import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
@@ -56,13 +53,11 @@ import com.mapbox.mapboxsdk.location.modes.CameraMode
 import com.mapbox.mapboxsdk.location.modes.RenderMode
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.Style
-import com.mapbox.mapboxsdk.plugins.building.BuildingPlugin
 import com.mapbox.mapboxsdk.style.expressions.Expression.*
 import com.mapbox.mapboxsdk.style.layers.*
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory.*
 import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
-import com.mapbox.mapboxsdk.utils.BitmapUtils
 import com.romainpiel.shimmer.Shimmer
 import com.romainpiel.shimmer.ShimmerTextView
 import io.reactivex.Observable
@@ -92,6 +87,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 
 class MainActivity : BaseActivity(), MainController.view,
@@ -132,6 +128,8 @@ class MainActivity : BaseActivity(), MainController.view,
     var START_POINT_NAME = ""
     var END_POINT_NAME = ""
 
+    var BONUS = 0.0
+
     var TILT_MAP = Constants.DEFAULT_TILT_MAP
 
     override fun setLayoutId(): Int {
@@ -145,6 +143,7 @@ class MainActivity : BaseActivity(), MainController.view,
 
         mLocationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager?
         presenter.checkIfAuthenticated()
+
 
     }
 
@@ -177,7 +176,9 @@ class MainActivity : BaseActivity(), MainController.view,
 
     }
 
+
     override fun onBonusReady(bonus: Double) {
+        BONUS = bonus
         if (::navigationFragment.isInitialized) {
             navigationFragment.onBonusReady(bonus)
         }
@@ -252,15 +253,20 @@ class MainActivity : BaseActivity(), MainController.view,
                 }
 
                 mapboxMap.addOnMapClickListener {
-//                    val position = CameraPosition.Builder()
-//                        .target(it)
-//                        .zoom(16.0)
-//                        .tilt(TILT_MAP)
-//                        .build()
-//
-//                    mapboxMap.easeCamera(CameraUpdateFactory.newCameraPosition(position), 1000)
+                    if (sharedPreferences.getBoolean(Constants.SETTINGS_DEMO_CAR, false)) {
+                        addCar(it.latitude, it.longitude)
+                    } else {
 
-                    addCar(it.latitude, it.longitude)
+                        val position = CameraPosition.Builder()
+                            .target(it)
+                            .zoom(16.0)
+                            .tilt(TILT_MAP)
+                            .build()
+
+                        mapboxMap.easeCamera(CameraUpdateFactory.newCameraPosition(position), 1000)
+
+                    }
+
 
                     true
                 }
@@ -269,32 +275,48 @@ class MainActivity : BaseActivity(), MainController.view,
 
                 registerFirebaseReceiver()
 
-                mainDisposables.add(presenter.getOngoingOrder())
+//                mainDisposables.add(presenter.getOngoingOrder())
 
-                val lat = sharedPreferences.getFloat(Constants.LAST_KNOWN_LATITUDE, 0f)
-                val lon = sharedPreferences.getFloat(Constants.LAST_KNOWN_LONGITUDE, 0f)
+//                val lat = sharedPreferences.getFloat(Constants.LAST_KNOWN_LATITUDE, 0f)
+//                val lon = sharedPreferences.getFloat(Constants.LAST_KNOWN_LONGITUDE, 0f)
 
-                if (lat != 0f) {
-                    val position = CameraPosition.Builder()
-                        .target(LatLng(lat.toDouble(), lon.toDouble()))
-                        .zoom(16.0)
-                        .tilt(TILT_MAP)
-                        .build()
+//                if (lat != 0f) {
+//                    val position = CameraPosition.Builder()
+//                        .target(LatLng(lat.toDouble(), lon.toDouble()))
+//                        .zoom(16.0)
+//                        .tilt(TILT_MAP)
+//                        .build()
+//
+//                    mapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(position))
+//                } else {
+//                    val position = CameraPosition.Builder()
+//                        .target(LatLng(41.31122086155292, 69.27967758784646))
+//                        .zoom(16.0)
+//                        .tilt(TILT_MAP)
+//                        .build()
+//
+//                    mapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(position))
+//                }
 
-                    mapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(position))
-                } else {
-                    val position = CameraPosition.Builder()
-                        .target(LatLng(41.31122086155292, 69.27967758784646))
-                        .zoom(16.0)
-                        .tilt(TILT_MAP)
-                        .build()
+                mainDisposables.add(
+                    presenter.getAvailableService(
+                        40.50023580389371,
+                        68.77399624638494
+                    )
+                )
 
-                    mapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(position))
+                val position = CameraPosition.Builder()
+                    .target(LatLng(40.50023580389371, 68.77399624638494))
+                    .zoom(16.0)
+                    .tilt(TILT_MAP)
+                    .build()
 
-                }
+                mapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(position))
+
 
                 setUpMapButtons()
 
+                showCarsAround()
             }
 
             mapView.addOnDidFinishLoadingStyleListener {
@@ -351,7 +373,7 @@ class MainActivity : BaseActivity(), MainController.view,
                         imageViewCloudTop.animate().translationY(-200f).alpha(0.6f)
                             .setInterpolator(AccelerateInterpolator()).setDuration(800).start()
 
-
+                        textViewCurrentAddressDetails.text = ""
                         textViewCurrentAddress.text = "уточняем адрес..."
                         shimmer.start(textViewCurrentAddress)
                     }
@@ -445,7 +467,8 @@ class MainActivity : BaseActivity(), MainController.view,
                     val mapLong = mapLatLng.longitude
 
                     if (CURRENT_MODE == Constants.MODE_SEARCH_WHERE || CURRENT_MODE == Constants.MODE_DESTINATION_PICK)
-                        mainDisposables.add(presenter.findCurrentAddress(mapLat, mapLong))
+//                        mainDisposables.add(presenter.findCurrentAddress(mapLat, mapLong))
+                        mainDisposables.add(presenter.reverseGeocode(mapLat, mapLong))
 
                     when (CURRENT_MODE) {
                         Constants.MODE_SEARCH_WHERE -> {
@@ -483,6 +506,26 @@ class MainActivity : BaseActivity(), MainController.view,
 
         }
 
+    }
+
+    lateinit var aroundCarsDisposable: Disposable
+
+    private fun showCarsAround() {
+        aroundCarsDisposable = Observable.interval(
+            0, 2000,
+            TimeUnit.MILLISECONDS
+        )
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io())
+            .subscribe {
+                mainDisposables.add(
+                    presenter.getAvailableCars(
+                        START_POINT_LAT,
+                        START_POINT_LON,
+                        TARIFF_ID
+                    )
+                )
+            }
     }
 
     override fun onHasGPS() {
@@ -1145,49 +1188,11 @@ class MainActivity : BaseActivity(), MainController.view,
 
                         rvOrder.setOnClickListener {
 
-                            if (progressOrder.visibility == View.GONE) {
+                            if (BONUS < 1000) {
+                                createOrder(0.0,tariffID)
+                            }else{
 
-                                progressOrder.visibility = View.VISIBLE
-                                textOrder.visibility = View.GONE
-
-                                val routeORDER = ArrayList<ClientAddress>()
-                                routeORDER.add(
-                                    ClientAddress(
-                                        SearchedAddress(
-                                            START_POINT_NAME, null, null,
-                                            SearchPosition(START_POINT_LAT, START_POINT_LON)
-                                        ), null, null, null, null
-                                    )
-                                )
-                                if (END_POINT_LAT != 0.0) {
-                                    routeORDER.add(
-                                        ClientAddress(
-                                            SearchedAddress(
-                                                END_POINT_NAME,
-                                                null,
-                                                null,
-                                                SearchPosition(END_POINT_LAT, END_POINT_LON)
-                                            ), null, null, null, null
-                                        )
-                                    )
-                                }
-
-                                val createOrderRequest = CreateOrderRequest(
-                                    CHOSEN_PAYMENT_METHOD,
-                                    tariffID,
-                                    TARIF_OPTIONS,
-                                    routeORDER,
-                                    null,
-                                    COMMENT,
-                                    null,
-                                    null,
-                                    null,
-                                    null,
-                                    true,
-                                    null
-                                )
-
-                                mainDisposables.add(presenter.createOrder(createOrderRequest))
+                                UserBonusSheet(BONUS,tariffID).show(supportFragmentManager,"bonus")
 
                             }
 
@@ -1196,6 +1201,56 @@ class MainActivity : BaseActivity(), MainController.view,
 
                     }
                 })
+
+        }
+
+    }
+
+    fun createOrder(bonus : Double,tariffID : Long) {
+
+        if (progressOrder.visibility == View.GONE) {
+
+            progressOrder.visibility = View.VISIBLE
+            textOrder.visibility = View.GONE
+
+            val routeORDER = ArrayList<ClientAddress>()
+            routeORDER.add(
+                ClientAddress(
+                    SearchedAddress(
+                        START_POINT_NAME, null, null,
+                        SearchPosition(START_POINT_LAT, START_POINT_LON)
+                    ), null, null, null, null
+                )
+            )
+            if (END_POINT_LAT != 0.0) {
+                routeORDER.add(
+                    ClientAddress(
+                        SearchedAddress(
+                            END_POINT_NAME,
+                            null,
+                            null,
+                            SearchPosition(END_POINT_LAT, END_POINT_LON)
+                        ), null, null, null, null
+                    )
+                )
+            }
+
+            val createOrderRequest = CreateOrderRequest(
+                CHOSEN_PAYMENT_METHOD,
+                tariffID,
+                TARIF_OPTIONS,
+                routeORDER,
+                null,
+                COMMENT,
+                null,
+                null,
+                null,
+                null,
+                true,
+                null
+            )
+
+            mainDisposables.add(presenter.createOrder(createOrderRequest))
 
         }
 
@@ -1553,70 +1608,269 @@ class MainActivity : BaseActivity(), MainController.view,
     }
 
 
-    override fun onCarsAvailabe(data: ArrayList<GetCarResponse>) {
-
-        for (layer in mapBoxStyle.layers) {
-            if (layer.id.startsWith("layer-"))
-                mapBoxStyle.removeLayer(layer)
-        }
-        for (source in mapBoxStyle.sources) {
-            if (source.id.startsWith("source-taxi-"))
-                mapBoxStyle.removeSource(source)
-        }
-
-
-        var i = 0
-
-
-        var lastCarLatLng =
-            LatLng(data[data.size - 1].location.lat, data[data.size - 1].location.lon)
-
-        for (car in data) {
-            i++
-
-            val SOURCE_ID = "source-taxi-$i"
-
-            val geoJsonSource = GeoJsonSource(
-                SOURCE_ID, Feature.fromGeometry(
-                    Point.fromLngLat(
-                        car.location.lon,
-                        car.location.lat
-                    )
-                ),
-                GeoJsonOptions()
-                    .withCluster(true)
-                    .withClusterMaxZoom(16)
-                    .withClusterRadius(50)
-            )
-
-            mapBoxStyle.addSource(geoJsonSource)
-
-            val LAYER_ID = "layer-${car.id}"
-
-            val rotation = Constants.getRotation(
-                LatLng(car.location.lat, car.location.lon),
-                lastCarLatLng
-            )
-
-            val carLayer = SymbolLayer(LAYER_ID, SOURCE_ID)
-                .withProperties(
-                    iconImage(Constants.getCarIcon(rotation)),
-                    iconIgnorePlacement(true),
-                    iconAllowOverlap(true),
-//                    iconRotate(
-//                        Constants.getRotation(
-//                            LatLng(car.location.lat, car.location.lon),
-//                            lastCarLatLng
-//                        )
+//    override fun onCarsAvailabe(data: ArrayList<GetCarResponse>) {
+//
+//        for (layer in mapBoxStyle.layers) {
+//            if (layer.id.startsWith("layer-"))
+//                mapBoxStyle.removeLayer(layer)
+//        }
+//        for (source in mapBoxStyle.sources) {
+//            if (source.id.startsWith("source-taxi-"))
+//                mapBoxStyle.removeSource(source)
+//        }
+//
+//
+//        var i = 0
+//
+//
+//        var lastCarLatLng =
+//            LatLng(data[data.size - 1].location.lat, data[data.size - 1].location.lon)
+//
+//        for (car in data) {
+//            i++
+//
+//            val SOURCE_ID = "source-taxi-$i"
+//
+//            val geoJsonSource = GeoJsonSource(
+//                SOURCE_ID, Feature.fromGeometry(
+//                    Point.fromLngLat(
+//                        car.location.lon,
+//                        car.location.lat
 //                    )
+//                ),
+//                GeoJsonOptions()
+//                    .withCluster(true)
+//                    .withClusterMaxZoom(16)
+//                    .withClusterRadius(50)
+//            )
+//
+//            mapBoxStyle.addSource(geoJsonSource)
+//
+//            val LAYER_ID = "layer-${car.id}"
+//
+//            val rotation = Constants.getRotation(
+//                LatLng(car.location.lat, car.location.lon),
+//                lastCarLatLng
+//            )
+//            var image = "fleet-0"
+//            if (data.size>1){
+//                image = Constants.getCarIcon(rotation)
+//            }
+//
+//            val carLayer = SymbolLayer(LAYER_ID, SOURCE_ID)
+//                .withProperties(
+//                    iconImage(image),
+//                    iconIgnorePlacement(true),
+//                    iconAllowOverlap(true),
+//                )
+//
+//            lastCarLatLng = LatLng(car.location.lat, car.location.lon)
+//            mapBoxStyle.addLayer(carLayer)
+//        }
+//    }
+
+    var movingCarPositions = HashMap<Long, LatLng>()
+    var movingCarGeoJsonSources = HashMap<Long, GeoJsonSource>()
+    var movingCarAnimations = HashMap<Long, ValueAnimator>()
+    var movingCarAnimationListeners = HashMap<Long, AnimatorUpdateListener>()
+
+    var movingCarRotations = HashMap<Long, Float>()
+
+    fun addMovingCar(car: GetCarResponse) {
+
+        if (movingCarGeoJsonSources[car.id] == null) {
+
+            Log.d("DSADASDSDA", "ADD CAR : ${car.id} , ${car.location.lat} , ${car.location.lon}")
+
+            movingCarPositions[car.id] = LatLng(car.location.lat, car.location.lon)
+
+            movingCarGeoJsonSources[car.id] = GeoJsonSource(
+                "moving-source-${car.id}",
+                Feature.fromGeometry(
+                    Point.fromLngLat(
+                        car.location.lat, car.location.lon
+                    )
+                )
+            )
+
+
+            if (mapBoxStyle.getSource("moving-source-${car.id}") == null)
+                mapBoxStyle.addSource(movingCarGeoJsonSources[car.id]!!)
+            Log.d("DSADASDSDA", "ADD CAR : ${car.id} SOURCE")
+
+
+            val carLayer = SymbolLayer("moving-layer-${car.id}", "moving-source-${car.id}")
+                .withProperties(
+                    iconImage(Constants.getRandomIcon()),
+//                    iconImage("fleet-0"),
+                    iconAllowOverlap(true),
+                    iconIgnorePlacement(true),
+                    iconKeepUpright(true)
                 )
 
-            lastCarLatLng = LatLng(car.location.lat, car.location.lon)
-            mapBoxStyle.addLayer(carLayer)
+            mapBoxStyle.addLayer(
+                carLayer
+            )
+            Log.d("DSADASDSDA", "ADD CAR : ${car.id} LAYER")
+
+        } else {
 
 
+            if (movingCarAnimations[car.id] != null) {
+                val anim = movingCarAnimations[car.id]
+                anim!!.removeAllUpdateListeners()
+                anim.removeAllListeners()
+                anim.cancel()
+                moveMovingCar(car)
+            } else if (animator == null) {
+                moveMovingCar(car)
+            }
         }
+
     }
+
+
+    fun moveMovingCar(car: GetCarResponse) {
+
+        val OLD_ROTATION = movingCarRotations[car.id] ?: 0f
+
+        val carPointOLD = Location("movingCarPointOLD")
+        val oldCarPosition = movingCarPositions[car.id]
+
+        carPointOLD.latitude = oldCarPosition!!.latitude
+        carPointOLD.longitude = oldCarPosition.longitude
+
+
+        val carPointNEW = Location("movingCarPointNEW")
+        carPointNEW.latitude = car.location.lat
+        carPointNEW.longitude = car.location.lon
+
+        val distance = carPointOLD.distanceTo(carPointNEW)
+
+        if (distance > 5) {
+
+            var rotation = Constants.getRotation(
+                movingCarPositions[car.id]!!,
+                LatLng(car.location.lat, car.location.lon)
+            )
+
+            if (!rotation.isNaN()) {
+
+                if (kotlin.math.abs(rotation - OLD_ROTATION) > 180) {
+                    rotation -= 360
+                }
+
+                val iconSpinningAnimator = ValueAnimator.ofFloat(OLD_ROTATION, rotation)
+                iconSpinningAnimator.duration = 600
+                iconSpinningAnimator.interpolator = LinearInterpolator()
+
+                iconSpinningAnimator.addUpdateListener { valueAnimator -> // Retrieve the new animation number to use as the map camera bearing value
+                    var newIconRotateValue = valueAnimator.animatedValue as Float
+                    movingCarRotations[car.id] = newIconRotateValue
+
+                    if (newIconRotateValue < 0)
+                        newIconRotateValue += 360
+
+                    val rotateFormatter = DecimalFormat("#.#")
+
+                    mapboxMap.getStyle { style ->
+                        val iconSymbolLayer: Layer? = style.getLayerAs("moving-layer-${car.id}")
+                        iconSymbolLayer?.setProperties(
+                            iconImage(
+                                Constants.getCarIcon(
+                                    kotlin.math.abs(
+                                        rotateFormatter.format(
+                                            newIconRotateValue
+                                        ).toFloat()
+                                    )
+                                )
+                            )
+                        )
+                    }
+                }
+
+                iconSpinningAnimator!!.start()
+            }
+        }
+
+        val animatorUpdateListener =
+            AnimatorUpdateListener { valueAnimator ->
+                val animatedPosition = valueAnimator.animatedValue as LatLng
+                movingCarPositions[car.id] = animatedPosition
+                Log.d("DSADASDSDA", "animating ${car.id}")
+                (mapBoxStyle.getSource("moving-source-${car.id}") as GeoJsonSource).setGeoJson(
+                    Point.fromLngLat(
+                        animatedPosition.longitude,
+                        animatedPosition.latitude
+                    )
+                )
+
+            }
+        movingCarAnimationListeners[car.id] = animatorUpdateListener
+
+        val latLngEvaluator: TypeEvaluator<LatLng> = object : TypeEvaluator<LatLng> {
+            private val latLng = LatLng()
+            override fun evaluate(fraction: Float, startValue: LatLng, endValue: LatLng): LatLng {
+                latLng.latitude = (startValue.latitude
+                        + (endValue.latitude - startValue.latitude) * fraction)
+                latLng.longitude = (startValue.longitude
+                        + (endValue.longitude - startValue.longitude) * fraction)
+                return latLng
+            }
+        }
+
+        val anim = ObjectAnimator
+            .ofObject(
+                latLngEvaluator,
+                movingCarPositions[car.id],
+                LatLng(car.location.lat, car.location.lon)
+            )
+            .setDuration(5000)
+
+        Log.d(
+            "DSADASDSDA",
+            "MOVE CAR : ${movingCarPositions[car.id]?.latitude}, ${movingCarPositions[car.id]?.longitude}  , ${car.location.lat} , ${car.location.lon} "
+        )
+        anim.interpolator = LinearInterpolator()
+
+        anim.addUpdateListener(movingCarAnimationListeners[car.id])
+        movingCarAnimations[car.id] = anim
+        movingCarAnimations[car.id]?.start()
+
+
+        movingCarPositions[car.id] = LatLng(car.location.lat, car.location.lon)
+
+
+    }
+
+
+    override fun onCarsAvailabe(data: ArrayList<GetCarResponse>) {
+        val ids = ArrayList<Long>()
+
+        for (car in data) {
+            ids.add(car.id)
+        }
+
+        for (key in movingCarGeoJsonSources.keys) {
+            if (ids.size > 0 && !ids.contains(key)) {
+                movingCarGeoJsonSources.remove(key)
+                mapBoxStyle.removeSource("moving-source-$key")
+                mapBoxStyle.removeLayer("moving-layer-$key")
+                val anim = movingCarAnimations[key]
+                anim!!.removeAllUpdateListeners()
+                anim.removeAllListeners()
+                anim.cancel()
+                movingCarAnimations.remove(key)
+                movingCarAnimationListeners.remove(key)
+            }
+        }
+
+        for (car in data) {
+            addMovingCar(car)
+        }
+
+    }
+
 
     override fun onAddAddressClicked() {
         AddresSearchFragment().show(supportFragmentManager, "add_address")
@@ -1660,7 +1914,7 @@ class MainActivity : BaseActivity(), MainController.view,
             override fun onStateChanged(bottomSheet: View, newState: Int) {
                 Log.d("DASDADS", "STATE $newState")
                 if (searchCancelListener != null) {
-                    if (newState != BottomSheetBehavior.STATE_EXPANDED) {
+                    if (newState == BottomSheetBehavior.STATE_HALF_EXPANDED || newState == BottomSheetBehavior.STATE_COLLAPSED) {
                         searchCancelListener!!.onSearchCancel()
                     } else if (newState == BottomSheetBehavior.STATE_EXPANDED) {
                         searchCancelListener!!.onSearchStart()
@@ -1686,8 +1940,10 @@ class MainActivity : BaseActivity(), MainController.view,
 
     }
 
-    override fun onAddressFound(name: String) {
+    override fun onAddressFound(name: String, details: String) {
         textViewCurrentAddress.text = name
+        textViewCurrentAddressDetails.text = details
+
         shimmer.cancel()
         if (name != "")
             CURRENT_ADDRESS = name
@@ -1906,6 +2162,10 @@ class MainActivity : BaseActivity(), MainController.view,
             shimmer.cancel()
         }
 
+        if (::aroundCarsDisposable.isInitialized) {
+            aroundCarsDisposable.dispose()
+        }
+
         if (animator != null) {
             animator!!.cancel()
         }
@@ -1937,7 +2197,9 @@ class MainActivity : BaseActivity(), MainController.view,
         bottomSheetBehaviour.state = BottomSheetBehavior.STATE_COLLAPSED
         textViewCurrentAddress.text = "уточняем адрес..."
         shimmer.start(textViewCurrentAddress)
-        mainDisposables.add(presenter.findCurrentAddress(location.latitude, location.longitude))
+
+//        mainDisposables.add(presenter.findCurrentAddress(location.latitude, location.longitude))
+        mainDisposables.add(presenter.reverseGeocode(location.latitude, location.longitude))
 
         CURRENT_LATITUDE = location.latitude
         CURRENT_LONGITUDE = location.longitude
@@ -2090,7 +2352,10 @@ class MainActivity : BaseActivity(), MainController.view,
             AnimatorUpdateListener { valueAnimator ->
                 val animatedPosition = valueAnimator.animatedValue as LatLng
                 carPosition = animatedPosition
-                Log.d("DASDSADSADASDSA","${animatedPosition.latitude}   ,   ${ animatedPosition.longitude}")
+                Log.d(
+                    "DASDSADSADASDSA",
+                    "${animatedPosition.latitude}   ,   ${animatedPosition.longitude}"
+                )
                 geoJsonSource.setGeoJson(
                     Point.fromLngLat(
                         animatedPosition.longitude,
@@ -2368,16 +2633,16 @@ class MainActivity : BaseActivity(), MainController.view,
 
         mapBoxStyle.addImage(
             "fleet-0", Bitmap.createScaledBitmap(
-                BitmapFactory.decodeResource(resources, R.drawable.car_0),
-                168, 168,
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_0),
+                188, 188,
                 true
             )
         )
 
         mapBoxStyle.addImage(
             "fleet-5", Bitmap.createScaledBitmap(
-                BitmapFactory.decodeResource(resources, R.drawable.car_5),
-                168, 168,
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_5),
+                188, 188,
                 true
             )
         )
@@ -2385,16 +2650,16 @@ class MainActivity : BaseActivity(), MainController.view,
         mapBoxStyle.addImage(
             "fleet-10",
             Bitmap.createScaledBitmap(
-                BitmapFactory.decodeResource(resources, R.drawable.car_10),
-                168, 168,
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_10),
+                188, 188,
                 true
             )
         )
 
         mapBoxStyle.addImage(
             "fleet-15", Bitmap.createScaledBitmap(
-                BitmapFactory.decodeResource(resources, R.drawable.car_15),
-                168, 168,
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_15),
+                188, 188,
                 true
             )
         )
@@ -2402,16 +2667,16 @@ class MainActivity : BaseActivity(), MainController.view,
         mapBoxStyle.addImage(
             "fleet-20",
             Bitmap.createScaledBitmap(
-                BitmapFactory.decodeResource(resources, R.drawable.car_20),
-                168, 168,
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_20),
+                188, 188,
                 true
             )
         )
 
         mapBoxStyle.addImage(
             "fleet-25", Bitmap.createScaledBitmap(
-                BitmapFactory.decodeResource(resources, R.drawable.car_25),
-                168, 168,
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_25),
+                188, 188,
                 true
             )
         )
@@ -2419,16 +2684,16 @@ class MainActivity : BaseActivity(), MainController.view,
         mapBoxStyle.addImage(
             "fleet-30",
             Bitmap.createScaledBitmap(
-                BitmapFactory.decodeResource(resources, R.drawable.car_30),
-                168, 168,
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_30),
+                188, 188,
                 true
             )
         )
 
         mapBoxStyle.addImage(
             "fleet-35", Bitmap.createScaledBitmap(
-                BitmapFactory.decodeResource(resources, R.drawable.car_35),
-                168, 168,
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_35),
+                188, 188,
                 true
             )
         )
@@ -2436,16 +2701,16 @@ class MainActivity : BaseActivity(), MainController.view,
         mapBoxStyle.addImage(
             "fleet-40",
             Bitmap.createScaledBitmap(
-                BitmapFactory.decodeResource(resources, R.drawable.car_40),
-                168, 168,
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_40),
+                188, 188,
                 true
             )
         )
 
         mapBoxStyle.addImage(
             "fleet-45", Bitmap.createScaledBitmap(
-                BitmapFactory.decodeResource(resources, R.drawable.car_45),
-                168, 168,
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_45),
+                188, 188,
                 true
             )
         )
@@ -2453,16 +2718,16 @@ class MainActivity : BaseActivity(), MainController.view,
         mapBoxStyle.addImage(
             "fleet-50",
             Bitmap.createScaledBitmap(
-                BitmapFactory.decodeResource(resources, R.drawable.car_50),
-                168, 168,
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_50),
+                188, 188,
                 true
             )
         )
 
         mapBoxStyle.addImage(
             "fleet-55", Bitmap.createScaledBitmap(
-                BitmapFactory.decodeResource(resources, R.drawable.car_55),
-                168, 168,
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_55),
+                188, 188,
                 true
             )
         )
@@ -2470,16 +2735,16 @@ class MainActivity : BaseActivity(), MainController.view,
         mapBoxStyle.addImage(
             "fleet-60",
             Bitmap.createScaledBitmap(
-                BitmapFactory.decodeResource(resources, R.drawable.car_60),
-                168, 168,
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_60),
+                188, 188,
                 true
             )
         )
 
         mapBoxStyle.addImage(
             "fleet-65", Bitmap.createScaledBitmap(
-                BitmapFactory.decodeResource(resources, R.drawable.car_65),
-                168, 168,
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_65),
+                188, 188,
                 true
             )
         )
@@ -2487,16 +2752,16 @@ class MainActivity : BaseActivity(), MainController.view,
         mapBoxStyle.addImage(
             "fleet-70",
             Bitmap.createScaledBitmap(
-                BitmapFactory.decodeResource(resources, R.drawable.car_70),
-                168, 168,
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_70),
+                188, 188,
                 true
             )
         )
 
         mapBoxStyle.addImage(
             "fleet-75", Bitmap.createScaledBitmap(
-                BitmapFactory.decodeResource(resources, R.drawable.car_75),
-                168, 168,
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_75),
+                188, 188,
                 true
             )
         )
@@ -2504,16 +2769,16 @@ class MainActivity : BaseActivity(), MainController.view,
         mapBoxStyle.addImage(
             "fleet-80",
             Bitmap.createScaledBitmap(
-                BitmapFactory.decodeResource(resources, R.drawable.car_80),
-                168, 168,
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_80),
+                188, 188,
                 true
             )
         )
 
         mapBoxStyle.addImage(
             "fleet-85", Bitmap.createScaledBitmap(
-                BitmapFactory.decodeResource(resources, R.drawable.car_85),
-                168, 168,
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_85),
+                188, 188,
                 true
             )
         )
@@ -2521,32 +2786,32 @@ class MainActivity : BaseActivity(), MainController.view,
         mapBoxStyle.addImage(
             "fleet-90",
             Bitmap.createScaledBitmap(
-                BitmapFactory.decodeResource(resources, R.drawable.car_90),
-                168, 168,
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_90),
+                188, 188,
                 true
             )
         )
 
         mapBoxStyle.addImage(
             "fleet-95", Bitmap.createScaledBitmap(
-                BitmapFactory.decodeResource(resources, R.drawable.car_95),
-                168, 168,
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_95),
+                188, 188,
                 true
             )
         )
 
         mapBoxStyle.addImage(
             "fleet-100", Bitmap.createScaledBitmap(
-                BitmapFactory.decodeResource(resources, R.drawable.car_100),
-                168, 168,
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_100),
+                188, 188,
                 true
             )
         )
 
         mapBoxStyle.addImage(
             "fleet-105", Bitmap.createScaledBitmap(
-                BitmapFactory.decodeResource(resources, R.drawable.car_105),
-                168, 168,
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_105),
+                188, 188,
                 true
             )
         )
@@ -2554,16 +2819,16 @@ class MainActivity : BaseActivity(), MainController.view,
         mapBoxStyle.addImage(
             "fleet-110",
             Bitmap.createScaledBitmap(
-                BitmapFactory.decodeResource(resources, R.drawable.car_110),
-                168, 168,
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_110),
+                188, 188,
                 true
             )
         )
 
         mapBoxStyle.addImage(
             "fleet-115", Bitmap.createScaledBitmap(
-                BitmapFactory.decodeResource(resources, R.drawable.car_115),
-                168, 168,
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_115),
+                188, 188,
                 true
             )
         )
@@ -2571,16 +2836,16 @@ class MainActivity : BaseActivity(), MainController.view,
         mapBoxStyle.addImage(
             "fleet-120",
             Bitmap.createScaledBitmap(
-                BitmapFactory.decodeResource(resources, R.drawable.car_120),
-                168, 168,
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_120),
+                188, 188,
                 true
             )
         )
 
         mapBoxStyle.addImage(
             "fleet-125", Bitmap.createScaledBitmap(
-                BitmapFactory.decodeResource(resources, R.drawable.car_125),
-                168, 168,
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_125),
+                188, 188,
                 true
             )
         )
@@ -2588,16 +2853,16 @@ class MainActivity : BaseActivity(), MainController.view,
         mapBoxStyle.addImage(
             "fleet-130",
             Bitmap.createScaledBitmap(
-                BitmapFactory.decodeResource(resources, R.drawable.car_130),
-                168, 168,
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_130),
+                188, 188,
                 true
             )
         )
 
         mapBoxStyle.addImage(
             "fleet-135", Bitmap.createScaledBitmap(
-                BitmapFactory.decodeResource(resources, R.drawable.car_135),
-                168, 168,
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_135),
+                188, 188,
                 true
             )
         )
@@ -2605,16 +2870,16 @@ class MainActivity : BaseActivity(), MainController.view,
         mapBoxStyle.addImage(
             "fleet-140",
             Bitmap.createScaledBitmap(
-                BitmapFactory.decodeResource(resources, R.drawable.car_140),
-                168, 168,
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_140),
+                188, 188,
                 true
             )
         )
 
         mapBoxStyle.addImage(
             "fleet-145", Bitmap.createScaledBitmap(
-                BitmapFactory.decodeResource(resources, R.drawable.car_145),
-                168, 168,
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_145),
+                188, 188,
                 true
             )
         )
@@ -2622,16 +2887,16 @@ class MainActivity : BaseActivity(), MainController.view,
         mapBoxStyle.addImage(
             "fleet-150",
             Bitmap.createScaledBitmap(
-                BitmapFactory.decodeResource(resources, R.drawable.car_150),
-                168, 168,
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_150),
+                188, 188,
                 true
             )
         )
 
         mapBoxStyle.addImage(
             "fleet-155", Bitmap.createScaledBitmap(
-                BitmapFactory.decodeResource(resources, R.drawable.car_155),
-                168, 168,
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_155),
+                188, 188,
                 true
             )
         )
@@ -2639,16 +2904,16 @@ class MainActivity : BaseActivity(), MainController.view,
         mapBoxStyle.addImage(
             "fleet-160",
             Bitmap.createScaledBitmap(
-                BitmapFactory.decodeResource(resources, R.drawable.car_160),
-                168, 168,
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_160),
+                188, 188,
                 true
             )
         )
 
         mapBoxStyle.addImage(
             "fleet-165", Bitmap.createScaledBitmap(
-                BitmapFactory.decodeResource(resources, R.drawable.car_165),
-                168, 168,
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_165),
+                188, 188,
                 true
             )
         )
@@ -2656,16 +2921,16 @@ class MainActivity : BaseActivity(), MainController.view,
         mapBoxStyle.addImage(
             "fleet-170",
             Bitmap.createScaledBitmap(
-                BitmapFactory.decodeResource(resources, R.drawable.car_170),
-                168, 168,
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_170),
+                188, 188,
                 true
             )
         )
 
         mapBoxStyle.addImage(
             "fleet-175", Bitmap.createScaledBitmap(
-                BitmapFactory.decodeResource(resources, R.drawable.car_175),
-                168, 168,
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_175),
+                188, 188,
                 true
             )
         )
@@ -2673,32 +2938,32 @@ class MainActivity : BaseActivity(), MainController.view,
         mapBoxStyle.addImage(
             "fleet-180",
             Bitmap.createScaledBitmap(
-                BitmapFactory.decodeResource(resources, R.drawable.car_180),
-                168, 168,
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_180),
+                188, 188,
                 true
             )
         )
 
         mapBoxStyle.addImage(
             "fleet-185", Bitmap.createScaledBitmap(
-                BitmapFactory.decodeResource(resources, R.drawable.car_185),
-                168, 168,
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_185),
+                188, 188,
                 true
             )
         )
 
         mapBoxStyle.addImage(
             "fleet-190", Bitmap.createScaledBitmap(
-                BitmapFactory.decodeResource(resources, R.drawable.car_190),
-                168, 168,
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_190),
+                188, 188,
                 true
             )
         )
 
         mapBoxStyle.addImage(
             "fleet-195", Bitmap.createScaledBitmap(
-                BitmapFactory.decodeResource(resources, R.drawable.car_195),
-                168, 168,
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_195),
+                188, 188,
                 true
             )
         )
@@ -2706,16 +2971,16 @@ class MainActivity : BaseActivity(), MainController.view,
         mapBoxStyle.addImage(
             "fleet-200",
             Bitmap.createScaledBitmap(
-                BitmapFactory.decodeResource(resources, R.drawable.car_200),
-                168, 168,
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_200),
+                188, 188,
                 true
             )
         )
 
         mapBoxStyle.addImage(
             "fleet-205", Bitmap.createScaledBitmap(
-                BitmapFactory.decodeResource(resources, R.drawable.car_205),
-                168, 168,
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_205),
+                188, 188,
                 true
             )
         )
@@ -2723,16 +2988,16 @@ class MainActivity : BaseActivity(), MainController.view,
         mapBoxStyle.addImage(
             "fleet-210",
             Bitmap.createScaledBitmap(
-                BitmapFactory.decodeResource(resources, R.drawable.car_210),
-                168, 168,
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_210),
+                188, 188,
                 true
             )
         )
 
         mapBoxStyle.addImage(
             "fleet-215", Bitmap.createScaledBitmap(
-                BitmapFactory.decodeResource(resources, R.drawable.car_215),
-                168, 168,
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_215),
+                188, 188,
                 true
             )
         )
@@ -2740,16 +3005,16 @@ class MainActivity : BaseActivity(), MainController.view,
         mapBoxStyle.addImage(
             "fleet-220",
             Bitmap.createScaledBitmap(
-                BitmapFactory.decodeResource(resources, R.drawable.car_220),
-                168, 168,
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_220),
+                188, 188,
                 true
             )
         )
 
         mapBoxStyle.addImage(
             "fleet-225", Bitmap.createScaledBitmap(
-                BitmapFactory.decodeResource(resources, R.drawable.car_225),
-                168, 168,
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_225),
+                188, 188,
                 true
             )
         )
@@ -2757,16 +3022,16 @@ class MainActivity : BaseActivity(), MainController.view,
         mapBoxStyle.addImage(
             "fleet-230",
             Bitmap.createScaledBitmap(
-                BitmapFactory.decodeResource(resources, R.drawable.car_230),
-                168, 168,
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_230),
+                188, 188,
                 true
             )
         )
 
         mapBoxStyle.addImage(
             "fleet-235", Bitmap.createScaledBitmap(
-                BitmapFactory.decodeResource(resources, R.drawable.car_235),
-                168, 168,
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_235),
+                188, 188,
                 true
             )
         )
@@ -2774,16 +3039,16 @@ class MainActivity : BaseActivity(), MainController.view,
         mapBoxStyle.addImage(
             "fleet-240",
             Bitmap.createScaledBitmap(
-                BitmapFactory.decodeResource(resources, R.drawable.car_240),
-                168, 168,
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_240),
+                188, 188,
                 true
             )
         )
 
         mapBoxStyle.addImage(
             "fleet-245", Bitmap.createScaledBitmap(
-                BitmapFactory.decodeResource(resources, R.drawable.car_245),
-                168, 168,
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_245),
+                188, 188,
                 true
             )
         )
@@ -2791,16 +3056,16 @@ class MainActivity : BaseActivity(), MainController.view,
         mapBoxStyle.addImage(
             "fleet-250",
             Bitmap.createScaledBitmap(
-                BitmapFactory.decodeResource(resources, R.drawable.car_250),
-                168, 168,
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_250),
+                188, 188,
                 true
             )
         )
 
         mapBoxStyle.addImage(
             "fleet-255", Bitmap.createScaledBitmap(
-                BitmapFactory.decodeResource(resources, R.drawable.car_255),
-                168, 168,
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_255),
+                188, 188,
                 true
             )
         )
@@ -2808,16 +3073,16 @@ class MainActivity : BaseActivity(), MainController.view,
         mapBoxStyle.addImage(
             "fleet-260",
             Bitmap.createScaledBitmap(
-                BitmapFactory.decodeResource(resources, R.drawable.car_260),
-                168, 168,
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_260),
+                188, 188,
                 true
             )
         )
 
         mapBoxStyle.addImage(
             "fleet-265", Bitmap.createScaledBitmap(
-                BitmapFactory.decodeResource(resources, R.drawable.car_265),
-                168, 168,
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_265),
+                188, 188,
                 true
             )
         )
@@ -2825,16 +3090,16 @@ class MainActivity : BaseActivity(), MainController.view,
         mapBoxStyle.addImage(
             "fleet-270",
             Bitmap.createScaledBitmap(
-                BitmapFactory.decodeResource(resources, R.drawable.car_270),
-                168, 168,
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_270),
+                188, 188,
                 true
             )
         )
 
         mapBoxStyle.addImage(
             "fleet-275", Bitmap.createScaledBitmap(
-                BitmapFactory.decodeResource(resources, R.drawable.car_275),
-                168, 168,
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_275),
+                188, 188,
                 true
             )
         )
@@ -2842,31 +3107,31 @@ class MainActivity : BaseActivity(), MainController.view,
         mapBoxStyle.addImage(
             "fleet-280",
             Bitmap.createScaledBitmap(
-                BitmapFactory.decodeResource(resources, R.drawable.car_280),
-                168, 168,
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_280),
+                188, 188,
                 true
             )
         )
 
         mapBoxStyle.addImage(
             "fleet-285", Bitmap.createScaledBitmap(
-                BitmapFactory.decodeResource(resources, R.drawable.car_285),
-                168, 168,
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_285),
+                188, 188,
                 true
             )
         )
 
         mapBoxStyle.addImage(
             "fleet-290", Bitmap.createScaledBitmap(
-                BitmapFactory.decodeResource(resources, R.drawable.car_290),
-                168, 168,
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_290),
+                188, 188,
                 true
             )
         )
         mapBoxStyle.addImage(
             "fleet-295", Bitmap.createScaledBitmap(
-                BitmapFactory.decodeResource(resources, R.drawable.car_295),
-                168, 168,
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_295),
+                188, 188,
                 true
             )
         )
@@ -2874,15 +3139,15 @@ class MainActivity : BaseActivity(), MainController.view,
         mapBoxStyle.addImage(
             "fleet-300",
             Bitmap.createScaledBitmap(
-                BitmapFactory.decodeResource(resources, R.drawable.car_300),
-                168, 168,
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_300),
+                188, 188,
                 true
             )
         )
         mapBoxStyle.addImage(
             "fleet-305", Bitmap.createScaledBitmap(
-                BitmapFactory.decodeResource(resources, R.drawable.car_305),
-                168, 168,
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_305),
+                188, 188,
                 true
             )
         )
@@ -2890,16 +3155,16 @@ class MainActivity : BaseActivity(), MainController.view,
         mapBoxStyle.addImage(
             "fleet-310",
             Bitmap.createScaledBitmap(
-                BitmapFactory.decodeResource(resources, R.drawable.car_310),
-                168, 168,
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_310),
+                188, 188,
                 true
             )
         )
 
         mapBoxStyle.addImage(
             "fleet-315", Bitmap.createScaledBitmap(
-                BitmapFactory.decodeResource(resources, R.drawable.car_315),
-                168, 168,
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_315),
+                188, 188,
                 true
             )
         )
@@ -2907,16 +3172,16 @@ class MainActivity : BaseActivity(), MainController.view,
         mapBoxStyle.addImage(
             "fleet-320",
             Bitmap.createScaledBitmap(
-                BitmapFactory.decodeResource(resources, R.drawable.car_320),
-                168, 168,
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_320),
+                188, 188,
                 true
             )
         )
 
         mapBoxStyle.addImage(
             "fleet-325", Bitmap.createScaledBitmap(
-                BitmapFactory.decodeResource(resources, R.drawable.car_325),
-                168, 168,
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_325),
+                188, 188,
                 true
             )
         )
@@ -2924,16 +3189,16 @@ class MainActivity : BaseActivity(), MainController.view,
         mapBoxStyle.addImage(
             "fleet-330",
             Bitmap.createScaledBitmap(
-                BitmapFactory.decodeResource(resources, R.drawable.car_330),
-                168, 168,
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_330),
+                188, 188,
                 true
             )
         )
 
         mapBoxStyle.addImage(
             "fleet-335", Bitmap.createScaledBitmap(
-                BitmapFactory.decodeResource(resources, R.drawable.car_335),
-                168, 168,
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_335),
+                188, 188,
                 true
             )
         )
@@ -2941,16 +3206,16 @@ class MainActivity : BaseActivity(), MainController.view,
         mapBoxStyle.addImage(
             "fleet-340",
             Bitmap.createScaledBitmap(
-                BitmapFactory.decodeResource(resources, R.drawable.car_340),
-                168, 168,
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_340),
+                188, 188,
                 true
             )
         )
 
         mapBoxStyle.addImage(
             "fleet-345", Bitmap.createScaledBitmap(
-                BitmapFactory.decodeResource(resources, R.drawable.car_345),
-                168, 168,
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_345),
+                188, 188,
                 true
             )
         )
@@ -2958,21 +3223,33 @@ class MainActivity : BaseActivity(), MainController.view,
         mapBoxStyle.addImage(
             "fleet-350",
             Bitmap.createScaledBitmap(
-                BitmapFactory.decodeResource(resources, R.drawable.car_350),
-                168, 168,
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_350),
+                188, 188,
                 true
             )
         )
 
         mapBoxStyle.addImage(
             "fleet-355", Bitmap.createScaledBitmap(
-                BitmapFactory.decodeResource(resources, R.drawable.car_355),
-                168, 168,
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_355),
+                188, 188,
                 true
             )
         )
 
 
+    }
+
+
+    fun hideKeyboard() {
+        val imm: InputMethodManager = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+        //Find the currently focused view, so we can grab the correct window token from it.
+        var view = currentFocus
+        //If no view currently has focus, create a new one, just so we can grab a window token from it
+        if (view == null) {
+            view = View(this)
+        }
+        imm.hideSoftInputFromWindow(view.windowToken, 0)
     }
 
 }

@@ -17,6 +17,7 @@ import me.jeybi.uztaxi.network.RetrofitHelper
 import me.jeybi.uztaxi.utils.Constants
 import me.jeybi.uztaxi.utils.NaiveHmacSigner
 import me.jeybi.uztaxi.utils.PolyLineUtils
+import java.lang.StringBuilder
 import java.nio.charset.StandardCharsets.UTF_8
 import java.security.InvalidKeyException
 import java.security.NoSuchAlgorithmException
@@ -83,7 +84,7 @@ class MainPresenter(val view: MainActivity) : MainController.presenter {
         )
         if (!provider.contains("gps")) {
             view.buildAlertMessageNoGps()
-        }else{
+        } else {
             view.onHasGPS()
         }
 
@@ -119,6 +120,38 @@ class MainPresenter(val view: MainActivity) : MainController.presenter {
             })
 
         return registerTokenDisposable
+    }
+
+
+    override fun reverseGeocode(latitude: Double, longitude: Double): Disposable {
+        return RetrofitHelper.apiService(Constants.BASE_URL_NOMINATIM)
+            .reverseGeocode(
+                latitude,
+                longitude,
+                Constants.NOMINATIM_ZOOM_LVL,
+                Constants.NOMINATIM_ZOOM_FORMAT,
+                view.sharedPreferences.getString(Constants.NOMINATIM_LANGUAGE, "ru") ?: "ru"
+            ).observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io())
+            .subscribe({
+                if (it.isSuccessful && it.body() != null) {
+                    val address = StringBuilder()
+                    val details = StringBuilder()
+
+                    if (it.body()!!.name != null) {
+                        address.append(it.body()!!.name)
+                        if (it.body()!!.address.road!=null)
+                        details.append("${it.body()!!.address.road}")
+                        if (it.body()!!.address.house_number!=null)
+                            details.append(", ${it.body()!!.address.house_number}")
+                    }else{
+                        address.append(it.body()!!.display_name)
+                    }
+                    view.onAddressFound(address.toString(),details.toString())
+                }
+            }, {
+
+            })
     }
 
     override fun getUserAddresses(): Disposable {
@@ -167,17 +200,17 @@ class MainPresenter(val view: MainActivity) : MainController.presenter {
                                 for (component in it.body()!![0].components!!) {
                                     if (component.level == 7)
                                         address = component.name
-                                    if (address == ""&&component.level == 9)
+                                    if (address == "" && component.level == 9)
                                         address = component.name
                                     if (component.level == 8)
                                         address += ", ${component.name}"
-                                    if (address != ""&&component.level == 9)
+                                    if (address != "" && component.level == 9)
                                         address += ", ${component.name}"
                                 }
-                                view.onAddressFound(address)
+                                view.onAddressFound(address,"")
 
                             } else
-                                view.onAddressFound("")
+                                view.onAddressFound("","")
                         }
                     }
 
@@ -205,7 +238,7 @@ class MainPresenter(val view: MainActivity) : MainController.presenter {
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribe({
-                if (it.isSuccessful&&it.body()!=null){
+                if (it.isSuccessful && it.body() != null) {
                     view.onBonusReady(it.body()!!.balance)
                 }
             }, {
@@ -247,9 +280,9 @@ class MainPresenter(val view: MainActivity) : MainController.presenter {
                     val decoded = PolyLineUtils.decode(it.body()!!.trip.legs[0].shape, 6)
                     if (!driverRoute)
                         view.drawRoute(decoded)
-                    else if (driverRoute&&it.body()!!.trip.summary.length>1.0)
-                        view.drawDriverRoute(decoded,origin)
-                }else{
+                    else if (driverRoute && it.body()!!.trip.summary.length > 1.0)
+                        view.drawDriverRoute(decoded, origin)
+                } else {
                     view.onErrorGetRoute()
                 }
             }, {
@@ -269,7 +302,14 @@ class MainPresenter(val view: MainActivity) : MainController.presenter {
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
                 if (it.isSuccessful) {
-                    view.onCarsAvailabe(it.body()!!)
+                    val carsList = ArrayList<GetCarResponse>()
+                    for ((counter, car) in it.body()!!.withIndex()){
+                        if (counter<5){
+                            carsList.add(car)
+                        }
+                    }
+                    view.onCarsAvailabe(carsList)
+//                    view.onCarsAvailabe(it.body()!!)
                 }
             }, {
 
@@ -324,7 +364,7 @@ class MainPresenter(val view: MainActivity) : MainController.presenter {
                 if (it.isSuccessful && it.body() != null) {
                     Log.d("DASDASDASDSADS", "${it.body()}")
                     view.onOrderCreated(it.body()!!.id)
-                }else{
+                } else {
                     view.onErrorCreateOrder()
                 }
             }, {
@@ -350,7 +390,7 @@ class MainPresenter(val view: MainActivity) : MainController.presenter {
                 if (it.isSuccessful && it.body() != null) {
                     if (it.body()!!.size > 0) {
                         view.onOnGoingOrderFound(it.body()!![0])
-                    }else{
+                    } else {
                         view.onNoGoingOrder()
                     }
                 }
@@ -359,42 +399,46 @@ class MainPresenter(val view: MainActivity) : MainController.presenter {
             })
     }
 
-    override fun notifyDriver(orderID : Long): Disposable {
+    override fun notifyDriver(orderID: Long): Disposable {
         return RetrofitHelper.apiService(Constants.BASE_URL)
-            .notifyDriver(Constants.HIVE_PROFILE,
+            .notifyDriver(
+                Constants.HIVE_PROFILE,
                 NaiveHmacSigner.DateSignature(),
                 NaiveHmacSigner.AuthSignature(
                     view.HIVE_USER_ID,
                     view.HIVE_TOKEN,
                     "GET",
-                    "/api/client/mobile/1.0/orders/$orderID/coming"),
+                    "/api/client/mobile/1.0/orders/$orderID/coming"
+                ),
                 orderID
-                ).observeOn(AndroidSchedulers.mainThread())
+            ).observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribe({
 
-            },{
+            }, {
 
             })
     }
 
 
-    override fun notifyDriver(orderID : Long,rateOrderBody: RateOrderBody): Disposable {
+    override fun notifyDriver(orderID: Long, rateOrderBody: RateOrderBody): Disposable {
         return RetrofitHelper.apiService(Constants.BASE_URL)
-            .rateOrder(Constants.HIVE_PROFILE,
+            .rateOrder(
+                Constants.HIVE_PROFILE,
                 NaiveHmacSigner.DateSignature(),
                 NaiveHmacSigner.AuthSignature(
                     view.HIVE_USER_ID,
                     view.HIVE_TOKEN,
                     "POST",
-                    "/api/client/mobile/1.1/orders/$orderID/feedback"),
+                    "/api/client/mobile/1.1/orders/$orderID/feedback"
+                ),
                 orderID,
                 rateOrderBody
             ).observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribe({
 
-            },{
+            }, {
 
             })
     }

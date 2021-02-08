@@ -14,7 +14,7 @@ interface MainController {
 
         fun onBonusReady(bonus : Double)
 
-        fun onAddressFound(name : String)
+        fun onAddressFound(name : String,details : String)
 
         fun onSearchClicked(searchCancelListener: SearchCancelListener)
 
@@ -62,6 +62,8 @@ interface MainController {
         fun getUserAddresses() : Disposable
 
         fun findCurrentAddress(latitude : Double, longitude : Double) : Disposable
+
+        fun reverseGeocode(latitude : Double, longitude : Double) : Disposable
 
         fun getBonuses(latitude: Double, longitude: Double) : Disposable
 
