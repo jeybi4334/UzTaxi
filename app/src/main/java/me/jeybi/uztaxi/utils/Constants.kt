@@ -5,9 +5,11 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.drawable.Drawable
 import android.util.DisplayMetrics
+import android.util.Log
 import com.mapbox.mapboxsdk.geometry.LatLng
 import java.text.DecimalFormat
 import java.util.*
+import kotlin.math.abs
 
 
 class Constants {
@@ -509,7 +511,7 @@ class Constants {
 
         fun getFormattedPrice(price : Double) : String{
             val decimalFormat = DecimalFormat("###,###")
-            return decimalFormat.format(price)
+            return decimalFormat.format(price).replace(",",".")
         }
 
         fun getRandomIcon() : String{
@@ -519,7 +521,8 @@ class Constants {
 
         fun getCarIcon(rotation : Float) : String{
             val rotateFormatter = DecimalFormat("#.#")
-           return when (kotlin.math.abs(rotateFormatter.format(rotation).toFloat())) {
+
+           return when (abs(rotateFormatter.format(rotation).replace(",",".").toFloat())) {
                 in 0f..2.4f -> "fleet-0"
                 in 2.5f..7.4f -> "fleet-5"
                 in 7.5f..12.4f -> "fleet-10"

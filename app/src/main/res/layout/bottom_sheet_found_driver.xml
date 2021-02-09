@@ -1,48 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:paddingBottom="48dp"
     android:background="@color/white">
 
 
-    <TextView
+    <com.romainpiel.shimmer.ShimmerTextView
         android:id="@+id/textViewTimeCome"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginEnd="16dp"
         android:layout_height="wrap_content"
         android:textSize="16sp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="18dp"
         android:layout_marginStart="24dp"
-        android:text="Your driver is coming in 4 minutes"
+        android:text="Водитель приедет в течение 5 минут"
         android:textColor="@color/purple_200"
-        android:fontFamily="@font/g_semi_bold"
+        android:fontFamily="@font/g_bold"
         />
 
-    <TextView
-        android:id="@+id/textViewCancel"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:clickable="true"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="@id/textViewTimeCome"
-        app:layout_constraintBottom_toBottomOf="@id/textViewTimeCome"
-        android:layout_marginEnd="18dp"
-        android:text="Cancel"
-        android:padding="12dp"
-        android:textColor="@color/red"
-        android:fontFamily="@font/g_semi_bold"
-        android:textSize="18sp"
-        />
+<!--    <TextView-->
+<!--        android:id="@+id/textViewCancel"-->
+<!--        android:background="?attr/selectableItemBackgroundBorderless"-->
+<!--        android:clickable="true"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        app:layout_constraintRight_toRightOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="@id/textViewTimeCome"-->
+<!--        app:layout_constraintBottom_toBottomOf="@id/textViewTimeCome"-->
+<!--        android:layout_marginEnd="18dp"-->
+<!--        android:text="Cancel"-->
+<!--        android:padding="12dp"-->
+<!--        android:textColor="@color/red"-->
+<!--        android:fontFamily="@font/g_semi_bold"-->
+<!--        android:textSize="18sp"-->
+<!--        />-->
 
     <View
         android:id="@+id/divider1"
         android:layout_width="0dp"
         android:layout_height="1dp"
         app:layout_constraintTop_toBottomOf="@id/textViewTimeCome"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="14dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         android:background="#E4E9F2"
@@ -55,14 +59,14 @@
         android:id="@+id/imageViewNexia"
         android:layout_width="156dp"
         android:layout_height="100dp"
-        android:src="@drawable/nexia_dark"
+        android:src="@drawable/nexia"
         app:layout_constraintLeft_toLeftOf="parent"
-        android:scaleX="-1"
         app:layout_constraintTop_toBottomOf="@id/divider1"
+        android:padding="8dp"
         />
 
         <TextView
-            android:id="@+id/textViewCarName"
+            android:id="@+id/textViewCarName1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintLeft_toRightOf="@id/imageViewNexia"
@@ -74,29 +78,18 @@
             android:fontFamily="@font/g_semi_bold"
             android:textSize="16sp"
             />
-    <TextView
-        android:id="@+id/textViewCarNumber"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintLeft_toRightOf="@id/textViewCarName"
-        app:layout_constraintTop_toTopOf="@id/textViewCarName"
-        android:hint="Car number"
-        android:fontFamily="@font/g_bold"
-        android:textColor="#222B45"
-        android:layout_marginStart="2dp"
-        android:textSize="16sp"
-        />
 
     <TextView
-        android:id="@+id/textViewDriverName"
+        android:id="@+id/textViewCarNumber1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="#222B45"
-        android:hint="Driver name"
-        app:layout_constraintTop_toBottomOf="@id/textViewCarName"
-        app:layout_constraintLeft_toLeftOf="@id/textViewCarName"
+        android:hint="Car number"
+        app:layout_constraintTop_toBottomOf="@id/textViewCarName1"
+        app:layout_constraintLeft_toLeftOf="@id/textViewCarName1"
         android:layout_marginTop="4dp"
-        android:fontFamily="@font/g_semi_bold"
+        android:fontFamily="@font/g_bold"
+        android:textColor="#222B45"
+        android:textSize="16sp"
         />
 
     <ImageView
@@ -104,8 +97,8 @@
         android:layout_width="18dp"
         android:layout_height="18dp"
         android:src="@drawable/ic_filled_star"
-        app:layout_constraintTop_toBottomOf="@id/textViewDriverName"
-        app:layout_constraintLeft_toLeftOf="@id/textViewDriverName"
+        app:layout_constraintTop_toBottomOf="@id/textViewCarNumber1"
+        app:layout_constraintLeft_toLeftOf="@id/textViewCarNumber1"
         android:layout_marginTop="4dp"
         />
 
@@ -114,8 +107,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="#222B45"
-        android:text="0.0"
-        app:layout_constraintTop_toBottomOf="@id/textViewDriverName"
+        android:text="5.0"
+        app:layout_constraintTop_toBottomOf="@id/textViewCarNumber1"
         app:layout_constraintLeft_toRightOf="@id/imageStar"
         android:layout_marginLeft="8dp"
         android:layout_marginTop="4dp"
@@ -134,9 +127,11 @@
         />
 
     <RelativeLayout
-        android:id="@+id/rvCall"
-        android:layout_width="80dp"
-        android:layout_height="48dp"
+        android:id="@+id/rvCallDriver"
+        android:layout_width="wrap_content"
+        android:layout_height="44dp"
+        android:paddingStart="24dp"
+        android:paddingEnd="24dp"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/divider2"
         android:layout_marginTop="16dp"
@@ -149,23 +144,23 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:text="Call"
             android:fontFamily="@font/g_bold"
+            android:text="Позвонить водителю"
             android:textColor="@color/purple_200"
-            android:textSize="16sp"
-            />
+            android:textSize="16sp" />
 
     </RelativeLayout>
 
     <RelativeLayout
+        android:id="@+id/rcCancelOrder"
         android:layout_width="0dp"
-        android:layout_height="48dp"
-        app:layout_constraintRight_toLeftOf="@id/rvCall"
+        android:layout_height="44dp"
+        app:layout_constraintRight_toLeftOf="@id/rvCallDriver"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@id/divider2"
         android:layout_marginTop="16dp"
-        android:layout_marginEnd="18dp"
-        android:layout_marginStart="18dp"
+        android:layout_marginEnd="12dp"
+        android:layout_marginStart="12dp"
         android:background="@drawable/bc_button_purple"
         android:clickable="true"
         >
@@ -174,7 +169,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:text="Message"
+            android:text="Отменить заказ"
             android:fontFamily="@font/g_bold"
             android:textColor="@color/white"
             android:textSize="16sp"

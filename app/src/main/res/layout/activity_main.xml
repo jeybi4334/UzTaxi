@@ -362,7 +362,19 @@
                         />
 
                     <include
-                        android:id="@+id/modeCarFound"
+                        android:id="@+id/modeSearchCar"
+                        android:visibility="gone"
+                        layout="@layout/bottom_sheet_car_search"
+                        />
+
+                    <include
+                        android:id="@+id/modeDriverFound"
+                        android:visibility="gone"
+                        layout="@layout/bottom_sheet_found_driver"
+                        />
+
+                    <include
+                        android:id="@+id/modeRideStart"
                         android:visibility="gone"
                         layout="@layout/bottom_edit_ride"
                         />

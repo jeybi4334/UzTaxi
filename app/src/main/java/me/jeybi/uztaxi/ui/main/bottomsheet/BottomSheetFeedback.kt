@@ -7,6 +7,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
+import android.widget.FrameLayout
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -19,7 +22,7 @@ import me.jeybi.uztaxi.utils.Constants
 import me.jeybi.uztaxi.utils.NaiveHmacSigner
 
 
-class BottomSheetFeedback(val orderID: Long, val cost : String, val bonus : String) : BottomSheetDialogFragment(){
+class BottomSheetFeedback(val orderID: Long, val cost : Double, val usedBonus : Double) : BottomSheetDialogFragment(){
 
     var RATE = 0
 
@@ -46,9 +49,23 @@ class BottomSheetFeedback(val orderID: Long, val cost : String, val bonus : Stri
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        textViewBillAmount.text = cost
-        textViewCashBackAmount.text = "+$bonus сум"
+        textViewBillAmount.text = "${cost - usedBonus}"
+        textViewCashBackAmount.text = "-$usedBonus сум"
         textViewOrderDate.text = NaiveHmacSigner.DateSignature()
+
+        dialog!!.setOnShowListener { dialog -> // In a previous life I used this method to get handles to the positive and negative buttons
+            // of a dialog in order to change their Typeface. Good ol' days.
+            val d = dialog as BottomSheetDialog
+
+            // This is gotten directly from the source of BottomSheetDialog
+            // in the wrapInBottomSheet() method
+            val bottomSheet =
+                d.findViewById<View>(R.id.design_bottom_sheet) as FrameLayout?
+
+            // Right here!
+            if (bottomSheet!=null)
+                BottomSheetBehavior.from(bottomSheet).state = BottomSheetBehavior.STATE_EXPANDED
+        }
 
         rvConfirm.setOnClickListener {
 //            if (RATE!=0){

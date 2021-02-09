@@ -19,7 +19,8 @@ import me.jeybi.uztaxi.utils.Constants
 import java.lang.StringBuilder
 
 
-class UserBonusSheet(val balance: Double,val tariffID : Long) : BottomSheetDialogFragment(),View.OnClickListener {
+class UserBonusSheet(val balance: Double, val tariffID: Long) : BottomSheetDialogFragment(),
+    View.OnClickListener {
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -52,8 +53,8 @@ class UserBonusSheet(val balance: Double,val tariffID : Long) : BottomSheetDialo
                 d.findViewById<View>(R.id.design_bottom_sheet) as FrameLayout?
 
             // Right here!
-            if (bottomSheet!=null)
-            BottomSheetBehavior.from(bottomSheet).state = BottomSheetBehavior.STATE_EXPANDED
+            if (bottomSheet != null)
+                BottomSheetBehavior.from(bottomSheet).state = BottomSheetBehavior.STATE_EXPANDED
         }
 
 
@@ -79,67 +80,78 @@ class UserBonusSheet(val balance: Double,val tariffID : Long) : BottomSheetDialo
     }
 
     override fun onClick(v: View?) {
-        when(v?.id){
-            R.id.textViewNumber1->{
+        when (v?.id) {
+            R.id.textViewNumber1 -> {
                 USED_BONUS.append("1")
             }
-            R.id.textViewNumber2->{
+            R.id.textViewNumber2 -> {
                 USED_BONUS.append("2")
             }
-            R.id.textViewNumber3->{
+            R.id.textViewNumber3 -> {
                 USED_BONUS.append("3")
             }
-            R.id.textViewNumber4->{
+            R.id.textViewNumber4 -> {
                 USED_BONUS.append("4")
             }
-            R.id.textViewNumber5->{
+            R.id.textViewNumber5 -> {
                 USED_BONUS.append("5")
             }
-            R.id.textViewNumber6->{
+            R.id.textViewNumber6 -> {
                 USED_BONUS.append("6")
             }
-            R.id.textViewNumber7->{
+            R.id.textViewNumber7 -> {
                 USED_BONUS.append("7")
             }
-            R.id.textViewNumber8->{
+            R.id.textViewNumber8 -> {
                 USED_BONUS.append("8")
             }
-            R.id.textViewNumber9->{
+            R.id.textViewNumber9 -> {
                 USED_BONUS.append("9")
             }
-            R.id.textViewNumber11->{
+            R.id.textViewNumber11 -> {
                 USED_BONUS.append("0")
             }
-            R.id.textViewNumber12->{
+            R.id.textViewNumber12 -> {
                 if (USED_BONUS.isNotEmpty()) {
                     USED_BONUS.setLength(USED_BONUS.length - 1)
                 }
             }
-            R.id.textOrderWithoutBonus->{
-                (activity as MainActivity).createOrder(0.0,tariffID)
+            R.id.textOrderWithoutBonus -> {
+                (activity as MainActivity).createOrder(0.0, tariffID)
                 dismiss()
             }
-            R.id.rvOrder->{
+            R.id.rvOrder -> {
                 var bon = 0.0
                 if (USED_BONUS.isNotEmpty()) {
                     bon = USED_BONUS.toString().toDouble()
                 }
-                if (bon<=balance){
-                (activity as MainActivity).createOrder(bon,tariffID)
-                dismiss()
-                }
-                else
-                    Toast.makeText(activity,"У вас недостаточно денег на балансе",Toast.LENGTH_SHORT).show()
+                if (bon <= balance) {
+                    if (bon >= 1000) {
+                        (activity as MainActivity).createOrder(bon, tariffID)
+                        dismiss()
+                    } else {
+                        Toast.makeText(
+                            activity,
+                            "Минимальная сумма бонуса для использования: 1000 сум.",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+
+                } else
+                    Toast.makeText(
+                        activity,
+                        "У вас недостаточно денег на балансе",
+                        Toast.LENGTH_SHORT
+                    ).show()
             }
 
         }
 
         if (USED_BONUS.isNotEmpty())
-        textEnteredBalance.text = Constants.getFormattedPrice(USED_BONUS.toString().toDouble())
+            textEnteredBalance.text = Constants.getFormattedPrice(USED_BONUS.toString().toDouble())
         else
             textEnteredBalance.text = "0"
     }
-
 
 
 }

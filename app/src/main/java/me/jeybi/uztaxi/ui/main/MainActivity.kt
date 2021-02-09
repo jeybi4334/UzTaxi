@@ -18,6 +18,7 @@ import android.location.Criteria
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
+import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
@@ -30,6 +31,7 @@ import android.view.animation.OvershootInterpolator
 import android.view.inputmethod.InputMethodManager
 import android.widget.RelativeLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -67,7 +69,11 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.bottom_edit_ride.*
+import kotlinx.android.synthetic.main.bottom_edit_ride.textViewCarName
+import kotlinx.android.synthetic.main.bottom_edit_ride.textViewCarNumber
+import kotlinx.android.synthetic.main.bottom_edit_ride.textViewRate
 import kotlinx.android.synthetic.main.bottom_sheet_car_search.*
+import kotlinx.android.synthetic.main.bottom_sheet_found_driver.*
 import kotlinx.android.synthetic.main.bottom_sheet_search.*
 import kotlinx.android.synthetic.main.bottom_sheet_where.*
 import kotlinx.android.synthetic.main.bottomsheet_map.*
@@ -82,6 +88,7 @@ import me.jeybi.uztaxi.ui.main.bottomsheet.*
 import me.jeybi.uztaxi.ui.main.fragments.*
 import me.jeybi.uztaxi.utils.Constants
 import me.jeybi.uztaxi.utils.NaiveHmacSigner
+import java.lang.Exception
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
@@ -535,7 +542,7 @@ class MainActivity : BaseActivity(), MainController.view,
 
     lateinit var receiver: BroadcastReceiver
 
-    var ORDER_COST = "0"
+    var ORDER_COST = 0.0
 
     private fun registerFirebaseReceiver() {
         val filter = IntentFilter()
@@ -639,6 +646,7 @@ class MainActivity : BaseActivity(), MainController.view,
         bottomSheetBehaviour.peekHeight = 0
         bottomSheetBehaviour.state = BottomSheetBehavior.STATE_COLLAPSED
 
+
         when (shortOrderInfo.state) {
             Constants.ORDER_STATE_CREATED -> {
                 ORDER_STATE = Constants.ORDER_STATE_CREATED
@@ -659,6 +667,7 @@ class MainActivity : BaseActivity(), MainController.view,
                 showCarSearchPage(shortOrderInfo.id)
             }
             Constants.ORDER_STATE_ASSIGNED -> {
+
                 ORDER_STATE = Constants.ORDER_STATE_ASSIGNED
                 CURRENT_MODE = Constants.MODE_CAR_FOUND
                 showFoundCarInfo(shortOrderInfo.id)
@@ -677,7 +686,7 @@ class MainActivity : BaseActivity(), MainController.view,
             Constants.ORDER_STATE_COMPLETED -> {
                 ORDER_STATE = Constants.ORDER_STATE_COMPLETED
                 carPositionDisposable.dispose()
-                showFeedbackOrder(shortOrderInfo.id, ORDER_COST)
+                showFeedbackOrder(shortOrderInfo.id, ORDER_COST,0.0)
 
             }
             Constants.ORDER_STATE_CANCELLED -> {
@@ -698,9 +707,24 @@ class MainActivity : BaseActivity(), MainController.view,
         bottomSheetBehaviour.peekHeight = 0
         bottomSheetBehaviour.state = BottomSheetBehavior.STATE_COLLAPSED
 
+        rvCallDriver.setOnClickListener{
+            if (orderInfo.assignee?.call?.numbers!=null&&orderInfo.assignee.call.numbers.size>0){
+                val dialIntent = Intent(Intent.ACTION_DIAL)
+                dialIntent.data = Uri.parse("tel:" + "${orderInfo.assignee?.call?.numbers!![0]}")
+                startActivity(dialIntent)
+            }else{
+                Toast.makeText(this@MainActivity,"Вызвать водителя сейчас невозможно",Toast.LENGTH_SHORT).show()
+            }
+
+        }
+
         when (orderInfo.state) {
 
             Constants.ORDER_STATE_ASSIGNED -> {
+                textViewCarName1.text =    "${orderInfo.assignee?.car?.brand} ${orderInfo.assignee?.car?.model} - ${orderInfo.assignee?.car?.color}"
+                textViewCarNumber1.text = "${orderInfo.assignee?.car?.regNum}"
+
+                modeDriverFound.visibility = View.VISIBLE
                 ORDER_STATE = Constants.ORDER_STATE_ASSIGNED
                 CURRENT_MODE = Constants.MODE_CAR_FOUND
                 if (lottieAnimation.visibility == View.VISIBLE)
@@ -722,6 +746,14 @@ class MainActivity : BaseActivity(), MainController.view,
                 }
             }
             Constants.ORDER_STATE_DRIVER_CAME -> {
+                textViewCarName1.text =    "${orderInfo.assignee?.car?.brand} ${orderInfo.assignee?.car?.model} - ${orderInfo.assignee?.car?.color}"
+                textViewCarNumber1.text = "${orderInfo.assignee?.car?.regNum}"
+
+                modeDriverFound.visibility = View.VISIBLE
+                val shimmer =  Shimmer()
+                shimmer.start(textViewTimeCome)
+                textViewTimeCome.text = "Водитель ждет вас"
+
                 ORDER_STATE = Constants.ORDER_STATE_DRIVER_CAME
                 CURRENT_MODE = Constants.MODE_DRIVER_CAME
                 if (!DRIVER_CAME_DIALOG_SHOWED) {
@@ -730,6 +762,40 @@ class MainActivity : BaseActivity(), MainController.view,
                 }
             }
             Constants.ORDER_STATE_EXECUTING -> {
+
+                textViewCarName.text =
+                    "${orderInfo.assignee?.car?.brand} ${orderInfo.assignee?.car?.model} - ${orderInfo.assignee?.car?.color}"
+                textViewCarNumber.text = "${orderInfo.assignee?.car?.regNum}"
+
+                val decimalFormat = DecimalFormat("###,###")
+
+                textViewRate.text =
+                    "${decimalFormat.format(ORDER_COST)} сум"
+                if (orderInfo.assignee != null)
+                    when (orderInfo.assignee!!.car.alias) {
+                        Constants.CAR_ALIAS_NEXIA -> {
+                            imageViewAssignedCar.setImageResource(R.drawable.nexia)
+                        }
+                        Constants.CAR_ALIAS_LACETTI -> {
+                            imageViewAssignedCar.setImageResource(R.drawable.lacetti)
+                        }
+                        Constants.CAR_ALIAS_MATIZ -> {
+                            imageViewAssignedCar.setImageResource(R.drawable.matiz)
+                        }
+                        Constants.CAR_ALIAS_SPARK -> {
+                            imageViewAssignedCar.setImageResource(R.drawable.spark_2)
+                        }
+
+
+                    }
+
+
+                textView0Address.text = "${orderInfo.route[0].address.name}"
+                if (orderInfo.route.size > 1)
+                    textView1Address.text = "${orderInfo.route[1].address.name}"
+
+                modeRideStart.visibility = View.VISIBLE
+
                 ORDER_STATE = Constants.ORDER_STATE_EXECUTING
                 CURRENT_MODE = Constants.MODE_RIDE_STARTED
 
@@ -748,7 +814,7 @@ class MainActivity : BaseActivity(), MainController.view,
             Constants.ORDER_STATE_COMPLETED -> {
                 ORDER_STATE = Constants.ORDER_STATE_COMPLETED
                 if (!FEEDBACK_SHOWED) {
-                    showFeedbackOrder(oderID, ORDER_COST)
+                    showFeedbackOrder(oderID, orderInfo.cost.amount,orderInfo.usedBonuses?:0.0)
                     FEEDBACK_SHOWED = true
                     showSearchWherePage()
                     carPositionDisposable.dispose()
@@ -772,12 +838,21 @@ class MainActivity : BaseActivity(), MainController.view,
         lottieAnimation.cancelAnimation()
         lottieAnimation.visibility = View.GONE
 
-        modeCarFound.visibility = View.VISIBLE
+        if (CURRENT_MODE == Constants.MODE_CAR_FOUND||CURRENT_MODE==Constants.MODE_DRIVER_CAME)
+        modeDriverFound.visibility = View.VISIBLE
+        else
+            modeRideStart.visibility = View.VISIBLE
+
+
         modeSearchCar.visibility = View.GONE
         cardGPS.visibility = View.GONE
         cardNext.visibility = View.GONE
 
         rvCancelRide.setOnClickListener {
+            mainDisposables.add(presenter.cancelOrder(orderID))
+        }
+
+        rcCancelOrder.setOnClickListener{
             mainDisposables.add(presenter.cancelOrder(orderID))
         }
 
@@ -1193,8 +1268,7 @@ class MainActivity : BaseActivity(), MainController.view,
                             }else{
 
                                 val useBonusSheet = UserBonusSheet(BONUS,tariffID)
-                                useBonusSheet.dialog?.setOnDismissListener { createOrder(0.0, tariffID) }
-                                    useBonusSheet.show(supportFragmentManager,"bonus")
+                                useBonusSheet.show(supportFragmentManager,"bonus")
 
 
                             }
@@ -1246,7 +1320,7 @@ class MainActivity : BaseActivity(), MainController.view,
                 null,
                 COMMENT,
                 null,
-                null,
+                bonus,
                 null,
                 null,
                 true,
@@ -1291,7 +1365,8 @@ class MainActivity : BaseActivity(), MainController.view,
         OPTIONS_VALUE = 0.0
         COMMENT = ""
 
-        modeCarFound.visibility = View.GONE
+        modeDriverFound.visibility = View.GONE
+        modeRideStart.visibility = View.GONE
         modeSearchCar.visibility = View.GONE
         modeCreateOrder.visibility = View.GONE
 
@@ -1503,41 +1578,9 @@ class MainActivity : BaseActivity(), MainController.view,
                     .subscribe({
 
                         if (it.isSuccessful && it.body() != null) {
-                            val decimalFormat = DecimalFormat("###,###")
 
                             onOnGoingOrderChange(orderID, it.body()!!)
-                            ORDER_COST = decimalFormat.format(it.body()!!.cost.amount)
-
-                            if (textViewRate.text == "" || textViewCarNumber.text.contains("null")) {
-                                textViewCarName.text =
-                                    "${it.body()!!.assignee?.car?.brand} ${it.body()!!.assignee?.car?.model} - ${it.body()!!.assignee?.car?.color}"
-                                textViewCarNumber.text = "${it.body()!!.assignee?.car?.regNum}"
-
-                                textViewRate.text =
-                                    "$ORDER_COST сум"
-                                if (it.body()!!.assignee != null)
-                                    when (it.body()!!.assignee!!.car.alias) {
-                                        Constants.CAR_ALIAS_NEXIA -> {
-                                            imageViewAssignedCar.setImageResource(R.drawable.nexia)
-                                        }
-                                        Constants.CAR_ALIAS_LACETTI -> {
-                                            imageViewAssignedCar.setImageResource(R.drawable.lacetti)
-                                        }
-                                        Constants.CAR_ALIAS_MATIZ -> {
-                                            imageViewAssignedCar.setImageResource(R.drawable.matiz)
-                                        }
-                                        Constants.CAR_ALIAS_SPARK -> {
-                                            imageViewAssignedCar.setImageResource(R.drawable.spark_2)
-                                        }
-
-
-                                    }
-
-
-                                textView0Address.text = "${it.body()!!.route[0].address.name}"
-                                if (it.body()!!.route.size > 1)
-                                    textView1Address.text = "${it.body()!!.route[1].address.name}"
-                            }
+                            ORDER_COST = it.body()!!.cost.amount
 
                             if (it.body()!!.route[0].address.position != null) {
                                 START_POINT_LAT = it.body()!!.route[0].address.position!!.lat
@@ -1569,7 +1612,8 @@ class MainActivity : BaseActivity(), MainController.view,
 
     override fun onOrderCancelled() {
         modeSearchCar.visibility = View.GONE
-        modeCarFound.visibility = View.GONE
+        modeDriverFound.visibility = View.GONE
+        modeRideStart.visibility = View.GONE
         modeSearchCar.visibility = View.GONE
         removeDriverRoute()
         removeDriverCar()
@@ -1784,7 +1828,7 @@ class MainActivity : BaseActivity(), MainController.view,
                                     kotlin.math.abs(
                                         rotateFormatter.format(
                                             newIconRotateValue
-                                        ).toFloat()
+                                        ).replace(",",".").toFloat()
                                     )
                                 )
                             )
@@ -1801,12 +1845,16 @@ class MainActivity : BaseActivity(), MainController.view,
                 val animatedPosition = valueAnimator.animatedValue as LatLng
                 movingCarPositions[car.id] = animatedPosition
                 Log.d("DSADASDSDA", "animating ${car.id}")
-                (mapBoxStyle.getSource("moving-source-${car.id}") as GeoJsonSource).setGeoJson(
-                    Point.fromLngLat(
-                        animatedPosition.longitude,
-                        animatedPosition.latitude
+                try {
+                    (mapBoxStyle.getSource("moving-source-${car.id}") as GeoJsonSource).setGeoJson(
+                        Point.fromLngLat(
+                            animatedPosition.longitude,
+                            animatedPosition.latitude
+                        )
                     )
-                )
+                }catch (ex : Exception){
+                    valueAnimator.cancel()
+                }
 
             }
         movingCarAnimationListeners[car.id] = animatorUpdateListener
@@ -2325,10 +2373,7 @@ class MainActivity : BaseActivity(), MainController.view,
 
                     val rotateFormatter = DecimalFormat("#.#")
 
-                    Log.d(
-                        "DSADASDASDSADASDASAA",
-                        "${kotlin.math.abs(rotateFormatter.format(newIconRotateValue).toFloat())}"
-                    )
+
 
                     mapboxMap.getStyle { style ->
                         val iconSymbolLayer: Layer? = style.getLayerAs("demo-l-id")
@@ -2418,8 +2463,8 @@ class MainActivity : BaseActivity(), MainController.view,
 
     }
 
-    fun showFeedbackOrder(orderID: Long, cost: String) {
-        BottomSheetFeedback(orderID, cost, "100").show(supportFragmentManager, "feedback-show")
+    fun showFeedbackOrder(orderID: Long, cost: Double,usedBonus : Double) {
+        BottomSheetFeedback(orderID, cost, usedBonus).show(supportFragmentManager, "feedback-show")
     }
 
     lateinit var driwerLineSource: GeoJsonSource
