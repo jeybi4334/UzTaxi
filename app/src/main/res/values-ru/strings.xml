@@ -46,7 +46,7 @@
     <string name="ready">Готово</string>
     <string name="km_0">0.0 км</string>
     <string name="minute">min</string>
-    <string name="order_history">История заказов</string>
+    <string name="order_history">Order history</string>
     <string name="settings">Настройки</string>
     <string name="app_language">Язык приложения</string>
     <string name="current_lang">Русский</string>
@@ -113,6 +113,7 @@
     <string name="information">Информация</string>
     <string name="sign_out">Выйти</string>
     <string name="version_number">v.1.0.0</string>
+    <string name="main_acitivty_title">main_activity</string>
 
-    <string name="main_acitivty_title">main</string>
+
 </resources>

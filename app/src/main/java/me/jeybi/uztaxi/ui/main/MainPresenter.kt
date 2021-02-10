@@ -113,9 +113,7 @@ class MainPresenter(val view: MainActivity) : MainController.presenter {
                     view.sharedPreferences.edit().putBoolean(Constants.PREF_FCM_REGISTERED, true)
                         .apply()
                 }
-                Log.d("DASDATOKEN", "${it}")
             }, {
-                Log.d("DASDATOKEN", "${it}")
 
             })
 
@@ -174,10 +172,9 @@ class MainPresenter(val view: MainActivity) : MainController.presenter {
             .subscribeOn(Schedulers.io())
             .subscribe({
 
-                Log.d("DASDASDASD", "${it}")
 
             }, {
-                Log.d("DASDASDASD", "${it}")
+
             })
 
         return getAdressesDisposable
@@ -362,7 +359,6 @@ class MainPresenter(val view: MainActivity) : MainController.presenter {
             .subscribeOn(Schedulers.io())
             .subscribe({
                 if (it.isSuccessful && it.body() != null) {
-                    Log.d("DASDASDASDSADS", "${it.body()}")
                     view.onOrderCreated(it.body()!!.id)
                 } else {
                     view.onErrorCreateOrder()
@@ -468,13 +464,5 @@ class MainPresenter(val view: MainActivity) : MainController.presenter {
 
     }
 
-
-    @Throws(NoSuchAlgorithmException::class, InvalidKeyException::class)
-    fun hmac(algorithm: String?, secret: ByteArray?, data: String): ByteArray? {
-        val mac: Mac = Mac.getInstance(algorithm)
-        val spec = SecretKeySpec(secret, algorithm)
-        mac.init(spec)
-        return mac.doFinal(data.toByteArray(UTF_8))
-    }
 
 }

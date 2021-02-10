@@ -1,27 +1,37 @@
 package me.jeybi.uztaxi.ui.intro
 
+import android.content.Context
 import android.content.Intent
+import android.content.res.Resources
 import android.os.Bundle
 import android.view.animation.AnimationUtils
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
+import com.akexorcist.localizationactivity.core.LocalizationActivityDelegate
+import com.akexorcist.localizationactivity.core.OnLocaleChangedListener
 import kotlinx.android.synthetic.main.activity_intro.*
 import me.jeybi.uztaxi.R
 import me.jeybi.uztaxi.ui.auth.AuthenticationActivity
 import me.jeybi.uztaxi.ui.intro.pages.IntroPagerTransforMer
 import me.jeybi.uztaxi.ui.intro.pages.IntroType1
-import me.jeybi.uztaxi.ui.main.MainActivity
+import java.util.*
 
 
-class IntroActivity : FragmentActivity(),IntroController.view {
+class IntroActivity : FragmentActivity(),IntroController.view, OnLocaleChangedListener {
 
     val INTRO_COUNT = 4
 
+    private val localizationDelegate = LocalizationActivityDelegate(this)
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
+        localizationDelegate.addOnLocaleChangedListener(this)
+        localizationDelegate.onCreate()
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_intro)
+        setTitle(R.string.main_acitivty_title)
 
         imageViewGoNext.setOnClickListener {
             imageViewGoNext.startAnimation(AnimationUtils.loadAnimation(this, R.anim.button_pop))
@@ -84,6 +94,47 @@ class IntroActivity : FragmentActivity(),IntroController.view {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        localizationDelegate.onResume(this)
+    }
+
+    override fun attachBaseContext(newBase: Context) {
+        applyOverrideConfiguration(localizationDelegate.updateConfigurationLocale(newBase))
+        super.attachBaseContext(newBase)
+    }
+
+    override fun getApplicationContext(): Context {
+        return localizationDelegate.getApplicationContext(super.getApplicationContext())
+    }
+
+    override fun getResources(): Resources {
+        return localizationDelegate.getResources(super.getResources())
+    }
+
+    fun setLanguage(language: String) {
+        localizationDelegate.setLanguage(this, language)
+    }
+
+    fun setLanguage(language: String, country: String) {
+        localizationDelegate.setLanguage(this, language, country)
+    }
+
+    fun setLanguage(locale: Locale) {
+        localizationDelegate.setLanguage(this, locale)
+    }
+
+    fun getCurrentLanguage(): Locale {
+        return localizationDelegate.getLanguage(this)
+    }
+
+    override fun onAfterLocaleChanged() {
+
+    }
+
+    override fun onBeforeLocaleChanged() {
+
+    }
 
 
 }

@@ -36,7 +36,7 @@ class PaymentMethodsSheet(val paymentMethods : ArrayList<PaymentMethod>) : Botto
         for (paymentMethod in paymentMethods){
             val itemView = LayoutInflater.from(view.context).inflate(R.layout.item_payment_method,linearParent,false)
             if (paymentMethod.kind=="cash") {
-                itemView.findViewById<TextView>(R.id.textViewPaymentType).text = "Наличные"
+                itemView.findViewById<TextView>(R.id.textViewPaymentType).text = getString(R.string.cash)
                 itemView.findViewById<ImageView>(R.id.imageViewPaymentMethod).setImageResource(R.drawable.ic_cash)
             }else{
                 itemView.findViewById<TextView>(R.id.textViewPaymentType).text = paymentMethod.kind

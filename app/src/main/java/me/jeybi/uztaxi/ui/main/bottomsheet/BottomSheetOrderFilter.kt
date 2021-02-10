@@ -45,7 +45,7 @@ class BottomSheetOrderFilter(
             val itemView =
                 LayoutInflater.from(context).inflate(R.layout.item_filter, linearParent, false)
             itemView.findViewById<TextView>(R.id.textViewOptionName).text = option.name
-            itemView.findViewById<TextView>(R.id.textViewOptionPrice).text = "${option.value.toInt()} сум"
+            itemView.findViewById<TextView>(R.id.textViewOptionPrice).text = "${option.value.toInt()} ${getString(R.string.currency)}"
             if (CHOSEN_OPTIONS.contains(option.id)){
                 itemView.findViewById<SwitchCompat>(R.id.switchFilter).isChecked = true
             }

@@ -25,18 +25,18 @@ class IntroType1(val position : Int) : Fragment() {
         when(position){
             1->{
                 imageViewIntro.setImageResource(R.drawable.page_2)
-                textViewIntroTitle.text = "Примите лучшие варианты"
-                textViewIntroContent.text = "Широкий выбор тарифов и водителей позволит вам подобрать оптимальную поездку для вашего пункта назначения."
+                textViewIntroTitle.text = getString(R.string.intro_2_title)
+                textViewIntroContent.text = getString(R.string.intro_2_content)
             }
             2->{
                 imageViewIntro.setImageResource(R.drawable.page_3)
-                textViewIntroTitle.text = "Лучшие водители в вашем регионе"
-                textViewIntroContent.text = "Мы нанимаем каждого водителя, проходя специальное собеседование, и выбираем его для вашей поездки на основе их поведения."
+                textViewIntroTitle.text = getString(R.string.intro_3_title)
+                textViewIntroContent.text = getString(R.string.intro_3_content)
             }
             3->{
                 imageViewIntro.setImageResource(R.drawable.page_4)
-                textViewIntroTitle.text = "Любой метод оплаты"
-                textViewIntroContent.text = "Вы можете добавить свою карту UzCard или HumoCard, чтобы оплатить поездку и получать кэшбэк в реальном времени с каждой успешной поездки."
+                textViewIntroTitle.text = getString(R.string.intro_4_title)
+                textViewIntroContent.text = getString(R.string.intro_4_content)
             }
         }
     }

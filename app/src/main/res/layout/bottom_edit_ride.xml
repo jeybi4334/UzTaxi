@@ -212,7 +212,7 @@
         android:ellipsize="end"
         app:layout_constraintRight_toLeftOf="@id/textViewEdit"
         android:layout_marginEnd="8dp"
-        android:text="По городу..."
+        android:text="@string/around_city"
         app:layout_constraintTop_toBottomOf="@id/div1"
         android:layout_marginTop="16dp"
         app:layout_constraintRight_toRightOf="parent"
@@ -226,7 +226,7 @@
         android:id="@+id/textViewEdit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Edit"
+        android:text="@string/edit"
         android:fontFamily="@font/g_bold"
         android:textColor="@color/purple_200"
         app:layout_constraintRight_toLeftOf="@id/arrowRight"
@@ -265,7 +265,9 @@
 
     <RelativeLayout
         android:id="@+id/rvCall"
-        android:layout_width="80dp"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:layout_width="wrap_content"
         android:layout_height="48dp"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/textViewEdit"
@@ -279,7 +281,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:text="Share"
+            android:text="@string/share"
             android:fontFamily="@font/g_bold"
             android:textColor="@color/purple_200"
             android:textSize="16sp"
@@ -298,14 +300,13 @@
         android:layout_marginEnd="18dp"
         android:layout_marginStart="18dp"
         android:background="@drawable/bc_button_purple"
-        android:clickable="true"
         >
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:text="Cancel Ride"
+            android:text="@string/to_cancel_order"
             android:fontFamily="@font/g_bold"
             android:textColor="@color/white"
             android:textSize="16sp"

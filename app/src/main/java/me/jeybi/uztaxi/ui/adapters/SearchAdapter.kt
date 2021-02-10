@@ -1,5 +1,6 @@
 package me.jeybi.uztaxi.ui.adapters
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,6 +16,7 @@ import me.jeybi.uztaxi.utils.Constants
 
 class SearchAdapter(
 //    val items: ArrayList<SearchedAddress>
+    val context : Context,
     val items: ArrayList<GeocodeFeature>, val listener: SearchItemClickListener
 
 ) :
@@ -116,7 +118,7 @@ class SearchAdapter(
 
         if (item.properties.distance!=null)
         holder.textViewSearchDistance.text =
-            "${Constants.roundAvoid(item.properties.distance, 2)} км"
+            "${Constants.roundAvoid(item.properties.distance, 2)} ${context.getString(R.string.km)}"
 
         holder.itemView.setOnClickListener {
 //            if (item.position != null) listener.onSearchClicked(item.position.lat, item.position.lon,holder.textViewTitle.text.toString())

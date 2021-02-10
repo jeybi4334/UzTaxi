@@ -207,14 +207,15 @@ interface ApiClient {
     ): Single<Response<BonusResponse>>
 
 
-    @GET("client/mobile/2.1/history?offset=0&length=16")
+    @GET("client/mobile/2.0/history")
     @Headers("Accept-Language: ru", "Content-Type: application/json; charset=utf-8")
     fun getOrderHistory(
-        @Header("X-Hive-GPS-Position") hive_gps: String,
         @Header("Hive-Profile") hive_profile: String,
         @Header("Date") date: String,
         @Header("Authentication") hmac: String,
-    ): Single<Response<BonusResponse>>
+        @Query("offset") offset : Int,
+        @Query("length") length : Int
+    ): Single<Response<ArrayList<ShortOrderInfo>>>
 
 
     @GET("reverse.php")

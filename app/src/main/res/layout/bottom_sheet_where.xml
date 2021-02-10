@@ -46,7 +46,7 @@
         android:alpha="0.8"
         app:layout_constraintTop_toBottomOf="@id/textViewStartAddress"
         android:layout_marginTop="16dp"
-        android:text="По городу..."
+        android:text="@string/around_city"
         android:ellipsize="end"
         android:maxLines="1"
         app:layout_constraintRight_toLeftOf="@id/viewDividerMap"
@@ -79,7 +79,6 @@
         android:src="@drawable/ic_map_small"
         android:padding="12dp"
         android:background="?attr/selectableItemBackgroundBorderless"
-        android:clickable="true"
         />
 
 
@@ -119,7 +118,6 @@
         android:paddingRight="8dp"
         android:src="@drawable/ic_cash"
         android:background="?attr/selectableItemBackgroundBorderless"
-        android:clickable="true"
         />
 
     <TextView
@@ -129,7 +127,7 @@
         app:layout_constraintRight_toLeftOf="@id/imageViewArrow"
         app:layout_constraintTop_toTopOf="@id/imageViewArrow"
         app:layout_constraintBottom_toBottomOf="@id/imageViewArrow"
-        android:text="Наличные"
+        android:text="@string/cash"
         android:textSize="16sp"
         android:textColor="#303030"
         android:fontFamily="@font/g_semi_bold"
@@ -146,7 +144,6 @@
     android:src="@drawable/ic_arrow_bottom"
     android:padding="16dp"
     android:background="?attr/selectableItemBackgroundBorderless"
-    android:clickable="true"
     />
 
     <ImageView
@@ -160,7 +157,6 @@
         android:src="@drawable/ic_filter"
         android:padding="12dp"
         android:background="?attr/selectableItemBackgroundBorderless"
-        android:clickable="true"
         />
 
     <RelativeLayout
@@ -173,7 +169,6 @@
         app:layout_constraintBottom_toBottomOf="@id/imageViewFilterCar"
         android:background="@drawable/bc_button_purple_disabled"
         android:overScrollMode="never"
-        android:clickable="true"
         >
 
         <TextView
@@ -181,7 +176,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:text="Заказать"
+            android:text="@string/order"
             android:textColor="@color/white"
             android:fontFamily="@font/g_bold"
             android:textSize="16sp"

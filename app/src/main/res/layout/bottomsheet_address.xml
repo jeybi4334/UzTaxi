@@ -51,7 +51,7 @@
                     android:layout_toLeftOf="@id/imageMap"
                     android:layout_height="wrap_content"
                     android:background="@android:color/transparent"
-                    android:hint="Поиск адреса"
+                    android:hint="@string/searching_address"
                     android:maxLines="1"
                     android:imeOptions="actionSearch"
                     android:inputType="textLongMessage"
@@ -86,7 +86,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginTop="32dp"
-                android:text="Адрес не найден"
+                android:text="@string/address_not_found"
                 android:fontFamily="@font/g_regular"
                 android:textColor="@color/black"
                 />

@@ -1,12 +1,12 @@
 package me.jeybi.uztaxi.ui.main
 
 import android.Manifest
+import android.animation.Animator
 import android.animation.ObjectAnimator
 import android.animation.TypeEvaluator
 import android.animation.ValueAnimator
 import android.animation.ValueAnimator.AnimatorUpdateListener
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -24,10 +24,7 @@ import android.provider.Settings
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
-import android.view.animation.AccelerateInterpolator
-import android.view.animation.DecelerateInterpolator
-import android.view.animation.LinearInterpolator
-import android.view.animation.OvershootInterpolator
+import android.view.animation.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.RelativeLayout
 import android.widget.TextView
@@ -43,6 +40,7 @@ import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.LottieDrawable
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.firebase.messaging.FirebaseMessaging
+import com.google.gson.Gson
 import com.mapbox.android.gestures.MoveGestureDetector
 import com.mapbox.geojson.*
 import com.mapbox.mapboxsdk.camera.CameraPosition
@@ -69,8 +67,6 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.bottom_edit_ride.*
-import kotlinx.android.synthetic.main.bottom_edit_ride.textViewCarName
-import kotlinx.android.synthetic.main.bottom_edit_ride.textViewCarNumber
 import kotlinx.android.synthetic.main.bottom_edit_ride.textViewRate
 import kotlinx.android.synthetic.main.bottom_sheet_car_search.*
 import kotlinx.android.synthetic.main.bottom_sheet_found_driver.*
@@ -88,7 +84,6 @@ import me.jeybi.uztaxi.ui.main.bottomsheet.*
 import me.jeybi.uztaxi.ui.main.fragments.*
 import me.jeybi.uztaxi.utils.Constants
 import me.jeybi.uztaxi.utils.NaiveHmacSigner
-import java.lang.Exception
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
@@ -167,10 +162,8 @@ class MainActivity : BaseActivity(), MainController.view,
         mainDisposables.add(presenter.getUserAddresses())
 
         if (!sharedPreferences.getBoolean(Constants.PREF_FCM_REGISTERED, false)) {
-            Log.d("DSADASDsd", "NO TOKEN")
             FirebaseMessaging.getInstance().token.addOnSuccessListener(this@MainActivity) { instanceIdResult ->
                 val mToken = instanceIdResult
-                Log.d("DSADASDsd", mToken)
                 mainDisposables.add(presenter.registerFCMToken(mToken))
 
             }
@@ -227,6 +220,7 @@ class MainActivity : BaseActivity(), MainController.view,
     lateinit var mapboxMap: MapboxMap
     lateinit var mapBoxStyle: Style
 
+    var MAP_MOVING = false
 
     private fun setUpMap() {
         setUpBottomSheet()
@@ -371,6 +365,8 @@ class MainActivity : BaseActivity(), MainController.view,
 
             var DIRECTION_CURRENT = 0
 
+
+
             mapboxMap.addOnMoveListener(object : MapboxMap.OnMoveListener {
                 override fun onMoveBegin(detector: MoveGestureDetector) {
                     // user started moving the map
@@ -380,8 +376,13 @@ class MainActivity : BaseActivity(), MainController.view,
                         imageViewCloudTop.animate().translationY(-200f).alpha(0.6f)
                             .setInterpolator(AccelerateInterpolator()).setDuration(800).start()
 
+                        textViewDurationDriver.text = ""
+                        textViewDurationMin.visibility = View.INVISIBLE
+
+                        pointerRectangle.animate().scaleY(1f).scaleX(1f).setDuration(400).setInterpolator(OvershootInterpolator()).start()
+
                         textViewCurrentAddressDetails.text = ""
-                        textViewCurrentAddress.text = "уточняем адрес..."
+                        textViewCurrentAddress.text = getString(R.string.clarifying_address)
                         shimmer.start(textViewCurrentAddress)
                     }
 
@@ -394,6 +395,10 @@ class MainActivity : BaseActivity(), MainController.view,
                 }
 
                 override fun onMove(detector: MoveGestureDetector) {
+                    textViewDurationDriver.text = ""
+                    textViewDurationMin.visibility = View.INVISIBLE
+                    MAP_MOVING = true
+
                     // user is moving the map
                     if (CURRENT_MODE == Constants.MODE_SEARCH_WHERE || CURRENT_MODE == Constants.MODE_DESTINATION_PICK) {
 
@@ -455,12 +460,11 @@ class MainActivity : BaseActivity(), MainController.view,
 
 
                 override fun onMoveEnd(detector: MoveGestureDetector) {
-
+                    MAP_MOVING = false
                     if (CURRENT_MODE == Constants.MODE_SEARCH_WHERE) {
                         bottomSheetBehaviour.setPeekHeight(PEEK_HEIGHT, true)
                         bottomSheetBehaviour.state = BottomSheetBehavior.STATE_COLLAPSED
                     }
-
 
                     imageViewCloudTop.animate().translationY(0f).alpha(1f)
                         .setInterpolator(DecelerateInterpolator()).setDuration(600).start()
@@ -686,7 +690,7 @@ class MainActivity : BaseActivity(), MainController.view,
             Constants.ORDER_STATE_COMPLETED -> {
                 ORDER_STATE = Constants.ORDER_STATE_COMPLETED
                 carPositionDisposable.dispose()
-                showFeedbackOrder(shortOrderInfo.id, ORDER_COST,0.0)
+                showFeedbackOrder(shortOrderInfo.id, ORDER_COST, 0.0)
 
             }
             Constants.ORDER_STATE_CANCELLED -> {
@@ -704,6 +708,8 @@ class MainActivity : BaseActivity(), MainController.view,
 
     fun onOnGoingOrderChange(oderID: Long, orderInfo: OrderInfo) {
 
+
+
         bottomSheetBehaviour.peekHeight = 0
         bottomSheetBehaviour.state = BottomSheetBehavior.STATE_COLLAPSED
 
@@ -713,7 +719,11 @@ class MainActivity : BaseActivity(), MainController.view,
                 dialIntent.data = Uri.parse("tel:" + "${orderInfo.assignee?.call?.numbers!![0]}")
                 startActivity(dialIntent)
             }else{
-                Toast.makeText(this@MainActivity,"Вызвать водителя сейчас невозможно",Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    this@MainActivity,
+                    getString(R.string.cannot_call_driver_now),
+                    Toast.LENGTH_SHORT
+                ).show()
             }
 
         }
@@ -721,8 +731,16 @@ class MainActivity : BaseActivity(), MainController.view,
         when (orderInfo.state) {
 
             Constants.ORDER_STATE_ASSIGNED -> {
-                textViewCarName1.text =    "${orderInfo.assignee?.car?.brand} ${orderInfo.assignee?.car?.model} - ${orderInfo.assignee?.car?.color}"
+                textViewCarName1.text =
+                    "${orderInfo.assignee?.car?.brand} ${orderInfo.assignee?.car?.model} - ${orderInfo.assignee?.car?.color}"
                 textViewCarNumber1.text = "${orderInfo.assignee?.car?.regNum}"
+
+                textViewCarName1.startAnimation(
+                    AnimationUtils.loadAnimation(
+                        this,
+                        R.anim.text_scroll
+                    ) as Animation
+                )
 
                 modeDriverFound.visibility = View.VISIBLE
                 ORDER_STATE = Constants.ORDER_STATE_ASSIGNED
@@ -746,13 +764,14 @@ class MainActivity : BaseActivity(), MainController.view,
                 }
             }
             Constants.ORDER_STATE_DRIVER_CAME -> {
-                textViewCarName1.text =    "${orderInfo.assignee?.car?.brand} ${orderInfo.assignee?.car?.model} - ${orderInfo.assignee?.car?.color}"
+                textViewCarName1.text =
+                    "${orderInfo.assignee?.car?.brand} ${orderInfo.assignee?.car?.model} - ${orderInfo.assignee?.car?.color}"
                 textViewCarNumber1.text = "${orderInfo.assignee?.car?.regNum}"
 
                 modeDriverFound.visibility = View.VISIBLE
-                val shimmer =  Shimmer()
+                val shimmer = Shimmer()
                 shimmer.start(textViewTimeCome)
-                textViewTimeCome.text = "Водитель ждет вас"
+                textViewTimeCome.text = getString(R.string.driver_is_waiting_for_you)
 
                 ORDER_STATE = Constants.ORDER_STATE_DRIVER_CAME
                 CURRENT_MODE = Constants.MODE_DRIVER_CAME
@@ -770,7 +789,7 @@ class MainActivity : BaseActivity(), MainController.view,
                 val decimalFormat = DecimalFormat("###,###")
 
                 textViewRate.text =
-                    "${decimalFormat.format(ORDER_COST)} сум"
+                    "${decimalFormat.format(ORDER_COST)} ${getString(R.string.currency)}"
                 if (orderInfo.assignee != null)
                     when (orderInfo.assignee!!.car.alias) {
                         Constants.CAR_ALIAS_NEXIA -> {
@@ -814,7 +833,7 @@ class MainActivity : BaseActivity(), MainController.view,
             Constants.ORDER_STATE_COMPLETED -> {
                 ORDER_STATE = Constants.ORDER_STATE_COMPLETED
                 if (!FEEDBACK_SHOWED) {
-                    showFeedbackOrder(oderID, orderInfo.cost.amount,orderInfo.usedBonuses?:0.0)
+                    showFeedbackOrder(oderID, orderInfo.cost.amount, orderInfo.usedBonuses ?: 0.0)
                     FEEDBACK_SHOWED = true
                     showSearchWherePage()
                     carPositionDisposable.dispose()
@@ -1009,12 +1028,10 @@ class MainActivity : BaseActivity(), MainController.view,
 
             recyclerViewCars.postDelayed({
                 if (recyclerViewCars.getChildAt(0) != null) {
-                    Log.d("DASDSADADAS", "CHILD HAS")
                     recyclerViewCars.getChildAt(0)
                         .findViewById<RelativeLayout>(R.id.rvCar)
                         .performClick()
                 } else {
-                    Log.d("DASDSADADAS", "NO CHILD")
                 }
             }, 500)
 
@@ -1170,7 +1187,7 @@ class MainActivity : BaseActivity(), MainController.view,
                 presenter.getPaymentMethods(START_POINT_LAT, START_POINT_LON)
             }
 
-            recyclerViewCars.adapter = CarsAdapter(
+            recyclerViewCars.adapter = CarsAdapter(this,
                 tariffs,
                 object : CarsAdapter.TariffClickListener {
                     override fun onTariffChosen(
@@ -1179,7 +1196,6 @@ class MainActivity : BaseActivity(), MainController.view,
                         textViewPrice: ShimmerTextView,
                         options: ArrayList<TariffOption>
                     ) {
-                        Log.d("DASDSADADAS", "TARIF CLICK")
 
                         COMMENT = ""
                         TARIF_OPTIONS.clear()
@@ -1210,7 +1226,7 @@ class MainActivity : BaseActivity(), MainController.view,
                                         if (it.body() != null) {
                                             price = it.body()!!.cost.amount
                                             textViewPrice.text =
-                                                "${decimalFormat.format(it.body()!!.cost.amount)} сум"
+                                                "${decimalFormat.format(it.body()!!.cost.amount)} ${getString(R.string.currency)}"
 
                                             if (END_POINT_LAT != 0.0) {
                                                 textViewDistance.visibility = View.VISIBLE
@@ -1219,7 +1235,7 @@ class MainActivity : BaseActivity(), MainController.view,
                                                         it.body()!!.distance / 1000,
                                                         2
                                                     )
-                                                } км"
+                                                } ${getString(R.string.km)}"
                                             }
 
                                         }
@@ -1242,7 +1258,7 @@ class MainActivity : BaseActivity(), MainController.view,
                                     COMMENT = comment
 
                                     textViewPrice.text =
-                                        "${decimalFormat.format(price + optionsValue)} сум"
+                                        "${decimalFormat.format(price + optionsValue)} ${getString(R.string.currency)}"
 
                                 }
                             }
@@ -1264,11 +1280,11 @@ class MainActivity : BaseActivity(), MainController.view,
                         rvOrder.setOnClickListener {
 
                             if (BONUS < 1000) {
-                                createOrder(0.0,tariffID)
-                            }else{
+                                createOrder(0.0, tariffID)
+                            } else {
 
-                                val useBonusSheet = UserBonusSheet(BONUS,tariffID)
-                                useBonusSheet.show(supportFragmentManager,"bonus")
+                                val useBonusSheet = UserBonusSheet(BONUS, tariffID)
+                                useBonusSheet.show(supportFragmentManager, "bonus")
 
 
                             }
@@ -1283,7 +1299,7 @@ class MainActivity : BaseActivity(), MainController.view,
 
     }
 
-    fun createOrder(bonus : Double,tariffID : Long) {
+    fun createOrder(bonus: Double, tariffID: Long) {
 
         if (progressOrder.visibility == View.GONE) {
 
@@ -1534,7 +1550,7 @@ class MainActivity : BaseActivity(), MainController.view,
         shimmer.start(textSearching)
 
         rvCancel.setOnClickListener {
-            textSearching.text = "Отмена заказа"
+            textSearching.text = getString(R.string.to_cancel_order)
             mainDisposables.add(presenter.cancelOrder(orderID))
         }
 
@@ -1545,12 +1561,12 @@ class MainActivity : BaseActivity(), MainController.view,
     override fun onOrderCreated(orderID: Long) {
 
         showCarSearchPage(orderID)
-        textSearching.text = "Ищем водителей вокруг ..."
+        textSearching.text = getString(R.string.looking_for_drivers)
         shimmer = Shimmer()
         shimmer.start(textSearching)
 
         rvCancel.setOnClickListener {
-            textSearching.text = "Отмена заказа"
+            textSearching.text =  getString(R.string.to_cancel_order)
             mainDisposables.add(presenter.cancelOrder(orderID))
         }
 
@@ -1727,7 +1743,6 @@ class MainActivity : BaseActivity(), MainController.view,
 
         if (movingCarGeoJsonSources[car.id] == null) {
 
-            Log.d("DSADASDSDA", "ADD CAR : ${car.id} , ${car.location.lat} , ${car.location.lon}")
 
             movingCarPositions[car.id] = LatLng(car.location.lat, car.location.lon)
 
@@ -1743,7 +1758,6 @@ class MainActivity : BaseActivity(), MainController.view,
 
             if (mapBoxStyle.getSource("moving-source-${car.id}") == null)
                 mapBoxStyle.addSource(movingCarGeoJsonSources[car.id]!!)
-            Log.d("DSADASDSDA", "ADD CAR : ${car.id} SOURCE")
 
 
             val carLayer = SymbolLayer("moving-layer-${car.id}", "moving-source-${car.id}")
@@ -1758,7 +1772,6 @@ class MainActivity : BaseActivity(), MainController.view,
             mapBoxStyle.addLayer(
                 carLayer
             )
-            Log.d("DSADASDSDA", "ADD CAR : ${car.id} LAYER")
 
         } else {
 
@@ -1828,7 +1841,7 @@ class MainActivity : BaseActivity(), MainController.view,
                                     kotlin.math.abs(
                                         rotateFormatter.format(
                                             newIconRotateValue
-                                        ).replace(",",".").toFloat()
+                                        ).replace(",", ".").toFloat()
                                     )
                                 )
                             )
@@ -1844,7 +1857,6 @@ class MainActivity : BaseActivity(), MainController.view,
             AnimatorUpdateListener { valueAnimator ->
                 val animatedPosition = valueAnimator.animatedValue as LatLng
                 movingCarPositions[car.id] = animatedPosition
-                Log.d("DSADASDSDA", "animating ${car.id}")
                 try {
                     (mapBoxStyle.getSource("moving-source-${car.id}") as GeoJsonSource).setGeoJson(
                         Point.fromLngLat(
@@ -1852,7 +1864,7 @@ class MainActivity : BaseActivity(), MainController.view,
                             animatedPosition.latitude
                         )
                     )
-                }catch (ex : Exception){
+                }catch (ex: Exception){
                     valueAnimator.cancel()
                 }
 
@@ -1878,10 +1890,7 @@ class MainActivity : BaseActivity(), MainController.view,
             )
             .setDuration(5000)
 
-        Log.d(
-            "DSADASDSDA",
-            "MOVE CAR : ${movingCarPositions[car.id]?.latitude}, ${movingCarPositions[car.id]?.longitude}  , ${car.location.lat} , ${car.location.lon} "
-        )
+
         anim.interpolator = LinearInterpolator()
 
         anim.addUpdateListener(movingCarAnimationListeners[car.id])
@@ -1901,6 +1910,54 @@ class MainActivity : BaseActivity(), MainController.view,
         for (car in data) {
             ids.add(car.id)
         }
+
+        val carFirst = data[0]
+
+        val carPointOLD = Location("pointOLD")
+        carPointOLD.latitude = START_POINT_LAT
+        carPointOLD.longitude = START_POINT_LON
+
+        val carPointNEW = Location("pointNEW")
+        carPointNEW.latitude = carFirst.location.lat
+        carPointNEW.longitude = carFirst.location.lon
+
+        val distance = carPointOLD.distanceTo(carPointNEW)
+
+
+        val time = ((distance.toInt() * 3600) / 10000)/60 + 1
+
+        if (!MAP_MOVING) {
+            pointerRectangle.animate().scaleY(3f).scaleX(3f)
+                .setListener(object  : Animator.AnimatorListener{
+                    override fun onAnimationStart(animation: Animator?) {
+
+                    }
+
+                    override fun onAnimationEnd(animation: Animator?) {
+
+                    }
+
+                    override fun onAnimationCancel(animation: Animator?) {
+
+                    }
+
+                    override fun onAnimationRepeat(animation: Animator?) {
+
+                    }
+
+                })
+                .setDuration(400).setInterpolator(AccelerateInterpolator()).start()
+
+
+            textViewDurationDriver.postDelayed({
+                textViewDurationDriver.text = "${time}"
+                textViewDurationMin.visibility = View.VISIBLE
+            }, 500)
+        }else{
+            textViewDurationDriver.text = ""
+            textViewDurationMin.visibility = View.INVISIBLE
+        }
+
 
         for (key in movingCarGeoJsonSources.keys) {
             if (ids.size > 0 && !ids.contains(key)) {
@@ -1963,7 +2020,6 @@ class MainActivity : BaseActivity(), MainController.view,
         bottomSheetBehaviour.addBottomSheetCallback(object :
             BottomSheetBehavior.BottomSheetCallback() {
             override fun onStateChanged(bottomSheet: View, newState: Int) {
-                Log.d("DASDADS", "STATE $newState")
                 if (searchCancelListener != null) {
                     if (newState == BottomSheetBehavior.STATE_HALF_EXPANDED || newState == BottomSheetBehavior.STATE_COLLAPSED) {
                         searchCancelListener!!.onSearchCancel()
@@ -2033,7 +2089,7 @@ class MainActivity : BaseActivity(), MainController.view,
         }
 
         cardNext.setOnClickListener {
-            textViewDestination.text = "По городу..."
+            textViewDestination.text = getString(R.string.around_city)
             drawRoute(arrayListOf())
 
         }
@@ -2246,7 +2302,7 @@ class MainActivity : BaseActivity(), MainController.view,
         mainDisposables.add(presenter.getBonuses(location.latitude, location.longitude))
 
         bottomSheetBehaviour.state = BottomSheetBehavior.STATE_COLLAPSED
-        textViewCurrentAddress.text = "уточняем адрес..."
+        textViewCurrentAddress.text = getString(R.string.clarifying_address)
         shimmer.start(textViewCurrentAddress)
 
 //        mainDisposables.add(presenter.findCurrentAddress(location.latitude, location.longitude))
@@ -2358,7 +2414,6 @@ class MainActivity : BaseActivity(), MainController.view,
 
 
 
-                Log.d("DASDASDSAAADS", "$rotation")
 
                 iconSpinningAnimator = ValueAnimator.ofFloat(OLD_ROTATION, rotation)
                 iconSpinningAnimator!!.duration = 600
@@ -2400,10 +2455,7 @@ class MainActivity : BaseActivity(), MainController.view,
             AnimatorUpdateListener { valueAnimator ->
                 val animatedPosition = valueAnimator.animatedValue as LatLng
                 carPosition = animatedPosition
-                Log.d(
-                    "DASDSADSADASDSA",
-                    "${animatedPosition.latitude}   ,   ${animatedPosition.longitude}"
-                )
+
                 geoJsonSource.setGeoJson(
                     Point.fromLngLat(
                         animatedPosition.longitude,
@@ -2463,7 +2515,7 @@ class MainActivity : BaseActivity(), MainController.view,
 
     }
 
-    fun showFeedbackOrder(orderID: Long, cost: Double,usedBonus : Double) {
+    fun showFeedbackOrder(orderID: Long, cost: Double, usedBonus: Double) {
         BottomSheetFeedback(orderID, cost, usedBonus).show(supportFragmentManager, "feedback-show")
     }
 

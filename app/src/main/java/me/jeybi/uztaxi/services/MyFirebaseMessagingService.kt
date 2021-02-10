@@ -20,14 +20,11 @@ import me.jeybi.uztaxi.utils.Constants.Companion.FIREBASE_TOKEN
 class MyFirebaseMessagingService : FirebaseMessagingService() {
     override fun onNewToken(s: String) {
         super.onNewToken(s)
-        Log.d("UZTAXI_FIREBASE", "NEW TOKEN : " + s)
         getSharedPreferences("_", MODE_PRIVATE).edit().putString(FIREBASE_TOKEN, s).apply()
     }
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
-        Log.d("UZTAXI_FIREBASE", "NEW MESSAGE : " + remoteMessage.data)
-
 
         var smallText = ""
 
@@ -37,44 +34,46 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 
         when (remoteMessage.data["kind"]) {
             Constants.ORDER_STATUS_CREATED -> {
-                smallText = "Заказ создан!"
+                smallText = getString(R.string.order_created)
                 intent.putExtra(Constants.ORDER_STATUS,Constants.ORDER_STATUS_CREATED )
             }
             Constants.ORDER_STATUS_CHANGED -> {
-                smallText = "Статус заказа изменен!"
+                smallText = getString(R.string.order_status_changed)
                 intent.putExtra(Constants.ORDER_STATUS,Constants.ORDER_STATUS_CHANGED )
             }
             Constants.ORDER_STATUS_DRIVER_ASSIGNED -> {
-                smallText = "Водитель уже идет к вам!"
+                smallText = getString(R.string.order_driver_coming)
                 intent.putExtra(Constants.ORDER_STATUS,Constants.ORDER_STATUS_DRIVER_ASSIGNED )
             }
             Constants.ORDER_STATUS_DRIVER_DELAY -> {
-                smallText = "Водитель может немного задержаться!"
+                smallText = getString(R.string.driver_may_delay)
                 intent.putExtra(Constants.ORDER_STATUS,Constants.ORDER_STATUS_DRIVER_DELAY )
             }
             Constants.ORDER_STATUS_DRIVER_ARRIVED -> {
-                smallText = "Водитель ждет вас!"
+                smallText = getString(R.string.driver_is_waiting)
                 intent.putExtra(Constants.ORDER_STATUS,Constants.ORDER_STATUS_DRIVER_ARRIVED )
             }
             Constants.ORDER_STATUS_EXECUTING -> {
-                smallText = "Маршрут запущен!"
+                smallText = getString(R.string.ride_started)
                 intent.putExtra(Constants.ORDER_STATUS,Constants.ORDER_STATUS_EXECUTING )
             }
             Constants.ORDER_STATUS_DRIVER_UNASSIGNED -> {
-                smallText = "Мы не назначили водителя!"
+                smallText = getString(R.string.driver_unassigned)
                 intent.putExtra(Constants.ORDER_STATUS,Constants.ORDER_STATUS_DRIVER_UNASSIGNED )
             }
+
             Constants.ORDER_STATUS_ORDER_COMPLETED -> {
-//                smallText = "Маршрут завершен!"
+//              smallText = "Маршрут завершен!"
                 smallText = "${remoteMessage.data.get("text")}"
                 intent.putExtra(Constants.ORDER_STATUS,Constants.ORDER_STATUS_ORDER_COMPLETED )
             }
+
             Constants.ORDER_STATUS_BONUS_ADDED -> {
-                smallText = "Бонусы добавлены на ваш счет!"
+                smallText = getString(R.string.bonus_added)
                 intent.putExtra(Constants.ORDER_STATUS,Constants.ORDER_STATUS_BONUS_ADDED )
             }
             Constants.ORDER_STATUS_BONUS_WITHDRAWN -> {
-                smallText = "Сняли бонусы со своего аккаунта!"
+                smallText = getString(R.string.bonus_withdrawn)
                 intent.putExtra(Constants.ORDER_STATUS,Constants.ORDER_STATUS_BONUS_WITHDRAWN )
             }
             Constants.ORDER_STATUS_CANCELLED -> {
@@ -83,11 +82,11 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
                 intent.putExtra(Constants.ORDER_STATUS,Constants.ORDER_STATUS_CANCELLED )
             }
             Constants.ORDER_STATUS_PAID_WAITING_BEGAN -> {
-                smallText = "Время ожидания начало оплачиваться!"
+                smallText = getString(R.string.paid_waiting_started)
                 intent.putExtra(Constants.ORDER_STATUS,Constants.ORDER_STATUS_PAID_WAITING_BEGAN )
             }
             Constants.ORDER_STATUS_CHAT_REQUEST -> {
-                smallText = "Запрос в чат"
+                smallText = getString(R.string.request_chat)
                 intent.putExtra(Constants.ORDER_STATUS,Constants.ORDER_STATUS_CHAT_REQUEST )
             }
 
@@ -129,7 +128,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 channelId,
-                "Channel human readable title",
+                "UZ TAXI™",
                 NotificationManager.IMPORTANCE_DEFAULT
             )
             notificationManager.createNotificationChannel(channel)

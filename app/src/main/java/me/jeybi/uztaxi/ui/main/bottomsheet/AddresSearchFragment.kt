@@ -139,7 +139,7 @@ class AddresSearchFragment : BottomSheetDialogFragment(), SearchAdapter.SearchIt
     private fun onCouldntFindAnything(){
         progressBarSearch.visibility = View.GONE
         textViewNoAddress.visibility = View.VISIBLE
-        textViewNoAddress.text = "Мы не смогли найти ничего по вашему запросу :("
+        textViewNoAddress.text = getString(R.string.couldnot_find_anything)
     }
 
 //

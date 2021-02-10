@@ -132,7 +132,7 @@ class UserBonusSheet(val balance: Double, val tariffID: Long) : BottomSheetDialo
                     } else {
                         Toast.makeText(
                             activity,
-                            "Минимальная сумма бонуса для использования: 1000 сум.",
+                            getString(R.string.minimum_bonus_to_use),
                             Toast.LENGTH_SHORT
                         ).show()
                     }
@@ -140,7 +140,7 @@ class UserBonusSheet(val balance: Double, val tariffID: Long) : BottomSheetDialo
                 } else
                     Toast.makeText(
                         activity,
-                        "У вас недостаточно денег на балансе",
+                        getString(R.string.not_enough_bonus),
                         Toast.LENGTH_SHORT
                     ).show()
             }

@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/textViewDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="10.02.2021, Saturday"
+        android:textColor="@color/black"
+        android:alpha="0.8"
+        android:textSize="16sp"
+        android:fontFamily="@font/g_semi_bold"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="16dp"
+        />
+
+    <androidx.cardview.widget.CardView
+        android:layout_marginTop="12dp"
+        android:layout_width="match_parent"
+        android:layout_height="130dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginBottom="12dp"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="6dp"
+        >
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            >
+
+            <TextView
+                android:id="@+id/textViewOrderTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:text="12:36 AM"
+                android:layout_marginStart="18dp"
+                android:layout_marginTop="12dp"
+                android:textSize="16sp"
+                android:fontFamily="@font/g_semi_bold"
+                android:textColor="@color/black"
+                android:alpha="0.9"
+                />
+
+            <TextView
+                android:id="@+id/textViewOderCost"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Завершено"
+                android:textAllCaps="true"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="@id/textViewOrderTime"
+                app:layout_constraintBottom_toBottomOf="@id/textViewOrderTime"
+                android:layout_marginEnd="18dp"
+                android:fontFamily="@font/g_bold"
+                android:textColor="#3bb54a"
+                android:alpha="0.9"
+                android:textSize="16sp"
+                />
+
+            <ImageView
+                android:id="@+id/imageViewOrderStatus"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_marginEnd="8dp"
+                android:src="@drawable/ic_checked"
+                app:layout_constraintRight_toLeftOf="@id/textViewOderCost"
+                app:layout_constraintTop_toTopOf="@id/textViewOderCost"
+                app:layout_constraintBottom_toBottomOf="@id/textViewOderCost"
+                />
+
+            <View
+                android:id="@+id/viewDivider"
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                app:layout_constraintLeft_toLeftOf="@id/textViewOrderTime"
+                app:layout_constraintRight_toRightOf="@id/textViewOderCost"
+                android:background="#E4E9F2"
+                android:alpha="0.5"
+                app:layout_constraintTop_toBottomOf="@id/textViewOderCost"
+                android:layout_marginTop="12dp"
+                />
+
+            <ImageView
+                android:id="@+id/imageStart"
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:src="@drawable/start_marker"
+                app:layout_constraintTop_toBottomOf="@id/viewDivider"
+                app:layout_constraintLeft_toLeftOf="parent"
+                android:layout_marginTop="18dp"
+                android:layout_marginStart="18dp"
+                />
+
+            <TextView
+                android:id="@+id/textViewStartAddress"
+                android:layout_width="0dp"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:layout_height="wrap_content"
+                app:layout_constraintLeft_toRightOf="@id/imageStart"
+                app:layout_constraintRight_toRightOf="parent"
+                android:layout_marginEnd="12dp"
+                app:layout_constraintTop_toTopOf="@id/imageStart"
+                app:layout_constraintBottom_toBottomOf="@id/imageStart"
+                android:layout_marginStart="12dp"
+                android:text="@string/around_city"
+                android:fontFamily="@font/g_semi_bold"
+                android:textColor="@color/purple_200"
+                android:textSize="16sp"
+                />
+
+            <ImageView
+                android:id="@+id/imageFinish"
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:src="@drawable/icon_finish"
+                app:layout_constraintTop_toBottomOf="@id/imageStart"
+                app:layout_constraintLeft_toLeftOf="parent"
+                android:layout_marginTop="18dp"
+                android:layout_marginStart="18dp"
+                />
+
+            <TextView
+                android:id="@+id/textViewEndAddress"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintLeft_toRightOf="@id/imageFinish"
+                app:layout_constraintRight_toRightOf="parent"
+                android:layout_marginEnd="12dp"
+                android:maxLines="1"
+                android:ellipsize="end"
+                app:layout_constraintTop_toTopOf="@id/imageFinish"
+                app:layout_constraintBottom_toBottomOf="@id/imageFinish"
+                android:layout_marginStart="12dp"
+                android:text="@string/around_city"
+                android:fontFamily="@font/g_semi_bold"
+                android:textColor="@color/purple_200"
+                android:textSize="16sp"
+                />
+
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    </androidx.cardview.widget.CardView>
+
+
+
+</LinearLayout>

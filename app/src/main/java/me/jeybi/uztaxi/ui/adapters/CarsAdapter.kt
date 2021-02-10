@@ -1,5 +1,6 @@
 package me.jeybi.uztaxi.ui.adapters
 
+import android.content.Context
 import android.graphics.Color
 import android.media.Image
 import android.text.format.Formatter
@@ -20,7 +21,7 @@ import me.jeybi.uztaxi.model.TariffOption
 import me.jeybi.uztaxi.utils.Constants
 import java.text.DecimalFormat
 
-class CarsAdapter(val items : ArrayList<ServiceTariff>, val listener : TariffClickListener) : RecyclerView.Adapter<CarsAdapter.CarsHolder>() {
+class CarsAdapter(val context : Context,val items : ArrayList<ServiceTariff>, val listener : TariffClickListener) : RecyclerView.Adapter<CarsAdapter.CarsHolder>() {
 
     var previousItem : View? = null
 
@@ -56,7 +57,7 @@ class CarsAdapter(val items : ArrayList<ServiceTariff>, val listener : TariffCli
             }
         }
 
-        holder.textViewPrice.text = "от ${decimalFormat.format(item.minCost)} сум"
+        holder.textViewPrice.text = "${context.getString(R.string.from)} ${decimalFormat.format(item.minCost)} ${context.getString(R.string.currency)}"
 
         holder.rvCar.setOnClickListener {
 
@@ -68,7 +69,7 @@ class CarsAdapter(val items : ArrayList<ServiceTariff>, val listener : TariffCli
             holder.textViewTarrifName.setTextColor(Color.BLACK)
             holder.textViewPrice.setTextColor(Color.BLACK)
 
-            holder.textViewPrice.text = "Оценивает..."
+            holder.textViewPrice.text = context.getString(R.string.estimating)
 
             if (previousItem!=null&& previousItem!!.tag != holder.itemView.tag){
                 previousItem!!.setBackgroundResource(R.drawable.bc_item_car)

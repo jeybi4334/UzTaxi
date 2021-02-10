@@ -6,6 +6,7 @@ import com.google.gson.reflect.TypeToken
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import me.jeybi.uztaxi.R
 import me.jeybi.uztaxi.model.ErrorObj
 import me.jeybi.uztaxi.model.RegisterUserRequest
 import me.jeybi.uztaxi.network.RetrofitHelper
@@ -49,7 +50,7 @@ class AuthenticationPresenter(val view: AuthenticationActivity) :
                             phoneNumberListener.onErrorOccured(errorResponse.message)
                     }
                     Constants.STATUS_SERVER_ERROR -> {
-                        phoneNumberListener.onErrorOccured("Server Error")
+                        phoneNumberListener.onErrorOccured(view.getString(R.string.server_error))
                     }
                 }
             }, {
@@ -99,7 +100,6 @@ class AuthenticationPresenter(val view: AuthenticationActivity) :
             .subscribeOn(Schedulers.io())
             .subscribe({
                 confirmDisposable!!.dispose()
-                Log.d("ASDASDA","${it.code()}")
                 when (it.code()) {
                     Constants.STATUS_SUCCESSFUL -> {
                         view.sharedPreferences.edit().putLong(Constants.HIVE_USER_ID,it.body()!!.id).apply()

@@ -135,7 +135,7 @@ class SearchFragment : BaseFragment(), SearchAdapter.SearchItemClickListener,
                             }
                         }
 
-                        recyclerViewSearchHistory.adapter = SearchAdapter(geocodes,this)
+                        recyclerViewSearchHistory.adapter = SearchAdapter(activity!!,geocodes,this)
                     }
                     progressBarSearch.visibility = View.GONE
 //                    textViewNoAddress.visibility = View.GONE
@@ -172,10 +172,9 @@ class SearchFragment : BaseFragment(), SearchAdapter.SearchItemClickListener,
                 .subscribe({
                     when (it.code()) {
                         Constants.STATUS_SUCCESSFUL -> {
-                            Log.d("ADASD", "SUCCESS ")
                             if (it.body() != null ) {
                                 progressBarSearch.visibility = View.GONE
-                                recyclerViewSearchHistory.adapter = SearchAdapter(it.body()!!.features, this)
+                                recyclerViewSearchHistory.adapter = SearchAdapter(activity!!,it.body()!!.features, this)
                             } else {
                                 onCouldntFindAnything()
                             }
@@ -195,7 +194,7 @@ class SearchFragment : BaseFragment(), SearchAdapter.SearchItemClickListener,
     private fun onCouldntFindAnything() {
         progressBarSearch.visibility = View.GONE
         textViewNoAddress.visibility = View.VISIBLE
-        textViewNoAddress.text = "Мы не смогли найти ничего по вашему запросу :("
+        textViewNoAddress.text = getString(R.string.couldnot_find_anything)
     }
 
 //

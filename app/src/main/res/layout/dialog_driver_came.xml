@@ -21,7 +21,7 @@
             android:fontFamily="@font/g_black"
             android:textColor="@color/black"
             android:textSize="18sp"
-            android:text="Водитель ждет вас!"
+            android:text="@string/driver_is_waiting"
             android:gravity="center"
             android:layout_marginTop="12dp"
             />
@@ -34,7 +34,7 @@
             android:textSize="16sp"
             android:layout_marginRight="16dp"
             android:layout_marginLeft="16dp"
-            android:text="Водитель прибыл по указанному адресу. Вы можете сообщить ему, что выходите на улицу"
+            android:text="@string/driver_is_here"
             android:gravity="center"
             android:layout_marginTop="12dp"
             />
@@ -57,7 +57,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
-                android:text="Я в пути"
+                android:text="@string/on_the_way"
                 android:textAllCaps="true"
                 android:textColor="@color/white"
                 android:fontFamily="@font/g_bold"

@@ -50,7 +50,7 @@ class BottomSheetFeedback(val orderID: Long, val cost : Double, val usedBonus : 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         textViewBillAmount.text = "${cost - usedBonus}"
-        textViewCashBackAmount.text = "-$usedBonus сум"
+        textViewCashBackAmount.text = "-$usedBonus ${activity?.getString(R.string.currency)}"
         textViewOrderDate.text = NaiveHmacSigner.DateSignature()
 
         dialog!!.setOnShowListener { dialog -> // In a previous life I used this method to get handles to the positive and negative buttons

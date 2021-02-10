@@ -94,7 +94,7 @@ class NavigationFragment : BaseFragment() {
     }
 
     public fun onBonusReady(bonus: Double){
-        textViewBonus.text = "$bonus сум"
+        textViewBonus.text = "$bonus ${getString(R.string.currency)}"
     }
 
 }

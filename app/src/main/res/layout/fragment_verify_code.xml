@@ -52,7 +52,7 @@
                android:id="@+id/text1"
                android:layout_width="match_parent"
                android:layout_height="wrap_content"
-               android:text="SMS подтверждение"
+               android:text="@string/sms_confirmation"
                android:gravity="center"
                android:textColor="#1A1A1A"
                android:lineSpacingExtra="-14dp"
@@ -72,7 +72,7 @@
                android:layout_marginEnd="18dp"
                android:fontFamily="@font/g_regular"
                android:gravity="center"
-               android:text="Мы отправили вам код для подтверждения \n вашего номера телефона"
+               android:text="@string/we_sent_code"
                android:textColor="#1a1a1a"
                android:textSize="14sp" />
 
@@ -155,7 +155,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Не получили код?"
+                android:text="@string/didnt_get_code"
                 android:textColor="#0A1B72"
                 android:layout_centerVertical="true"
                 android:fontFamily="@font/g_regular"
@@ -167,7 +167,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
-                android:text="ОТПРАВИТЬ СНОВА"
+                android:text="@string/send_again"
                 android:textColor="#0A1B72"
                 android:fontFamily="@font/g_semi_bold"
                 android:padding="12dp"
@@ -224,7 +224,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Подтвердить"
+            android:text="@string/confirm"
             android:fontFamily="@font/g_bold"
             android:layout_centerInParent="true"
             android:textColor="@color/white"

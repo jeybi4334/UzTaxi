@@ -28,6 +28,8 @@ class Constants {
 
         val PREF_AUTHENTICATED = "intro_shown"
 
+        val PREF_LANGUAGE = "app_language"
+
         val PREF_FCM_REGISTERED = "firebase_register"
 
         val BASE_URL = "https://office.uz.taxi:443/api/"

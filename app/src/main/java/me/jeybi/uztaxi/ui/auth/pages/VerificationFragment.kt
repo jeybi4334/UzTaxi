@@ -37,7 +37,7 @@ class VerificationFragment() : BaseFragment(), AuthenticationController.OnErrorL
                     (activity as AuthenticationActivity).onVerifyClicked("${smsCode1.text}${smsCode2.text}${smsCode3.text}${smsCode4.text}",this)
                 }
             } else {
-                textViewError.text = "Please correct verification code"
+                textViewError.text = getString(R.string.verification_code_wrong)
             }
         }
 
@@ -130,17 +130,14 @@ class VerificationFragment() : BaseFragment(), AuthenticationController.OnErrorL
             }
 
         })
-        smsCode4.setOnKeyListener(object : View.OnKeyListener {
-            override fun onKey(v: View?, keyCode: Int, event: KeyEvent?): Boolean {
-                //You can identify which key pressed buy checking keyCode value with KeyEvent.KEYCODE_
-                if (keyCode == KeyEvent.KEYCODE_DEL) {
-                    if (smsCode4.text.isEmpty()) {
-                        smsCode3.requestFocus()
-                    }
+        smsCode4.setOnKeyListener { v, keyCode, event -> //You can identify which key pressed buy checking keyCode value with KeyEvent.KEYCODE_
+            if (keyCode == KeyEvent.KEYCODE_DEL) {
+                if (smsCode4.text.isEmpty()) {
+                    smsCode3.requestFocus()
                 }
-                return false
             }
-        })
+            false
+        }
     }
 
     override fun onErrorOccured(message: String) {
@@ -148,7 +145,7 @@ class VerificationFragment() : BaseFragment(), AuthenticationController.OnErrorL
         textViewError.text = message
         textViewError.setTextColor(Color.RED)
         if (message == "no") {
-            textViewError.text = "SMS is sent successfully"
+            textViewError.text = getString(R.string.sms_sent_successfully)
             textViewError.setTextColor(Color.GREEN)
         }
     }

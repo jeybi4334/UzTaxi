@@ -48,7 +48,7 @@
                     android:inputType="text"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="18dp"
-                    android:hint="Комментарии для водителя..."
+                    android:hint="@string/comments_for_driver"
                     android:background="@android:color/transparent"
                     android:fontFamily="@font/g_bold"
                     android:textColor="@color/purple_200"
@@ -75,7 +75,6 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="12dp"
                 android:background="@drawable/bc_button_purple"
-                android:clickable="true"
                 android:layout_marginBottom="32dp"
                 >
 
@@ -83,7 +82,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerInParent="true"
-                    android:text="Сохранить"
+                    android:text="@string/save"
                     android:textColor="@color/white"
                     android:fontFamily="@font/g_bold"
                     android:textSize="18sp"

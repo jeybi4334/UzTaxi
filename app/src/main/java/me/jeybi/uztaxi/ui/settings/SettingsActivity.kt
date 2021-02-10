@@ -2,10 +2,13 @@ package me.jeybi.uztaxi.ui.settings
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import kotlinx.android.synthetic.main.activity_settings.*
 import me.jeybi.uztaxi.R
 import me.jeybi.uztaxi.ui.BaseActivity
+import me.jeybi.uztaxi.ui.main.bottomsheet.LanguageSheet
 import me.jeybi.uztaxi.utils.Constants
+import java.util.*
 
 class SettingsActivity : BaseActivity() {
     override fun setLayoutId(): Int {
@@ -28,7 +31,7 @@ class SettingsActivity : BaseActivity() {
 
 
         rvLanguage.setOnClickListener {
-
+            LanguageSheet(getCurrentLanguage().toLanguageTag()).show(supportFragmentManager,"language")
         }
 
         rvSendLocationDriver.setOnClickListener {
