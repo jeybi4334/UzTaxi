@@ -21,7 +21,7 @@ interface MainController {
         fun onWeatherReady(weather : ArrayList<WeatherType>, temperature : Int)
 
 
-        fun onDestinationPickClicked()
+        fun onDestinationPickClicked(action : Int)
 
 
         fun drawRoute(route: ArrayList<Point>)
@@ -69,7 +69,7 @@ interface MainController {
 
         fun getWeather(latitude : Double, longitude : Double) : Disposable
 
-        fun getRoute(origin: Point, destination: Point,driverRoute : Boolean) : Disposable
+        fun getRoute(listCoordinates: ArrayList<RouteCoordinates>,driverRoute : Boolean) : Disposable
 
         fun getAvailableCars(latitude: Double,longitude: Double,tariff : Long) : Disposable
 

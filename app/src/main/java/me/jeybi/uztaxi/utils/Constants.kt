@@ -83,6 +83,9 @@ class Constants {
 
         val MODE_SEARCH_WHERE = 1001
         val MODE_DESTINATION_PICK = 1002
+        val MODE_DESTINATION_PICK_STOP = 10021
+        val MODE_DESTINATION_PICK_ADDRESS = 10022
+        val MODE_DESTINATION_PICK_EDIT = 10023
         val MODE_CREATE_ORDER = 1003
         val MODE_CAR_SEARCH = 10004
         val MODE_CAR_FOUND = 10005
@@ -90,10 +93,16 @@ class Constants {
         val MODE_RIDE_STARTED = 10007
 
 
+
         val ORDER_STATUS_RECIEVER = "me.jeybi.uztaxi.utils.ORDER_STATUS_RECEIVER"
 
         val ORDER_STATUS = "order_status"
         val ORDER_ID = "order_id"
+
+        val DESTINATION_PICK_ORDEDR = 1
+        val DESTINATION_PICK_STOP = 2
+        val DESTINATION_PICK_ADDRESS = 3
+        val DESTINATION_PICK_EDIT = 4
 
 
         val ORDER_STATUS_CREATED = "order-created"

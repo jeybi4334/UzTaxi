@@ -13,6 +13,7 @@ import me.jeybi.uztaxi.ui.auth.AuthenticationActivity
 import me.jeybi.uztaxi.ui.history.OrderHistoryActivity
 import me.jeybi.uztaxi.ui.info.InfoActivity
 import me.jeybi.uztaxi.ui.main.MainActivity
+import me.jeybi.uztaxi.ui.payment.CardsActivity
 import me.jeybi.uztaxi.ui.settings.SettingsActivity
 import me.jeybi.uztaxi.utils.Constants
 
@@ -23,6 +24,10 @@ class NavigationFragment : BaseFragment() {
     }
 
     override fun onViewDidCreate(savedInstanceState: Bundle?) {
+
+        lottieProfile.setOnClickListener{
+            startActivity(Intent(activity,CardsActivity::class.java))
+        }
 
         textNavigation0.setOnClickListener{
             activity?.startActivity(Intent(activity, OrderHistoryActivity::class.java))

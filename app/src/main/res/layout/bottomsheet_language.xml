@@ -14,11 +14,9 @@
         android:layout_height="match_parent"
         app:cardCornerRadius="24dp"
         app:cardBackgroundColor="@color/white"
-
         app:cardElevation="16dp"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="-24dp"
-
         >
 
         <LinearLayout
@@ -45,7 +43,7 @@
                     android:gravity="center_vertical"
                     android:layout_marginStart="24dp"
                     android:textColor="@color/purple_200"
-                    android:text="O'zbekcha"
+                    android:text="@string/uzbek"
                     android:fontFamily="@font/g_bold"
                     android:textSize="17sp"
                     app:layout_constraintLeft_toLeftOf="parent"
@@ -75,41 +73,6 @@
                 app:layout_constraintRight_toRightOf="parent"
                 />
 
-            <LinearLayout
-                android:id="@+id/linearUzbek"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal"
-                android:background="?attr/selectableItemBackground"
-                >
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="48dp"
-                    android:layout_weight="1"
-                    android:gravity="center_vertical"
-                    android:layout_marginStart="24dp"
-                    android:textColor="@color/purple_200"
-                    android:text="Ўзбекча"
-                    android:fontFamily="@font/g_bold"
-                    android:textSize="17sp"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintRight_toLeftOf="@id/switchFilter"
-                    app:layout_constraintTop_toTopOf="parent"
-                    />
-
-                <ImageView
-                    android:id="@+id/checkUzbek"
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:visibility="invisible"
-                    android:src="@drawable/ic_done"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginEnd="24dp"
-                    />
-
-            </LinearLayout>
-
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
@@ -135,7 +98,7 @@
                     android:gravity="center_vertical"
                     android:layout_marginStart="24dp"
                     android:textColor="@color/purple_200"
-                    android:text="Каракалпакша"
+                    android:text="@string/karakalpak"
                     android:fontFamily="@font/g_bold"
                     android:textSize="17sp"
                     app:layout_constraintLeft_toLeftOf="parent"
@@ -180,7 +143,7 @@
                     android:gravity="center_vertical"
                     android:layout_marginStart="24dp"
                     android:textColor="@color/purple_200"
-                    android:text="Русский"
+                    android:text="@string/russian"
                     android:fontFamily="@font/g_bold"
                     android:textSize="17sp"
                     app:layout_constraintLeft_toLeftOf="parent"
@@ -225,7 +188,7 @@
                     android:gravity="center_vertical"
                     android:layout_marginStart="24dp"
                     android:textColor="@color/purple_200"
-                    android:text="English"
+                    android:text="@string/english"
                     android:fontFamily="@font/g_bold"
                     android:textSize="17sp"
                     app:layout_constraintLeft_toLeftOf="parent"

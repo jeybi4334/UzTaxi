@@ -51,6 +51,7 @@ class OrderHistoryActivity : BaseActivity() {
         disposables.add(
             RetrofitHelper.apiService(Constants.BASE_URL)
                 .getOrderHistory(
+                    getCurrentLanguage().toLanguageTag(),
                     Constants.HIVE_PROFILE,
                     NaiveHmacSigner.DateSignature(),
                     NaiveHmacSigner.AuthSignature(

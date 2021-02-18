@@ -15,8 +15,10 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.UzTaxi">
-        <activity android:name=".ui.settings.SettingsActivity"></activity>
+        android:theme="@style/Theme.UzTaxi"
+        android:usesCleartextTraffic="true">
+        <activity android:name=".ui.payment.CardsActivity"></activity>
+        <activity android:name=".ui.settings.SettingsActivity" />
         <activity
             android:name=".ui.info.InfoActivity"
             android:label="@string/title_activity_info"

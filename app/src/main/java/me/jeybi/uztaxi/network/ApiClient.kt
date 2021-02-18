@@ -9,23 +9,23 @@ import retrofit2.http.*
 interface ApiClient {
 
     @POST("client/mobile/1.0/registration/submit")
-    @Headers("Accept-Language: ru")
     fun registerClient(
+        @Header("Accept-Language") language : String,
         @Header("Hive-Profile") hive_profile: String,
         @Header("X-Hive-GPS-Position") hive_gps: String?,
         @Body registerUserRequest: RegisterUserRequest
     ): Single<Response<RegisterUserResponse>>
 
     @GET("client/mobile/1.0/registration/resubmit")
-    @Headers("Accept-Language: ru")
     fun resendSmsCode(
+        @Header("Accept-Language") language : String,
         @Header("Hive-Profile") hive_profile: String,
         @Query("id") id: Int, @Query("confirmationType") confirmationType: String
     ): Single<Response<EmptyModel>>
 
     @GET("client/mobile/1.0/registration/confirm")
-    @Headers("Accept-Language: ru")
     fun confirmSmsCode(
+        @Header("Accept-Language") language : String,
         @Header("Hive-Profile") hive_profile: String,
         @Query("id") id: Int, @Query("code") code: String
     ): Single<Response<ConfirmMessageResponse>>
@@ -43,22 +43,22 @@ interface ApiClient {
 
 
     @POST("client/mobile/1.1/service")
-    @Headers("Accept-Language: ru")
     fun getAvailableService(
+        @Header("Accept-Language") language : String,
         @Header("Hive-Profile") hive_profile: String,
         @Header("X-Hive-GPS-Position") hive_gps: String?
     ): Single<Response<ServiceResponse>>
 
     @GET("client/mobile/1.0/payment-methods")
-    @Headers("Accept-Language: ru")
     fun getPaymentOptions(
+        @Header("Accept-Language") language : String,
         @Header("Hive-Profile") hive_profile: String,
         @Header("X-Hive-GPS-Position") hive_gps: String?
     ): Single<Response<ArrayList<PaymentMethod>>>
 
     @GET("client/mobile/1.0/account")
-    @Headers("Accept-Language: ru")
     fun getClientBalance(
+        @Header("Accept-Language") language : String,
         @Header("Hive-Profile") hive_profile: String,
         @Header("X-Hive-GPS-Position") hive_gps: String?,
         @Header("Date") date: String,
@@ -66,16 +66,16 @@ interface ApiClient {
     ): Single<AccountState>
 
     @POST("client/mobile/2.0/estimate")
-    @Headers("Accept-Language: ru")
     fun getEstimatedRide(
+        @Header("Accept-Language") language : String,
         @Header("Hive-Profile") hive_profile: String,
         @Body estimateRideRequest: EstimateRideRequest
     ): Single<Response<EstimateResponse>>
 
 
     @POST("client/mobile/1.0/promo-code-activations")
-    @Headers("Accept-Language: ru")
     fun usePromocode(
+        @Header("Accept-Language") language : String,
         @Header("Hive-Profile") hive_profile: String,
         @Header("Date") date: String,
         @Header("Authentication") hmac: String,
@@ -83,16 +83,17 @@ interface ApiClient {
     ): Single<Response<PromocodeResponse>>
 
     @POST("client/mobile/2.0/drivers")
-    @Headers("Accept-Language: ru")
     fun getAvailableCars(
+        @Header("Accept-Language") language : String,
         @Header("Hive-Profile") hive_profile: String,
         @Header("X-Hive-GPS-Position") hive_gps: String,
         @Body getCarsRequest: GetCarsRequest
     ): Single<Response<ArrayList<GetCarResponse>>>
 
     @GET("client/mobile/3.0/address/client")
-    @Headers("Accept-Language: ru", "Content-Type: application/json; charset=utf-8")
+    @Headers("Content-Type: application/json; charset=utf-8")
     fun getClientAddresses(
+        @Header("Accept-Language") language : String,
         @Header("Hive-Profile") hive_profile: String,
         @Header("Date") date: String,
         @Header("Authentication") hmac: String
@@ -100,16 +101,16 @@ interface ApiClient {
 
 
     @GET("client/mobile/2.0/address/nearest")
-    @Headers("Accept-Language: ru")
     fun getCurrentAddress(
+        @Header("Accept-Language") language : String,
         @Header("Hive-Profile") hive_profile: String,
         @Header("X-Hive-GPS-Position") hive_gps: String?
     ): Single<Response<ArrayList<SearchedAddress>>>
 
 
     @GET("client/mobile/1.0/address/geocoding")
-    @Headers("Accept-Language: ru")
     fun geocodePoint(
+        @Header("Accept-Language") language : String,
         @Header("Hive-Profile") hive_profile: String,
         @Header("X-Hive-GPS-Position") hive_gps: String?,
         @Query("query") query: String
@@ -133,8 +134,8 @@ interface ApiClient {
 
 
     @POST("client/mobile/4.0/orders")
-    @Headers("Accept-Language: ru")
     fun createOrder(
+        @Header("Accept-Language") language : String,
         @Header("Hive-Profile") hive_profile: String,
         @Header("Date") date: String,
         @Header("Authentication") hmac: String,
@@ -142,8 +143,8 @@ interface ApiClient {
     ): Single<Response<CreateOrderResponse>>
 
     @DELETE("client/mobile/1.0/orders/{id}")
-    @Headers("Accept-Language: ru")
     fun cancelOrder(
+        @Header("Accept-Language") language : String,
         @Header("Hive-Profile") hive_profile: String,
         @Header("Date") date: String,
         @Header("Authentication") hmac: String,
@@ -152,8 +153,9 @@ interface ApiClient {
 
 
     @GET("client/mobile/2.0/orders")
-    @Headers("Accept-Language: ru", "Content-Type: application/json; charset=utf-8")
+    @Headers("Content-Type: application/json; charset=utf-8")
     fun getClientOrders(
+        @Header("Accept-Language") language : String,
         @Header("Hive-Profile") hive_profile: String,
         @Header("Date") date: String,
         @Header("Authentication") hmac: String
@@ -161,16 +163,18 @@ interface ApiClient {
 
 
     @GET("client/mobile/2.0/history?offset=0&length=16")
-    @Headers("Accept-Language: ru", "Content-Type: application/json; charset=utf-8")
+    @Headers( "Content-Type: application/json; charset=utf-8")
     fun getAddressHistory(
+        @Header("Accept-Language") language : String,
         @Header("Hive-Profile") hive_profile: String,
         @Header("Date") date: String,
         @Header("Authentication") hmac: String,
     ): Single<Response<ArrayList<ShortOrderInfo>>>
 
     @GET("client/mobile/2.2/orders/{id}")
-    @Headers("Accept-Language: ru", "Content-Type: application/json; charset=utf-8")
+    @Headers( "Content-Type: application/json; charset=utf-8")
     fun getOrderDetails(
+        @Header("Accept-Language") language : String,
         @Header("Hive-Profile") hive_profile: String,
         @Header("Date") date: String,
         @Header("Authentication") hmac: String,
@@ -178,8 +182,9 @@ interface ApiClient {
     ): Single<Response<OrderInfo>>
 
     @GET("client/mobile/1.0/orders/{id}/coming")
-    @Headers("Accept-Language: ru", "Content-Type: application/json; charset=utf-8")
+    @Headers( "Content-Type: application/json; charset=utf-8")
     fun notifyDriver(
+        @Header("Accept-Language") language : String,
         @Header("Hive-Profile") hive_profile: String,
         @Header("Date") date: String,
         @Header("Authentication") hmac: String,
@@ -187,8 +192,9 @@ interface ApiClient {
     ): Single<Response<EmptyModel>>
 
     @POST("client/mobile/1.1/orders/{id}/feedback")
-    @Headers("Accept-Language: ru", "Content-Type: application/json; charset=utf-8")
+    @Headers( "Content-Type: application/json; charset=utf-8")
     fun rateOrder(
+        @Header("Accept-Language") language : String,
         @Header("Hive-Profile") hive_profile: String,
         @Header("Date") date: String,
         @Header("Authentication") hmac: String,
@@ -198,8 +204,9 @@ interface ApiClient {
 
 
     @GET("client/mobile/2.1/bonuses")
-    @Headers("Accept-Language: ru", "Content-Type: application/json; charset=utf-8")
+    @Headers( "Content-Type: application/json; charset=utf-8")
     fun getBonuses(
+        @Header("Accept-Language") language : String,
         @Header("X-Hive-GPS-Position") hive_gps: String,
         @Header("Hive-Profile") hive_profile: String,
         @Header("Date") date: String,
@@ -208,8 +215,9 @@ interface ApiClient {
 
 
     @GET("client/mobile/2.0/history")
-    @Headers("Accept-Language: ru", "Content-Type: application/json; charset=utf-8")
+    @Headers( "Content-Type: application/json; charset=utf-8")
     fun getOrderHistory(
+        @Header("Accept-Language") language : String,
         @Header("Hive-Profile") hive_profile: String,
         @Header("Date") date: String,
         @Header("Authentication") hmac: String,

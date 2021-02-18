@@ -29,7 +29,9 @@ class AuthenticationPresenter(val view: AuthenticationActivity) :
 
         var sendSmsDisposable : Disposable? = null
         sendSmsDisposable = RetrofitHelper.apiService(Constants.BASE_URL)
-            .registerClient(Constants.HIVE_PROFILE, null, registerUserRequest)
+            .registerClient(
+                view.getCurrentLanguage().toLanguageTag(),
+                Constants.HIVE_PROFILE, null, registerUserRequest)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribe({
@@ -62,7 +64,9 @@ class AuthenticationPresenter(val view: AuthenticationActivity) :
     override fun resendSmsCode(onErrorListener: AuthenticationController.OnErrorListener): Disposable {
         var resendDisposable : Disposable? = null
         resendDisposable = RetrofitHelper.apiService(Constants.BASE_URL)
-            .resendSmsCode(Constants.HIVE_PROFILE, USER_ID, Constants.CONF_TYPE_SMS)
+            .resendSmsCode(
+                view.getCurrentLanguage().toLanguageTag(),
+                Constants.HIVE_PROFILE, USER_ID, Constants.CONF_TYPE_SMS)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribe({
@@ -95,7 +99,9 @@ class AuthenticationPresenter(val view: AuthenticationActivity) :
     ): Disposable {
         var confirmDisposable : Disposable?=null
         confirmDisposable = RetrofitHelper.apiService(Constants.BASE_URL)
-            .confirmSmsCode(Constants.HIVE_PROFILE, USER_ID, code)
+            .confirmSmsCode(
+                view.getCurrentLanguage().toLanguageTag(),
+                Constants.HIVE_PROFILE, USER_ID, code)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribe({

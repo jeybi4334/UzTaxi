@@ -1,28 +1,185 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.info.InfoActivity">
+    tools:context=".ui.settings.SettingsActivity"
+    android:background="@color/white"
+    >
 
-    <androidx.viewpager.widget.ViewPager
-        android:id="@+id/viewPagerInfo"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
 
-        <com.google.android.material.tabs.TabLayout
-            android:id="@+id/tab_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/white"
-            app:tabTextColor="@color/purple_200"
-            app:tabSelectedTextColor="@color/black"
+    <RelativeLayout
+        android:id="@+id/rvBack"
+        android:layout_width="54dp"
+        android:layout_height="54dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="52dp"
+        android:background="@drawable/bc_btn_menu"
+        android:clickable="true"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="13dp"
+            android:layout_centerInParent="true"
+            android:src="@drawable/ic_arrow_bottom"
+            android:rotation="90"
+            android:padding="2dp"
             />
 
-    </androidx.viewpager.widget.ViewPager>
+    </RelativeLayout>
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@id/rvBack"
+        app:layout_constraintBottom_toBottomOf="@id/rvBack"
+        app:layout_constraintLeft_toRightOf="@id/rvBack"
+        app:layout_constraintRight_toRightOf="parent"
+        android:gravity="center"
+        android:layout_marginRight="70dp"
+        android:text="@string/about_app"
+        android:fontFamily="@font/g_bold"
+        android:textColor="@color/purple_200"
+        android:textSize="18sp"
+        />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/rvBack"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:orientation="vertical"
+        android:paddingTop="12dp"
+        >
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="128dp"
+            android:src="@drawable/logo"
+            android:layout_marginTop="12dp"
+            />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="24dp"
+            android:text="@string/version"
+            android:gravity="center"
+            android:fontFamily="@font/g_regular"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="28dp"
+            android:background="#F1F1F1"
+            android:layout_marginTop="24dp"
+            />
+
+        <RelativeLayout
+            android:id="@+id/rvTerms"
+            android:layout_width="match_parent"
+            android:layout_height="72dp"
+            android:background="?attr/selectableItemBackground"
+            >
+
+
+            <ImageView
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:src="@drawable/ic_arrow_bottom"
+                android:layout_alignParentEnd="true"
+                android:rotation="270"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="16dp"
+                />
+
+
+            <TextView
+                android:id="@+id/text1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:text="@string/user_agreement"
+                android:textColor="@color/purple_200"
+                android:fontFamily="@font/g_semi_bold"
+                android:layout_marginStart="18dp"
+                android:textSize="18sp"
+                />
+
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp"
+                android:layout_alignParentBottom="true"
+                android:background="#DCDCDC"
+                />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/rvPolicy"
+            android:layout_width="match_parent"
+            android:layout_height="72dp"
+            android:background="?attr/selectableItemBackground"
+            >
+
+
+            <ImageView
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:src="@drawable/ic_arrow_bottom"
+                android:layout_alignParentEnd="true"
+                android:rotation="270"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="16dp"
+                />
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:text="@string/privacy_policy"
+                android:textColor="@color/purple_200"
+                android:fontFamily="@font/g_semi_bold"
+                android:layout_marginStart="18dp"
+                android:textSize="18sp"
+                />
+
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp"
+                android:layout_alignParentBottom="true"
+                android:background="#DCDCDC"
+                />
+
+        </RelativeLayout>
+
+    </LinearLayout>
 
 
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginBottom="18dp"
+        android:gravity="center"
+        android:textSize="14sp"
+        android:text="© 2019-2021   « UzTaxi™ »"
+        android:fontFamily="@font/g_light"
+        android:textColor="@color/black"
+        />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

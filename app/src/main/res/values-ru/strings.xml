@@ -45,12 +45,12 @@
     <string name="next">Next</string>
     <string name="ready">Готово</string>
     <string name="km_0">0.0 км</string>
+    <string name="sum_0">0 сум</string>
     <string name="minute">min</string>
     <string name="order_history">Order history</string>
     <string name="settings">Настройки</string>
     <string name="app_language">Язык приложения</string>
     <string name="current_lang">Русский</string>
-    <string name="russian">Русский</string>
     <string name="show_driver_where_am_i">Показать водителю, где я</string>
     <string name="shows_driver_ur_location">Показывает водителю ваше местоположение</string>
     <string name="receice_notifications">Получать уведомления</string>
@@ -114,6 +114,17 @@
     <string name="sign_out">Выйти</string>
     <string name="version_number">v.1.0.0</string>
     <string name="main_acitivty_title">main_activity</string>
+    <string name="about_app">О приложении</string>
+    <string name="user_agreement">Лицензионное соглашение</string>
+    <string name="privacy_policy">Политика конфиденциальности</string>
+    <string name="version">Версия 1.0.0</string>
+
+    <string name="uzbek">Узбекский</string>
+    <string name="karakalpak">Каракалпак</string>
+    <string name="russian">Русский</string>
+    <string name="english">Английский</string>
+
+    <string name="house">-дом</string>
 
 
 </resources>

@@ -1,26 +1,21 @@
 package me.jeybi.uztaxi.ui.main.bottomsheet
 
-import android.app.Activity
-import android.app.Dialog
-import android.content.DialogInterface
-import android.content.res.Resources
+import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.DisplayMetrics
-import android.util.Log
-import android.view.KeyEvent
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
 import android.widget.FrameLayout
 import android.widget.TextView
-import androidx.annotation.NonNull
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
@@ -40,6 +35,8 @@ class AddresSearchFragment : BottomSheetDialogFragment(), SearchAdapter.SearchIt
         setStyle(STYLE_NORMAL, R.style.CustomBottomSheetDialogTheme);
     }
 
+    val db = Firebase.firestore
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -52,12 +49,22 @@ class AddresSearchFragment : BottomSheetDialogFragment(), SearchAdapter.SearchIt
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        dialog!!.setOnShowListener { dialog -> // In a previous life I used this method to get handles to the positive and negative buttons
+            // of a dialog in order to change their Typeface. Good ol' days.
+            val d = dialog as BottomSheetDialog
 
+            // This is gotten directly from the source of BottomSheetDialog
+            // in the wrapInBottomSheet() method
+            val bottomSheet =
+                d.findViewById<View>(R.id.design_bottom_sheet) as FrameLayout?
+
+            // Right here!
+            if (bottomSheet!=null)
+                BottomSheetBehavior.from(bottomSheet).state = BottomSheetBehavior.STATE_EXPANDED
+        }
 
         recyclerViewSearch.layoutManager = LinearLayoutManager(activity)
 
-
-//        fillRecyclerViewWithDemoData()
 
         editTextSearch.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
@@ -90,10 +97,8 @@ class AddresSearchFragment : BottomSheetDialogFragment(), SearchAdapter.SearchIt
 
 
         imageMap.setOnClickListener {
-            (activity as MainActivity).onDestinationPickClicked()
-//            imageMap.setImageResource(R.drawable.ic_done)
-
-
+            (activity as MainActivity).onDestinationPickClicked(Constants.DESTINATION_PICK_STOP)
+            dismiss()
         }
     }
 
@@ -104,35 +109,50 @@ class AddresSearchFragment : BottomSheetDialogFragment(), SearchAdapter.SearchIt
         progressBarSearch.visibility = View.VISIBLE
         textViewNoAddress.visibility = View.GONE
         recyclerViewSearch.adapter = null
-//        searchDisposables.add(
-//            RetrofitHelper.apiService(Constants.BASE_URL_MILLENIUM)
-//                .geocodePoint(
-//                    Constants.HIVE_MILLENIUM,
-//                    "${(activity as MainActivity).CURRENT_LATITUDE} ${(activity as MainActivity).CURRENT_LONGITUDE}",
-//                    keyWord
-//                )
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribeOn(Schedulers.io())
-//                .subscribe({
-//                    when (it.code()) {
-//                        Constants.STATUS_SUCCESSFUL -> {
-//                            Log.d("ADASD", "SUCCESS ")
-//                            if (it.body() != null && it.body()!!.size > 0) {
-//                                progressBarSearch.visibility = View.GONE
-//                                recyclerViewSearch.adapter = SearchAdapter(it.body()!!, this)
-//                            } else {
-//                                onCouldntFindAnything()
-//                            }
-//                        }
-//                        Constants.STATUS_BAD_REQUEST -> {
-//                            onCouldntFindAnything()
-//                        }
-//                    }
-//                }, {
-//                    onCouldntFindAnything()
-//                })
-//        )
+        searchDisposables.add(
 
+            RetrofitHelper.apiService(Constants.BASE_URL_GEOCODE)
+                .geocode(
+                    keyWord,
+                    (activity as MainActivity).CURRENT_LATITUDE,
+                    (activity as MainActivity).CURRENT_LONGITUDE,
+                    Constants.GEOCODE_RADIUS,
+                    (activity as MainActivity).CURRENT_LATITUDE,
+                    (activity as MainActivity).CURRENT_LONGITUDE,
+                    Constants.GEOCODE_COUNTRY,
+                    Constants.GEOCODE_TOKEN,
+                    Constants.GEOCODE_LIMIT,
+                    (activity as MainActivity).sharedPreferences.getString(
+                        Constants.NOMINATIM_LANGUAGE,
+                        "uz"
+                    ) ?: "uz",
+                    Constants.GEOCODE_SOURCE
+                )
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe({
+                    when (it.code()) {
+                        Constants.STATUS_SUCCESSFUL -> {
+                            if (it.body() != null) {
+                                progressBarSearch.visibility = View.GONE
+                                recyclerViewSearch.adapter = SearchAdapter(
+                                    activity!!,
+                                    it.body()!!.features,
+                                    this
+                                )
+                            } else {
+                                onCouldntFindAnything()
+                            }
+                        }
+                        Constants.STATUS_BAD_REQUEST -> {
+                            onCouldntFindAnything()
+                        }
+                    }
+                }, {
+                    onCouldntFindAnything()
+                })
+
+        )
 
     }
 
@@ -153,6 +173,11 @@ class AddresSearchFragment : BottomSheetDialogFragment(), SearchAdapter.SearchIt
 
 
     override fun onSearchClicked(latitude: Double, longitude: Double, title: String) {
+        activity?.window?.setSoftInputMode(
+            WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN
+        )
+        (activity as MainActivity).hideKeyboard()
+        dismiss()
         (activity as MainActivity).onBottomSheetSearchItemClicked(latitude, longitude, title)
     }
 

@@ -13,6 +13,7 @@ import kotlinx.android.synthetic.main.bottomsheet_payment.*
 import me.jeybi.uztaxi.R
 import me.jeybi.uztaxi.model.PaymentMethod
 import me.jeybi.uztaxi.ui.settings.SettingsActivity
+import me.jeybi.uztaxi.utils.Constants
 import java.util.*
 
 class LanguageSheet(val langTag : String) : BottomSheetDialogFragment() {
@@ -40,9 +41,6 @@ class LanguageSheet(val langTag : String) : BottomSheetDialogFragment() {
             "uz"->{
                 checkOzbek.visibility = View.VISIBLE
             }
-            "os"->{
-                checkUzbek.visibility = View.VISIBLE
-            }
             "kl"->{
                 checkKarakalpak.visibility = View.VISIBLE
             }
@@ -56,21 +54,24 @@ class LanguageSheet(val langTag : String) : BottomSheetDialogFragment() {
 
         linearOzbek.setOnClickListener {
             (activity as SettingsActivity).setLanguage(Locale.forLanguageTag("uz"))
+            (activity as SettingsActivity).sharedPreferences.edit().putString(Constants.NOMINATIM_LANGUAGE,"uz").apply()
             dismiss()
         }
-        linearUzbek.setOnClickListener {
-            (activity as SettingsActivity).setLanguage(Locale.forLanguageTag("os"))
-            dismiss()
-        }
+
         linearKarakalpak.setOnClickListener {
+            (activity as SettingsActivity).sharedPreferences.edit().putString(Constants.NOMINATIM_LANGUAGE,"uz").apply()
             (activity as SettingsActivity).setLanguage(Locale.forLanguageTag("kl"))
             dismiss()
         }
+
         linearRussian.setOnClickListener {
+            (activity as SettingsActivity).sharedPreferences.edit().putString(Constants.NOMINATIM_LANGUAGE,"ru").apply()
             (activity as SettingsActivity).setLanguage(Locale.forLanguageTag("ru"))
             dismiss()
         }
+
         linearEnglish.setOnClickListener {
+            (activity as SettingsActivity).sharedPreferences.edit().putString(Constants.NOMINATIM_LANGUAGE,"en").apply()
             (activity as SettingsActivity).setLanguage(Locale.forLanguageTag("en"))
             dismiss()
         }

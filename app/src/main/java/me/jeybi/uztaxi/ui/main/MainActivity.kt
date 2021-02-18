@@ -35,12 +35,14 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.ItemTouchHelper.*
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.LottieDrawable
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.firebase.messaging.FirebaseMessaging
-import com.google.gson.Gson
 import com.mapbox.android.gestures.MoveGestureDetector
 import com.mapbox.geojson.*
 import com.mapbox.mapboxsdk.camera.CameraPosition
@@ -53,6 +55,8 @@ import com.mapbox.mapboxsdk.location.modes.CameraMode
 import com.mapbox.mapboxsdk.location.modes.RenderMode
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.Style
+import com.mapbox.mapboxsdk.plugins.localization.LocalizationPlugin
+import com.mapbox.mapboxsdk.plugins.localization.MapLocale
 import com.mapbox.mapboxsdk.style.expressions.Expression.*
 import com.mapbox.mapboxsdk.style.layers.*
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory.*
@@ -65,6 +69,10 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import io.socket.client.IO
+import io.socket.client.Socket
+import io.socket.emitter.Emitter
+import io.socket.engineio.client.transports.WebSocket
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.bottom_edit_ride.*
 import kotlinx.android.synthetic.main.bottom_edit_ride.textViewRate
@@ -79,11 +87,16 @@ import me.jeybi.uztaxi.model.*
 import me.jeybi.uztaxi.network.RetrofitHelper
 import me.jeybi.uztaxi.ui.BaseActivity
 import me.jeybi.uztaxi.ui.adapters.CarsAdapter
+import me.jeybi.uztaxi.ui.adapters.RouteAdapter
 import me.jeybi.uztaxi.ui.intro.IntroActivity
 import me.jeybi.uztaxi.ui.main.bottomsheet.*
 import me.jeybi.uztaxi.ui.main.fragments.*
 import me.jeybi.uztaxi.utils.Constants
 import me.jeybi.uztaxi.utils.NaiveHmacSigner
+import okhttp3.OkHttpClient
+import org.json.JSONArray
+import org.json.JSONException
+import org.json.JSONObject
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
@@ -93,7 +106,7 @@ import kotlin.collections.HashMap
 
 
 class MainActivity : BaseActivity(), MainController.view,
-    LocationListener {
+    LocationListener, RouteAdapter.onRouteAddClickListener {
 
     lateinit var presenter: MainPresenter
 
@@ -126,17 +139,27 @@ class MainActivity : BaseActivity(), MainController.view,
 
     var END_POINT_LAT = 0.0
     var END_POINT_LON = 0.0
+    var EDIT_POINT_LAT = 0.0
+    var EDIT_POINT_LON = 0.0
 
     var START_POINT_NAME = ""
     var END_POINT_NAME = ""
+    var EDIT_POINT_NAME = ""
 
     var BONUS = 0.0
 
     var TILT_MAP = Constants.DEFAULT_TILT_MAP
 
+//    val ROUTE_LIST = ArrayList<RouteCoordinates>()
+
+    val ROUTE_DATA = ArrayList<RouteItem>()
+
+
     override fun setLayoutId(): Int {
         return R.layout.activity_main
     }
+
+    private var mSocket: Socket? = null
 
     override fun onViewDidCreate(savedInstanceState: Bundle?) {
         presenter = MainPresenter(this)
@@ -237,6 +260,23 @@ class MainActivity : BaseActivity(), MainController.view,
             )
             {
                 mapBoxStyle = it
+                setUpSocketForDrivers()
+                val localizationPlugin = LocalizationPlugin(mapView!!, mapboxMap, it)
+
+                try {
+
+                    localizationPlugin.setMapLanguage(
+                        when (getCurrentLanguage().toLanguageTag()) {
+                            "ru" -> MapLocale.RUSSIA
+                            "kl" -> MapLocale("name")
+                            else -> MapLocale.US
+                        }
+                    )
+
+                } catch (exception: RuntimeException) {
+                    Log.d("APP LANG", exception.toString())
+                }
+
                 presenter.checkGPS()
                 mapboxMap.uiSettings.isRotateGesturesEnabled = false
                 mapboxMap.uiSettings.isLogoEnabled = false
@@ -276,43 +316,42 @@ class MainActivity : BaseActivity(), MainController.view,
 
                 registerFirebaseReceiver()
 
-//                mainDisposables.add(presenter.getOngoingOrder())
+                mainDisposables.add(presenter.getOngoingOrder())
 
-//                val lat = sharedPreferences.getFloat(Constants.LAST_KNOWN_LATITUDE, 0f)
-//                val lon = sharedPreferences.getFloat(Constants.LAST_KNOWN_LONGITUDE, 0f)
+                val lat = sharedPreferences.getFloat(Constants.LAST_KNOWN_LATITUDE, 0f)
+                val lon = sharedPreferences.getFloat(Constants.LAST_KNOWN_LONGITUDE, 0f)
 
-//                if (lat != 0f) {
-//                    val position = CameraPosition.Builder()
-//                        .target(LatLng(lat.toDouble(), lon.toDouble()))
-//                        .zoom(16.0)
-//                        .tilt(TILT_MAP)
-//                        .build()
+                if (lat != 0f) {
+                    val position = CameraPosition.Builder()
+                        .target(LatLng(lat.toDouble(), lon.toDouble()))
+                        .zoom(16.0)
+                        .tilt(TILT_MAP)
+                        .build()
+
+                    mapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(position))
+                } else {
+                    val position = CameraPosition.Builder()
+                        .target(LatLng(41.31122086155292, 69.27967758784646))
+                        .zoom(16.0)
+                        .tilt(TILT_MAP)
+                        .build()
+
+                    mapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(position))
+                }
+
+//                mainDisposables.add(
+//                    presenter.getAvailableService(
+//                        42.461981894118885, 59.61993481176865
+//                    )
+//                )
 //
-//                    mapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(position))
-//                } else {
-//                    val position = CameraPosition.Builder()
-//                        .target(LatLng(41.31122086155292, 69.27967758784646))
-//                        .zoom(16.0)
-//                        .tilt(TILT_MAP)
-//                        .build()
+//                val position = CameraPosition.Builder()
+//                    .target(LatLng(42.461981894118885, 59.61993481176865))
+//                    .zoom(16.0)
+//                    .tilt(TILT_MAP)
+//                    .build()
 //
-//                    mapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(position))
-//                }
-
-                mainDisposables.add(
-                    presenter.getAvailableService(
-                        40.50023580389371,
-                        68.77399624638494
-                    )
-                )
-
-                val position = CameraPosition.Builder()
-                    .target(LatLng(40.50023580389371, 68.77399624638494))
-                    .zoom(16.0)
-                    .tilt(TILT_MAP)
-                    .build()
-
-                mapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(position))
+//                mapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(position))
 
 
                 setUpMapButtons()
@@ -338,7 +377,7 @@ class MainActivity : BaseActivity(), MainController.view,
                     Constants.getBitmap(
                         ResourcesCompat.getDrawable(
                             resources,
-                            R.drawable.icon_finish,
+                            R.drawable.ic_marker_finish,
                             null
                         )!!
                     )!!
@@ -349,7 +388,18 @@ class MainActivity : BaseActivity(), MainController.view,
                     Constants.getBitmap(
                         ResourcesCompat.getDrawable(
                             resources,
-                            R.drawable.icon_start,
+                            R.drawable.ic_marker_start,
+                            null
+                        )!!
+                    )!!
+                )
+
+                mapBoxStyle.addImage(
+                    "stop-image",
+                    Constants.getBitmap(
+                        ResourcesCompat.getDrawable(
+                            resources,
+                            R.drawable.ic_marker_stop,
                             null
                         )!!
                     )!!
@@ -370,8 +420,10 @@ class MainActivity : BaseActivity(), MainController.view,
             mapboxMap.addOnMoveListener(object : MapboxMap.OnMoveListener {
                 override fun onMoveBegin(detector: MoveGestureDetector) {
                     // user started moving the map
+                    rvReady.isClickable = false
+                    rvReady.setBackgroundResource(R.drawable.bc_button_purple_disabled)
 
-                    if (CURRENT_MODE == Constants.MODE_SEARCH_WHERE || CURRENT_MODE == Constants.MODE_DESTINATION_PICK) {
+                    if (CURRENT_MODE == Constants.MODE_SEARCH_WHERE || CURRENT_MODE == Constants.MODE_DESTINATION_PICK || CURRENT_MODE==Constants.MODE_DESTINATION_PICK_STOP || CURRENT_MODE==Constants.MODE_DESTINATION_PICK_EDIT) {
                         rotatePointerRectangleAnimation()
                         imageViewCloudTop.animate().translationY(-200f).alpha(0.6f)
                             .setInterpolator(AccelerateInterpolator()).setDuration(800).start()
@@ -379,7 +431,8 @@ class MainActivity : BaseActivity(), MainController.view,
                         textViewDurationDriver.text = ""
                         textViewDurationMin.visibility = View.INVISIBLE
 
-                        pointerRectangle.animate().scaleY(1f).scaleX(1f).setDuration(400).setInterpolator(OvershootInterpolator()).start()
+                        pointerRectangle.animate().scaleY(1f).scaleX(1f).setDuration(400)
+                            .setInterpolator(OvershootInterpolator()).start()
 
                         textViewCurrentAddressDetails.text = ""
                         textViewCurrentAddress.text = getString(R.string.clarifying_address)
@@ -460,6 +513,7 @@ class MainActivity : BaseActivity(), MainController.view,
 
 
                 override fun onMoveEnd(detector: MoveGestureDetector) {
+
                     MAP_MOVING = false
                     if (CURRENT_MODE == Constants.MODE_SEARCH_WHERE) {
                         bottomSheetBehaviour.setPeekHeight(PEEK_HEIGHT, true)
@@ -477,30 +531,85 @@ class MainActivity : BaseActivity(), MainController.view,
                     val mapLat = mapLatLng.latitude
                     val mapLong = mapLatLng.longitude
 
-                    if (CURRENT_MODE == Constants.MODE_SEARCH_WHERE || CURRENT_MODE == Constants.MODE_DESTINATION_PICK)
+                    if (CURRENT_MODE == Constants.MODE_SEARCH_WHERE || CURRENT_MODE == Constants.MODE_DESTINATION_PICK || CURRENT_MODE == Constants.MODE_DESTINATION_PICK_STOP || CURRENT_MODE == Constants.MODE_DESTINATION_PICK_ADDRESS|| CURRENT_MODE == Constants.MODE_DESTINATION_PICK_EDIT)
 //                        mainDisposables.add(presenter.findCurrentAddress(mapLat, mapLong))
                         mainDisposables.add(presenter.reverseGeocode(mapLat, mapLong))
 
                     when (CURRENT_MODE) {
                         Constants.MODE_SEARCH_WHERE -> {
+//                            ROUTE_LIST.clear()
+                            ROUTE_DATA.clear()
                             START_POINT_LAT = mapLat
                             START_POINT_LON = mapLong
+//                            ROUTE_LIST.add(
+//                                0,
+//                                RouteCoordinates(START_POINT_LAT, START_POINT_LON, "through")
+//                            )
+//                            ROUTE_DATA.add(RouteItem(false,START_POINT_NAME,START_POINT_LAT,START_POINT_LON))
                         }
                         Constants.MODE_DESTINATION_PICK -> {
                             END_POINT_LAT = mapLat
                             END_POINT_LON = mapLong
+
+//                            ROUTE_LIST.clear()
+                            ROUTE_DATA.clear()
+
+//                            ROUTE_LIST.add(
+//                                0, RouteCoordinates(
+//                                    START_POINT_LAT,
+//                                    START_POINT_LON,
+//                                    "through"
+//                                )
+//                            )
+
+
+
+
+//                            ROUTE_LIST.add(
+//                                RouteCoordinates(
+//                                    END_POINT_LAT,
+//                                    END_POINT_LON,
+//                                    "through"
+//                                )
+//                            )
                         }
+                        Constants.MODE_DESTINATION_PICK_STOP -> {
+                            END_POINT_LAT = mapLat
+                            END_POINT_LON = mapLong
+//                            ROUTE_LIST.add(
+//                                RouteCoordinates(
+//                                    END_POINT_LAT,
+//                                    END_POINT_LON,
+//                                    "through"
+//                                )
+//                            )
+                        }
+
+                        Constants.MODE_DESTINATION_PICK_EDIT -> {
+                            EDIT_POINT_LAT = mapLat
+                            EDIT_POINT_LON = mapLong
+//                            ROUTE_LIST.add(
+//                                RouteCoordinates(
+//                                    END_POINT_LAT,
+//                                    END_POINT_LON,
+//                                    "through"
+//                                )
+//                            )
+                        }
+
+
                     }
+
                     if (CURRENT_MODE == Constants.MODE_SEARCH_WHERE || CURRENT_MODE == Constants.MODE_DESTINATION_PICK) {
 
                         if (TARIFF_ID != 0L) {
-                            mainDisposables.add(
-                                presenter.getAvailableCars(
-                                    mapLat,
-                                    mapLong,
-                                    TARIFF_ID
-                                )
-                            )
+//                            mainDisposables.add(
+//                                presenter.getAvailableCars(
+//                                    mapLat,
+//                                    mapLong,
+//                                    TARIFF_ID
+//                                )
+//                            )
                             if (CURRENT_MODE == Constants.MODE_SEARCH_WHERE) {
                                 mainDisposables.add(
                                     presenter.getAvailableService(
@@ -512,6 +621,7 @@ class MainActivity : BaseActivity(), MainController.view,
                         }
                     }
 
+                    sendLocationToSocket()
                 }
             })
 
@@ -519,24 +629,131 @@ class MainActivity : BaseActivity(), MainController.view,
 
     }
 
+    private fun setUpSocketForDrivers() {
+        try {
+
+            val options = IO.Options()
+            options.forceNew = true
+            options.transports = arrayOf(WebSocket.NAME)
+            options.reconnectionAttempts = 3
+            options.reconnection = true
+            options.timeout = 2000
+            options.path = "/apicl"
+
+
+            val okHttpClient: OkHttpClient = OkHttpClient.Builder().build()
+
+            IO.setDefaultOkHttpWebSocketFactory(okHttpClient)
+            IO.setDefaultOkHttpCallFactory(okHttpClient)
+
+
+            options.apply {
+                callFactory = okHttpClient
+                webSocketFactory = okHttpClient
+            }
+
+            mSocket = IO.socket("https://botmaker.uz/apicl", options)
+
+            mSocket?.on(Socket.EVENT_CONNECT, Emitter.Listener {
+                Log.d("DASDASDSADAS", "SOCKET CONNECTED")
+                mSocket?.emit("message", "test")
+            })?.on("message",
+                Emitter.Listener { args -> println("Message : " + args[0]) })?.on(
+                Socket.EVENT_DISCONNECT,
+                Emitter.Listener { Log.d("DASDASDSADAS", "SOCKET DISCONNECT") })?.on(
+                Socket.EVENT_CONNECT_ERROR,
+                Emitter.Listener { args ->
+                    Log.d(
+                        "DASDASDSADAS",
+                        "SOCKET ERROR CONNECTION ${args[0]}"
+                    )
+                })
+            mSocket?.on("drivers", onNewMessage)
+            mSocket?.connect()
+
+        } catch (e: java.lang.Exception) {
+            Log.d("DASDASDSADAS", "${e.message}")
+        }
+
+
+//        mSocket?.on("drivers", onNewMessage)
+//        mSocket?.connect()
+    }
+
+    fun sendLocationToSocket() {
+
+
+        val jsonObject = JSONObject()
+
+        jsonObject.put("radius", 2000)
+        jsonObject.put("lat", "${START_POINT_LAT}")
+        jsonObject.put("lon", "${START_POINT_LON}")
+        jsonObject.put("limit", 5)
+        Log.d("DASDASDSADAS", "$jsonObject")
+
+        mSocket!!.emit("drivers", jsonObject)
+
+    }
+
+    var OLD_SEARCH_POINT_LAT = 0.0
+    var OLD_SEARCH_POINT_LON = 0.0
+
+    private val onNewMessage: Emitter.Listener = object : Emitter.Listener {
+        override fun call(vararg args: Any) {
+            Log.d("DASDASDSADAS", args.toString())
+
+            runOnUiThread(Runnable {
+
+                val data = args[0] as JSONArray
+                try {
+
+                    val carsList = ArrayList<GetCarResponse>()
+
+                    for (i in 0 until data.length()) {
+                        val jsonObj = (data[i] as JSONObject)
+                        val car = GetCarResponse(
+                            jsonObj.getLong("workerId"),
+                            RouteCoordinates(
+                                jsonObj.getDouble("latitude"),
+                                jsonObj.getDouble("longitude"),
+                                null
+                            )
+                        )
+
+                        carsList.add(car)
+                    }
+                        if (carsList.size>0)
+                        onCarsAvailabe(carsList)
+
+
+                } catch (e: JSONException) {
+                    return@Runnable
+                }
+
+
+            })
+        }
+    }
+
+
     lateinit var aroundCarsDisposable: Disposable
 
     private fun showCarsAround() {
-        aroundCarsDisposable = Observable.interval(
-            0, 2000,
-            TimeUnit.MILLISECONDS
-        )
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeOn(Schedulers.io())
-            .subscribe {
-                mainDisposables.add(
-                    presenter.getAvailableCars(
-                        START_POINT_LAT,
-                        START_POINT_LON,
-                        TARIFF_ID
-                    )
-                )
-            }
+//        aroundCarsDisposable = Observable.interval(
+//            0, 2000,
+//            TimeUnit.MILLISECONDS
+//        )
+//            .observeOn(AndroidSchedulers.mainThread())
+//            .subscribeOn(Schedulers.io())
+//            .subscribe {
+//                mainDisposables.add(
+//                    presenter.getAvailableCars(
+//                        START_POINT_LAT,
+//                        START_POINT_LON,
+//                        TARIFF_ID
+//                    )
+//                )
+//            }
     }
 
     override fun onHasGPS() {
@@ -655,18 +872,43 @@ class MainActivity : BaseActivity(), MainController.view,
             Constants.ORDER_STATE_CREATED -> {
                 ORDER_STATE = Constants.ORDER_STATE_CREATED
                 if (!ROUTE_DRAWN && shortOrderInfo.route.size > 1) {
+//                    ROUTE_LIST.clear()
+                    ROUTE_DATA.clear()
+
+//                    ROUTE_LIST.add(
+//                        RouteCoordinates(
+//                            shortOrderInfo.route[0].position!!.lat,
+//                            shortOrderInfo.route[0].position!!.lon,
+//                            null
+//                        )
+//                    )
+
+                    ROUTE_DATA.add(RouteItem(false,shortOrderInfo.route[0].name,shortOrderInfo.route[0].position!!.lat,
+                        shortOrderInfo.route[0].position!!.lon))
+                    ROUTE_DATA.add(RouteItem(false,shortOrderInfo.route[1].name,shortOrderInfo.route[1].position!!.lat,
+                        shortOrderInfo.route[1].position!!.lon))
+
+//                    ROUTE_LIST.add(
+//                        RouteCoordinates(
+//                            shortOrderInfo.route[1].position!!.lat,
+//                            shortOrderInfo.route[1].position!!.lon,
+//                            null
+//                        )
+//                    )
+
+                    var routeToDraw = ArrayList<RouteCoordinates>()
+
+                    for (rot in shortOrderInfo.route){
+                        routeToDraw.add(RouteCoordinates(rot.position!!.lat,rot.position.lon,"through"))
+                    }
+
                     mainDisposables.add(
                         presenter.getRoute(
-                            Point.fromLngLat(
-                                shortOrderInfo.route[0].position!!.lat,
-                                shortOrderInfo.route[0].position!!.lon
-                            ),
-                            Point.fromLngLat(
-                                shortOrderInfo.route[1].position!!.lat,
-                                shortOrderInfo.route[1].position!!.lon
-                            ), false
+                            routeToDraw,
+                            false
                         )
                     )
+
                 }
                 showCarSearchPage(shortOrderInfo.id)
             }
@@ -709,16 +951,15 @@ class MainActivity : BaseActivity(), MainController.view,
     fun onOnGoingOrderChange(oderID: Long, orderInfo: OrderInfo) {
 
 
-
         bottomSheetBehaviour.peekHeight = 0
         bottomSheetBehaviour.state = BottomSheetBehavior.STATE_COLLAPSED
 
-        rvCallDriver.setOnClickListener{
-            if (orderInfo.assignee?.call?.numbers!=null&&orderInfo.assignee.call.numbers.size>0){
+        rvCallDriver.setOnClickListener {
+            if (orderInfo.assignee?.call?.numbers != null && orderInfo.assignee.call.numbers.size > 0) {
                 val dialIntent = Intent(Intent.ACTION_DIAL)
                 dialIntent.data = Uri.parse("tel:" + "${orderInfo.assignee?.call?.numbers!![0]}")
                 startActivity(dialIntent)
-            }else{
+            } else {
                 Toast.makeText(
                     this@MainActivity,
                     getString(R.string.cannot_call_driver_now),
@@ -731,6 +972,27 @@ class MainActivity : BaseActivity(), MainController.view,
         when (orderInfo.state) {
 
             Constants.ORDER_STATE_ASSIGNED -> {
+
+                val carPointOLD = Location("pointOLD")
+                carPointOLD.latitude = START_POINT_LAT
+                carPointOLD.longitude = START_POINT_LON
+
+                val carPointNEW = Location("pointNEW")
+
+                if (orderInfo.assignee?.location != null) {
+                    carPointNEW.latitude = orderInfo.assignee.location.lat
+                    carPointNEW.longitude = orderInfo.assignee.location.lon
+
+                    val distance = carPointOLD.distanceTo(carPointNEW)
+
+
+                    val time = ((distance.toInt() * 3600) / 10000) / 60 + 1
+
+
+                    textViewTimeCome.text = "$time ${getString(R.string.minute)}"
+                }
+
+
                 textViewCarName1.text =
                     "${orderInfo.assignee?.car?.brand} ${orderInfo.assignee?.car?.model} - ${orderInfo.assignee?.car?.color}"
                 textViewCarNumber1.text = "${orderInfo.assignee?.car?.regNum}"
@@ -741,6 +1003,30 @@ class MainActivity : BaseActivity(), MainController.view,
                         R.anim.text_scroll
                     ) as Animation
                 )
+//                ROUTE_LIST.clear()
+                ROUTE_DATA.clear()
+
+//                ROUTE_LIST.add(
+//                    RouteCoordinates(
+//                        orderInfo.route[0].address.position!!.lat,
+//                        orderInfo.route[0].address.position!!.lon,
+//                        null
+//                    )
+//                )
+//                ROUTE_LIST.add(
+//                    RouteCoordinates(
+//                        orderInfo.route[1].address.position!!.lat,
+//                        orderInfo.route[1].address.position!!.lon,
+//                        null
+//                    )
+//                )
+
+                var routeToDraw = ArrayList<RouteCoordinates>()
+
+                for (rot in orderInfo.route){
+                    routeToDraw.add(RouteCoordinates(rot.address.position!!.lat,rot.address.position.lon,"through"))
+                }
+
 
                 modeDriverFound.visibility = View.VISIBLE
                 ORDER_STATE = Constants.ORDER_STATE_ASSIGNED
@@ -750,14 +1036,7 @@ class MainActivity : BaseActivity(), MainController.view,
                 if (!ROUTE_DRAWN && orderInfo.route.size > 1) {
                     mainDisposables.add(
                         presenter.getRoute(
-                            Point.fromLngLat(
-                                orderInfo.route[0].address.position!!.lon,
-                                orderInfo.route[0].address.position!!.lat
-                            ),
-                            Point.fromLngLat(
-                                orderInfo.route[1].address.position!!.lon,
-                                orderInfo.route[1].address.position!!.lat
-                            ),
+                            routeToDraw,
                             false
                         )
                     )
@@ -857,8 +1136,8 @@ class MainActivity : BaseActivity(), MainController.view,
         lottieAnimation.cancelAnimation()
         lottieAnimation.visibility = View.GONE
 
-        if (CURRENT_MODE == Constants.MODE_CAR_FOUND||CURRENT_MODE==Constants.MODE_DRIVER_CAME)
-        modeDriverFound.visibility = View.VISIBLE
+        if (CURRENT_MODE == Constants.MODE_CAR_FOUND || CURRENT_MODE == Constants.MODE_DRIVER_CAME)
+            modeDriverFound.visibility = View.VISIBLE
         else
             modeRideStart.visibility = View.VISIBLE
 
@@ -871,7 +1150,7 @@ class MainActivity : BaseActivity(), MainController.view,
             mainDisposables.add(presenter.cancelOrder(orderID))
         }
 
-        rcCancelOrder.setOnClickListener{
+        rcCancelOrder.setOnClickListener {
             mainDisposables.add(presenter.cancelOrder(orderID))
         }
 
@@ -962,9 +1241,11 @@ class MainActivity : BaseActivity(), MainController.view,
         textViewTemperature.text = "$temperature"
     }
 
-    override fun onDestinationPickClicked() {
-        showDestinationPickPage()
+    override fun onDestinationPickClicked(action: Int) {
+        showDestinationPickPage(action,0.0,0.0)
     }
+
+
 
 
     fun playLottie(
@@ -986,7 +1267,56 @@ class MainActivity : BaseActivity(), MainController.view,
 
     var routeLineData = ArrayList<Point>()
 
+    override fun onRouteAddClicked(){
+        AddresSearchFragment().show(supportFragmentManager, "searchStopPoint")
+    }
+
+    override  fun onChangeRouteLocationClicked(lat : Double,lon : Double){
+        val position = CameraPosition.Builder()
+            .target(LatLng(lat, lon))
+            .zoom(16.0)
+            .tilt(TILT_MAP)
+            .build()
+
+        mapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(position))
+
+        showDestinationPickPage(Constants.DESTINATION_PICK_EDIT,lat,lon)
+    }
+    override fun onRemoveRouteClicked(lat:Double,lon :Double,position: Int,removedItem : RouteItem){
+        ROUTE_DATA.remove(removedItem)
+
+        imageViewCloudTop.animate().scaleY(8f).setDuration(400).setInterpolator(AccelerateInterpolator()).start()
+        textViewDrawingAddress.visibility = View.VISIBLE
+        shimmer.start(textViewDrawingAddress)
+
+        val routeToDraw = ArrayList<RouteCoordinates>()
+        val routePoints =  ArrayList<RouteItem>()
+        routePoints.addAll(ROUTE_DATA)
+        routePoints.add(0,RouteItem(false,START_POINT_NAME,START_POINT_LAT,START_POINT_LON))
+        for (rot in routePoints){
+            routeToDraw.add(RouteCoordinates(rot.lat,rot.lon,"through"))
+        }
+
+        mainDisposables.add(
+            presenter.getRoute(
+                routeToDraw,
+                false
+            )
+        )
+
+        recyclerViewRoute.adapter?.notifyItemRemoved(position)
+    }
+
     override fun drawRoute(route: ArrayList<Point>) {
+
+        imageViewCloudTop.animate().scaleY(1f).setDuration(400).setInterpolator(AccelerateInterpolator()).start()
+        textViewDrawingAddress.visibility = View.GONE
+        shimmer.cancel()
+
+        bottomSheetBehaviour.peekHeight = 0
+        bottomSheetBehaviour.state = BottomSheetBehavior.STATE_COLLAPSED
+
+
         routeLineData.clear()
         routeLineData.addAll(route)
 
@@ -996,6 +1326,13 @@ class MainActivity : BaseActivity(), MainController.view,
 
 
         if (ORDER_STATE == Constants.ORDER_STATE_NOT_CREATED) {
+
+            recyclerViewRoute.layoutManager = LinearLayoutManager(this)
+
+            recyclerViewRoute.adapter = RouteAdapter(ROUTE_DATA,this,this)
+            itemTouchHelper.attachToRecyclerView(recyclerViewRoute)
+
+
 
             textReady.visibility = View.VISIBLE
             progressReady.visibility = View.GONE
@@ -1016,14 +1353,12 @@ class MainActivity : BaseActivity(), MainController.view,
             imageViewPointerShadow.visibility = View.GONE
             pointerLayout.visibility = View.GONE
             textViewCurrentAddress.visibility = View.GONE
+            textViewCurrentAddressDetails.visibility = View.GONE
 
-            imageViewSelectFromMap.setOnClickListener {
-                showDestinationPickPage()
-            }
+
 
             textViewStartAddress.text = START_POINT_NAME
-            if (END_POINT_NAME != "")
-                textViewDestination.text = END_POINT_NAME
+
 
 
             recyclerViewCars.postDelayed({
@@ -1083,6 +1418,9 @@ class MainActivity : BaseActivity(), MainController.view,
 
         if (route.size > 0) {
 
+            removeRoute()
+
+
 
             routeLineSource = GeoJsonSource(
                 "line-source",
@@ -1122,12 +1460,41 @@ class MainActivity : BaseActivity(), MainController.view,
                 )
             )
 
+            val routePoints =  ArrayList<RouteItem>()
+            routePoints.addAll(ROUTE_DATA)
+            routePoints.add(0,RouteItem(false,START_POINT_NAME,START_POINT_LAT,START_POINT_LON))
+
+            for ((counter, rot) in routePoints.withIndex()){
+                if (counter!=0&&counter!=routePoints.size-1){
+                    mapBoxStyle.addSource(
+                        GeoJsonSource(
+                            "start-source-${counter}", Feature.fromGeometry(
+                                Point.fromLngLat(
+                                    rot.lon,
+                                    rot.lat
+                                )
+                            )
+                        )
+                    )
+                    mapBoxStyle.addLayer(
+                        SymbolLayer(
+                            "start-layer-${counter}",
+                            "start-source-${counter}"
+                        ).withProperties(
+                            iconImage("stop-image"),
+                            iconOffset(arrayOf(0f, -8f))
+                        )
+                    )
+                }
+            }
+
 
 
 
             mapBoxStyle.addSource(
                 GeoJsonSource(
-                    "finish-source", Feature.fromGeometry(
+                    "finish-source-${route[route.size - 1].latitude()},${route[route.size - 1].longitude()}",
+                    Feature.fromGeometry(
                         Point.fromLngLat(
                             route[route.size - 1].longitude(),
                             route[route.size - 1].latitude()
@@ -1145,10 +1512,11 @@ class MainActivity : BaseActivity(), MainController.view,
                     iconOffset(arrayOf(0f, -8f))
                 )
             )
+
             mapBoxStyle.addLayer(
                 SymbolLayer(
-                    "finish-layer",
-                    "finish-source"
+                    "finish-layer-${route[route.size - 1].latitude()},${route[route.size - 1].longitude()}",
+                    "finish-source-${route[route.size - 1].latitude()},${route[route.size - 1].longitude()}"
                 ).withProperties(
                     iconImage("finish-image"),
                     iconOffset(arrayOf(0f, -8f))
@@ -1210,6 +1578,7 @@ class MainActivity : BaseActivity(), MainController.view,
                         mainDisposables.add(
                             RetrofitHelper.apiService(Constants.BASE_URL)
                                 .getEstimatedRide(
+                                    getCurrentLanguage().toLanguageTag(),
                                     Constants.HIVE_PROFILE,
                                     EstimateRideRequest(
                                         PaymentMethod("cash", null, null, null),
@@ -1226,7 +1595,11 @@ class MainActivity : BaseActivity(), MainController.view,
                                         if (it.body() != null) {
                                             price = it.body()!!.cost.amount
                                             textViewPrice.text =
-                                                "${decimalFormat.format(it.body()!!.cost.amount)} ${getString(R.string.currency)}"
+                                                "${decimalFormat.format(it.body()!!.cost.amount)} ${
+                                                    getString(
+                                                        R.string.currency
+                                                    )
+                                                }"
 
                                             if (END_POINT_LAT != 0.0) {
                                                 textViewDistance.visibility = View.VISIBLE
@@ -1390,6 +1763,7 @@ class MainActivity : BaseActivity(), MainController.view,
 
         CURRENT_MODE = Constants.MODE_SEARCH_WHERE
         textViewCurrentAddress.visibility = View.VISIBLE
+        textViewCurrentAddressDetails.visibility = View.VISIBLE
 
         bottomSheetBehaviour.peekHeight = PEEK_HEIGHT
 
@@ -1407,7 +1781,10 @@ class MainActivity : BaseActivity(), MainController.view,
 
     }
 
-    fun showDestinationPickPage() {
+    fun showDestinationPickPage(action: Int,lat : Double,lon : Double) {
+        END_POINT_NAME = ""
+        rvReady.isClickable = false
+        rvReady.setBackgroundResource(R.drawable.bc_button_purple_disabled)
 
         imageViewPointerFoot.visibility = View.VISIBLE
 
@@ -1425,10 +1802,28 @@ class MainActivity : BaseActivity(), MainController.view,
 
             rvOrder.setBackgroundResource(R.drawable.bc_button_purple_disabled)
             rvOrder.setOnClickListener(null)
-            removeRoute()
+//            removeRoute()
         }
 
-        CURRENT_MODE = Constants.MODE_DESTINATION_PICK
+        when (action) {
+
+            Constants.DESTINATION_PICK_ORDEDR -> {
+                CURRENT_MODE = Constants.MODE_DESTINATION_PICK
+            }
+
+            Constants.DESTINATION_PICK_STOP -> {
+                CURRENT_MODE = Constants.MODE_DESTINATION_PICK_STOP
+            }
+
+            Constants.DESTINATION_PICK_ADDRESS -> {
+                CURRENT_MODE = Constants.MODE_DESTINATION_PICK_ADDRESS
+            }
+            Constants.DESTINATION_PICK_EDIT->{
+                CURRENT_MODE = Constants.MODE_DESTINATION_PICK_EDIT
+            }
+
+        }
+
 
         val mapLatLng = mapboxMap.cameraPosition.target
         val mapLat = mapLatLng.latitude
@@ -1453,19 +1848,110 @@ class MainActivity : BaseActivity(), MainController.view,
 
         rvReady.setOnClickListener {
 
-            if (progressReady.visibility != View.VISIBLE) {
-                textReady.visibility = View.GONE
-                progressReady.visibility = View.VISIBLE
-                mainDisposables.add(
-                    presenter.getRoute(
-                        Point.fromLngLat(START_POINT_LON, START_POINT_LAT),
-                        Point.fromLngLat(END_POINT_LON, END_POINT_LAT),
-                        false
+
+            when (action) {
+
+                Constants.DESTINATION_PICK_ORDEDR -> {
+//                    ROUTE_DATA.add(RouteItem(false,END_POINT_NAME,END_POINT_LAT,END_POINT_LON))
+                    ROUTE_DATA.add(RouteItem(false,END_POINT_NAME,END_POINT_LAT,END_POINT_LON))
+                    if (progressReady.visibility != View.VISIBLE) {
+
+                        val routeToDraw = ArrayList<RouteCoordinates>()
+                       val routePoints =  ArrayList<RouteItem>()
+                        routePoints.addAll(ROUTE_DATA)
+                        routePoints.add(0,RouteItem(false,START_POINT_NAME,START_POINT_LAT,START_POINT_LON))
+                        for (rot in routePoints){
+                            routeToDraw.add(RouteCoordinates(rot.lat,rot.lon,"through"))
+                        }
+
+                        textReady.visibility = View.GONE
+                        progressReady.visibility = View.VISIBLE
+                        mainDisposables.add(
+                            presenter.getRoute(
+                                routeToDraw,
+                                false
+                            )
+                        )
+                    }
+
+                }
+
+                Constants.DESTINATION_PICK_STOP -> {
+                    ROUTE_DATA.add(RouteItem(false,END_POINT_NAME,END_POINT_LAT,END_POINT_LON))
+
+                    recyclerViewRoute.adapter?.notifyDataSetChanged()
+
+                    if (progressReady.visibility != View.VISIBLE) {
+                        textReady.visibility = View.GONE
+                        progressReady.visibility = View.VISIBLE
+
+                        val routeToDraw = ArrayList<RouteCoordinates>()
+
+                        val routePoints =  ArrayList<RouteItem>()
+                        routePoints.addAll(ROUTE_DATA)
+                        routePoints.add(0,RouteItem(false,START_POINT_NAME,START_POINT_LAT,START_POINT_LON))
+                        for (rot in routePoints){
+                            routeToDraw.add(RouteCoordinates(rot.lat,rot.lon,"through"))
+                        }
+
+                        mainDisposables.add(
+                            presenter.getRoute(
+                                routeToDraw,
+                                false
+                            )
+                        )
+
+                    }
+
+                }
+                Constants.DESTINATION_PICK_EDIT->{
+                    var REMOVE_INDEX = 0
+                    for ((index,rot) in ROUTE_DATA.withIndex()){
+                        if(rot.lat==lat&&rot.lon==lon){
+                            REMOVE_INDEX= index
+                        }
+                    }
+                    ROUTE_DATA.removeAt(REMOVE_INDEX)
+                    ROUTE_DATA.add(REMOVE_INDEX,
+                        RouteItem(false,EDIT_POINT_NAME,EDIT_POINT_LAT,EDIT_POINT_LON)
                     )
-                )
+                    recyclerViewRoute.adapter?.notifyDataSetChanged()
+
+                    if (progressReady.visibility != View.VISIBLE) {
+                        textReady.visibility = View.GONE
+                        progressReady.visibility = View.VISIBLE
+
+                        val routeToDraw = ArrayList<RouteCoordinates>()
+
+                        val routePoints =  ArrayList<RouteItem>()
+                        routePoints.addAll(ROUTE_DATA)
+                        routePoints.add(0,RouteItem(false,START_POINT_NAME,START_POINT_LAT,START_POINT_LON))
+                        for (rot in routePoints){
+                            routeToDraw.add(RouteCoordinates(rot.lat,rot.lon,"through"))
+                        }
+
+                        mainDisposables.add(
+                            presenter.getRoute(
+                                routeToDraw,
+                                false
+                            )
+                        )
+
+                    }
+                }
+
+
+                Constants.DESTINATION_PICK_ADDRESS -> {
+
+
+                }
+
             }
 
+
         }
+        rvReady.isClickable = false
+
 
         ROUTE_DRAWN = false
 
@@ -1476,7 +1962,7 @@ class MainActivity : BaseActivity(), MainController.view,
         imageViewPointerShadow.visibility = View.VISIBLE
         pointerLayout.visibility = View.VISIBLE
         textViewCurrentAddress.visibility = View.VISIBLE
-
+        textViewCurrentAddressDetails.visibility = View.VISIBLE
 
     }
 
@@ -1566,7 +2052,7 @@ class MainActivity : BaseActivity(), MainController.view,
         shimmer.start(textSearching)
 
         rvCancel.setOnClickListener {
-            textSearching.text =  getString(R.string.to_cancel_order)
+            textSearching.text = getString(R.string.to_cancel_order)
             mainDisposables.add(presenter.cancelOrder(orderID))
         }
 
@@ -1579,6 +2065,7 @@ class MainActivity : BaseActivity(), MainController.view,
             .subscribe({
                 RetrofitHelper.apiService(Constants.BASE_URL)
                     .getOrderDetails(
+                        getCurrentLanguage().toLanguageTag(),
                         Constants.HIVE_PROFILE,
                         NaiveHmacSigner.DateSignature(),
                         NaiveHmacSigner.AuthSignature(
@@ -1733,7 +2220,7 @@ class MainActivity : BaseActivity(), MainController.view,
 //    }
 
     var movingCarPositions = HashMap<Long, LatLng>()
-    var movingCarGeoJsonSources = HashMap<Long, GeoJsonSource>()
+    var movingCarGeoJsonSources  = HashMap<Long, GeoJsonSource>()
     var movingCarAnimations = HashMap<Long, ValueAnimator>()
     var movingCarAnimationListeners = HashMap<Long, AnimatorUpdateListener>()
 
@@ -1903,7 +2390,6 @@ class MainActivity : BaseActivity(), MainController.view,
 
     }
 
-
     override fun onCarsAvailabe(data: ArrayList<GetCarResponse>) {
         val ids = ArrayList<Long>()
 
@@ -1958,20 +2444,36 @@ class MainActivity : BaseActivity(), MainController.view,
             textViewDurationMin.visibility = View.INVISIBLE
         }
 
-
-        for (key in movingCarGeoJsonSources.keys) {
-            if (ids.size > 0 && !ids.contains(key)) {
-                movingCarGeoJsonSources.remove(key)
-                mapBoxStyle.removeSource("moving-source-$key")
-                mapBoxStyle.removeLayer("moving-layer-$key")
-                val anim = movingCarAnimations[key]
-                anim!!.removeAllUpdateListeners()
-                anim.removeAllListeners()
-                anim.cancel()
-                movingCarAnimations.remove(key)
-                movingCarAnimationListeners.remove(key)
+        val iterator = movingCarGeoJsonSources.iterator()
+        while(iterator.hasNext()){
+            val item = iterator.next()
+            if(!ids.contains(item.key)){
+                iterator.remove()
+                mapBoxStyle.removeLayer("moving-layer-${item.key}")
+                mapBoxStyle.removeSource("moving-source-${item.key}")
+                val anim = movingCarAnimations[item.key]
+                anim?.removeAllUpdateListeners()
+                anim?.removeAllListeners()
+                anim?.cancel()
+                movingCarAnimations.remove(item.key)
+                movingCarAnimationListeners.remove(item.key)
             }
         }
+
+
+//        for (key in movingCarGeoJsonSources.keys) {
+//            if (ids.size > 0 && !ids.contains(key)) {
+//                movingCarGeoJsonSources.remove(key,movingCarGeoJsonSources[key])
+//                mapBoxStyle.removeSource("moving-source-$key")
+//                mapBoxStyle.removeLayer("moving-layer-$key")
+//                val anim = movingCarAnimations[key]
+//                anim?.removeAllUpdateListeners()
+//                anim?.removeAllListeners()
+//                anim?.cancel()
+//                movingCarAnimations.remove(key,movingCarAnimations[key])
+//                movingCarAnimationListeners.remove(key,movingCarAnimationListeners[key])
+//            }
+//        }
 
         for (car in data) {
             addMovingCar(car)
@@ -1989,19 +2491,28 @@ class MainActivity : BaseActivity(), MainController.view,
         longitude: Double,
         title: String
     ) {
-        bottomSheetBehaviour.peekHeight = 0
-        bottomSheetBehaviour.state = BottomSheetBehavior.STATE_COLLAPSED
-
-        mainDisposables.add(
-            presenter.getRoute(
-                Point.fromLngLat(START_POINT_LON, START_POINT_LAT),
-                Point.fromLngLat(longitude, latitude),
-                false
-            )
-        )
         END_POINT_NAME = title
         END_POINT_LAT = latitude
         END_POINT_LON = longitude
+
+        ROUTE_DATA.add(RouteItem(false,title,latitude,longitude))
+
+        val routeToDraw = ArrayList<RouteCoordinates>()
+
+        val routePoints =  ArrayList<RouteItem>()
+        routePoints.addAll(ROUTE_DATA)
+        routePoints.add(0,RouteItem(false,START_POINT_NAME,START_POINT_LAT,START_POINT_LON))
+        for (rot in routePoints){
+            routeToDraw.add(RouteCoordinates(rot.lat,rot.lon,"through"))
+        }
+
+        mainDisposables.add(
+            presenter.getRoute(
+                routeToDraw,
+                false
+            )
+        )
+
     }
 
     fun setUpBottomSheet() {
@@ -2048,21 +2559,65 @@ class MainActivity : BaseActivity(), MainController.view,
     }
 
     override fun onAddressFound(name: String, details: String) {
-        textViewCurrentAddress.text = name
-        textViewCurrentAddressDetails.text = details
+        try {
+            textViewCurrentAddress.text = "${name.toInt()}${getString(R.string.house)}"
+        } catch (e: java.lang.Exception) {
+
+            textViewCurrentAddress.text = name
+            textViewCurrentAddressDetails.text = details
+        }
+        if (details.isEmpty()) {
+            if (name.split(",").size > 1) {
+
+                val newName = name.split(",")[0]
+                try {
+                    try {
+                        val houseNumber = newName.substring(0, 1).toInt()
+                        textViewCurrentAddress.text = "${newName}${getString(R.string.house)}"
+                    } catch (e: java.lang.Exception) {
+                        textViewCurrentAddress.text =
+                            "${newName.toInt()}${getString(R.string.house)}"
+                    }
+                } catch (exception: java.lang.Exception) {
+                    textViewCurrentAddress.text = name.split(",")[0]
+                }
+
+
+                textViewCurrentAddressDetails.text = name.split(",")[1]
+            }
+        } else {
+            textViewCurrentAddressDetails.text = details
+        }
+
+
 
         shimmer.cancel()
-        if (name != "")
-            CURRENT_ADDRESS = name
-        else
-            CURRENT_ADDRESS = "${CURRENT_LATITUDE},${CURRENT_LONGITUDE}"
 
         when (CURRENT_MODE) {
             Constants.MODE_SEARCH_WHERE -> {
-                START_POINT_NAME = CURRENT_ADDRESS
+                START_POINT_NAME = if (details != "") details else name
             }
             Constants.MODE_DESTINATION_PICK -> {
-                END_POINT_NAME = CURRENT_ADDRESS
+                END_POINT_NAME = if (details != "") details else name
+                rvReady.isClickable = true
+                rvReady.setBackgroundResource(R.drawable.bc_button_purple)
+
+
+//                ROUTE_DATA.add(RouteItem(false,END_POINT_NAME,END_POINT_LAT,END_POINT_LON))
+//                textViewDestination.text = END_POINT_NAME
+            }
+            Constants.MODE_DESTINATION_PICK_EDIT->{
+                EDIT_POINT_NAME = if (details != "") details else name
+                rvReady.isClickable = true
+                rvReady.setBackgroundResource(R.drawable.bc_button_purple)
+            }
+            else->{
+                END_POINT_NAME = if (details != "") details else name
+//                ROUTE_DATA.add(RouteItem(false,END_POINT_NAME,END_POINT_LAT,END_POINT_LON))
+                rvReady.isClickable = true
+                rvReady.setBackgroundResource(R.drawable.bc_button_purple)
+
+                rvReady.isClickable = true
             }
         }
     }
@@ -2089,7 +2644,7 @@ class MainActivity : BaseActivity(), MainController.view,
         }
 
         cardNext.setOnClickListener {
-            textViewDestination.text = getString(R.string.around_city)
+//            textViewDestination.text = getString(R.string.around_city)
             drawRoute(arrayListOf())
 
         }
@@ -2281,6 +2836,10 @@ class MainActivity : BaseActivity(), MainController.view,
         }
         if (::carPositionDisposable.isInitialized)
             carPositionDisposable.dispose()
+
+
+        mSocket?.disconnect();
+        mSocket?.off("drivers", onNewMessage);
     }
 
     override fun onLocationChanged(location: Location) {
@@ -2303,6 +2862,7 @@ class MainActivity : BaseActivity(), MainController.view,
 
         bottomSheetBehaviour.state = BottomSheetBehavior.STATE_COLLAPSED
         textViewCurrentAddress.text = getString(R.string.clarifying_address)
+        textViewCurrentAddressDetails.text = ""
         shimmer.start(textViewCurrentAddress)
 
 //        mainDisposables.add(presenter.findCurrentAddress(location.latitude, location.longitude))
@@ -2678,7 +3238,7 @@ class MainActivity : BaseActivity(), MainController.view,
                 }
                 Constants.MODE_CREATE_ORDER -> {
                     if (END_POINT_LAT != 0.0)
-                        showDestinationPickPage()
+                        showDestinationPickPage(Constants.DESTINATION_PICK_ORDEDR,0.0,0.0)
                     else
                         showSearchWherePage()
                 }
@@ -3352,4 +3912,79 @@ class MainActivity : BaseActivity(), MainController.view,
         imm.hideSoftInputFromWindow(view.windowToken, 0)
     }
 
+    fun startDragging(viewHolder: RecyclerView.ViewHolder) {
+        itemTouchHelper.startDrag(viewHolder)
+    }
+
+
+    private val itemTouchHelper by lazy {
+        // 1. Note that I am specifying all 4 directions.
+        //    Specifying START and END also allows
+        //    more organic dragging than just specifying UP and DOWN.
+        val simpleItemTouchCallback =
+            object : ItemTouchHelper.SimpleCallback(UP or
+                    DOWN,
+//                    or
+//                    START or
+//                    END,
+                0) {
+
+                override fun onMove(recyclerView: RecyclerView,
+                                    viewHolder: RecyclerView.ViewHolder,
+                                    target: RecyclerView.ViewHolder): Boolean {
+
+                    val adapter = recyclerView.adapter as RouteAdapter
+                    val from = viewHolder.adapterPosition
+                    val to = target.adapterPosition
+                    // 2. Update the backing model. Custom implementation in
+                    //    MainRecyclerViewAdapter. You need to implement
+                    //    reordering of the backing model inside the method.
+
+                    adapter.moveItem(viewHolder,target ,from, to)
+                    // 3. Tell adapter to render the model update.
+                    adapter.notifyItemMoved(from, to)
+
+//                    val fromEmoji = ROUTE_DATA[from]
+//                    ROUTE_DATA.removeAt(from)
+//                    if (to < from) {
+//                        ROUTE_DATA.add(to, fromEmoji)
+//                    } else {
+//                        ROUTE_DATA.add(to - 1, fromEmoji)
+//                    }
+
+                    val routeToDraw = ArrayList<RouteCoordinates>()
+
+                    val routePoints =  ArrayList<RouteItem>()
+                    routePoints.addAll(ROUTE_DATA)
+                    routePoints.add(0,RouteItem(false,START_POINT_NAME,START_POINT_LAT,START_POINT_LON))
+                    for (rot in routePoints){
+                        routeToDraw.add(RouteCoordinates(rot.lat,rot.lon,"through"))
+                    }
+
+                    imageViewCloudTop.animate().scaleY(8f).setDuration(400).setInterpolator(AccelerateInterpolator()).start()
+                    textViewDrawingAddress.visibility = View.VISIBLE
+                    shimmer.start(textViewDrawingAddress)
+
+                    mainDisposables.add(
+                        presenter.getRoute(
+                            routeToDraw,
+                            false
+                        )
+                    )
+
+                    recyclerView.postDelayed({
+                        adapter.notifyDataSetChanged()
+                    },500)
+
+                    return true
+                }
+                override fun onSwiped(viewHolder: RecyclerView.ViewHolder,
+                                      direction: Int) {
+                    // 4. Code block for horizontal swipe.
+                    //    ItemTouchHelper handles horizontal swipe as well, but
+                    //    it is not relevant with reordering. Ignoring here.
+                }
+            }
+        ItemTouchHelper(simpleItemTouchCallback)
+    }
 }

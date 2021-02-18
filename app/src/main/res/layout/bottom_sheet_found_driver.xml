@@ -167,10 +167,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
+            android:gravity="center"
+
             android:text="@string/cancelling_order"
             android:fontFamily="@font/g_bold"
             android:textColor="@color/white"
-            android:textSize="16sp"
+            android:textSize="15sp"
             />
 
     </RelativeLayout>

@@ -31,62 +31,63 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         val intent = Intent(Constants.ORDER_STATUS_RECIEVER)
         if (remoteMessage.data["orderId"]!=null)
         intent.putExtra(Constants.ORDER_ID,remoteMessage.data["orderId"]?.toLong())
+        smallText = "${remoteMessage.data["text"]}"
 
         when (remoteMessage.data["kind"]) {
             Constants.ORDER_STATUS_CREATED -> {
-                smallText = getString(R.string.order_created)
+//                smallText = getString(R.string.order_created)
                 intent.putExtra(Constants.ORDER_STATUS,Constants.ORDER_STATUS_CREATED )
             }
             Constants.ORDER_STATUS_CHANGED -> {
-                smallText = getString(R.string.order_status_changed)
+//                smallText = getString(R.string.order_status_changed)
                 intent.putExtra(Constants.ORDER_STATUS,Constants.ORDER_STATUS_CHANGED )
             }
             Constants.ORDER_STATUS_DRIVER_ASSIGNED -> {
-                smallText = getString(R.string.order_driver_coming)
+//                smallText = getString(R.string.order_driver_coming)
                 intent.putExtra(Constants.ORDER_STATUS,Constants.ORDER_STATUS_DRIVER_ASSIGNED )
             }
             Constants.ORDER_STATUS_DRIVER_DELAY -> {
-                smallText = getString(R.string.driver_may_delay)
+//                smallText = getString(R.string.driver_may_delay)
                 intent.putExtra(Constants.ORDER_STATUS,Constants.ORDER_STATUS_DRIVER_DELAY )
             }
             Constants.ORDER_STATUS_DRIVER_ARRIVED -> {
-                smallText = getString(R.string.driver_is_waiting)
+//                smallText = getString(R.string.driver_is_waiting)
                 intent.putExtra(Constants.ORDER_STATUS,Constants.ORDER_STATUS_DRIVER_ARRIVED )
             }
             Constants.ORDER_STATUS_EXECUTING -> {
-                smallText = getString(R.string.ride_started)
+//                smallText = getString(R.string.ride_started)
                 intent.putExtra(Constants.ORDER_STATUS,Constants.ORDER_STATUS_EXECUTING )
             }
             Constants.ORDER_STATUS_DRIVER_UNASSIGNED -> {
-                smallText = getString(R.string.driver_unassigned)
+//                smallText = getString(R.string.driver_unassigned)
                 intent.putExtra(Constants.ORDER_STATUS,Constants.ORDER_STATUS_DRIVER_UNASSIGNED )
             }
 
             Constants.ORDER_STATUS_ORDER_COMPLETED -> {
 //              smallText = "Маршрут завершен!"
-                smallText = "${remoteMessage.data.get("text")}"
+//                smallText = "${remoteMessage.data["text"]}"
                 intent.putExtra(Constants.ORDER_STATUS,Constants.ORDER_STATUS_ORDER_COMPLETED )
             }
 
             Constants.ORDER_STATUS_BONUS_ADDED -> {
-                smallText = getString(R.string.bonus_added)
+//                smallText = getString(R.string.bonus_added)
                 intent.putExtra(Constants.ORDER_STATUS,Constants.ORDER_STATUS_BONUS_ADDED )
             }
             Constants.ORDER_STATUS_BONUS_WITHDRAWN -> {
-                smallText = getString(R.string.bonus_withdrawn)
+//                smallText = getString(R.string.bonus_withdrawn)
                 intent.putExtra(Constants.ORDER_STATUS,Constants.ORDER_STATUS_BONUS_WITHDRAWN )
             }
             Constants.ORDER_STATUS_CANCELLED -> {
 //                smallText = "Заказ отменен!"
-                smallText = "${remoteMessage.data.get("text")}"
+//                smallText = "${remoteMessage.data.get("text")}"
                 intent.putExtra(Constants.ORDER_STATUS,Constants.ORDER_STATUS_CANCELLED )
             }
             Constants.ORDER_STATUS_PAID_WAITING_BEGAN -> {
-                smallText = getString(R.string.paid_waiting_started)
+//                smallText = getString(R.string.paid_waiting_started)
                 intent.putExtra(Constants.ORDER_STATUS,Constants.ORDER_STATUS_PAID_WAITING_BEGAN )
             }
             Constants.ORDER_STATUS_CHAT_REQUEST -> {
-                smallText = getString(R.string.request_chat)
+//                smallText = getString(R.string.request_chat)
                 intent.putExtra(Constants.ORDER_STATUS,Constants.ORDER_STATUS_CHAT_REQUEST )
             }
 

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:layout_height="48dp"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    >
+
+    <ImageView
+        android:id="@+id/iconEnd"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:padding="16dp"
+        android:src="@drawable/ic_circle_end"
+        android:layout_marginStart="8dp"
+        />
+
+
+    <TextView
+        android:id="@+id/textViewDestination"
+        android:background="?attr/selectableItemBackground"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="wrap_content"
+        android:textColor="@color/black"
+        android:alpha="0.8"
+        android:layout_marginTop="0dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:text="@string/around_city"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:layout_marginEnd="8dp"
+        android:fontFamily="@font/g_semi_bold"
+        android:textSize="15sp"
+        />
+
+
+    <ImageView
+        android:id="@+id/imageViewAdd"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:src="@drawable/ic_add_point"
+        android:padding="12dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        />
+
+    <View
+        android:id="@+id/viewDividerMap"
+        android:layout_width="2dp"
+        android:layout_height="28dp"
+        android:background="@drawable/bc_handler_bottomsheet"
+        android:alpha="0.14"
+        />
+
+    <ImageView
+        android:id="@+id/imageViewSelectFromMap"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginEnd="8dp"
+        android:src="@drawable/ic_map_small"
+        android:padding="12dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        />
+
+</LinearLayout>

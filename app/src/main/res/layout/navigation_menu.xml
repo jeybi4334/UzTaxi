@@ -59,7 +59,7 @@
                 app:layout_constraintTop_toTopOf="@id/lottieProfile"
                 app:layout_constraintBottom_toBottomOf="@id/lottieProfile"
                 android:textColor="@color/black"
-                android:text="0 сум"
+                android:text="@string/sum_0"
                 android:fontFamily="@font/g_bold"
                 android:textSize="16sp"
                 />

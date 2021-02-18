@@ -99,12 +99,10 @@ class MainPresenter(val view: MainActivity) : MainController.presenter {
                 Constants.HIVE_PROFILE,
                 null,
                 NaiveHmacSigner.DateSignature(),
-                NaiveHmacSigner.AuthSignature(
-                    view.HIVE_USER_ID,
-                    view.HIVE_TOKEN,
-                    "POST",
-                    "/api/client/mobile/1.0/registration/fcm"
-                ), RegisterFCMRequest(token)
+                NaiveHmacSigner.AuthSignature(view.HIVE_USER_ID, view.HIVE_TOKEN, "POST", "/api/client/mobile/1.0/registration/fcm"),
+
+
+                RegisterFCMRequest(token)
             )
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
@@ -128,7 +126,7 @@ class MainPresenter(val view: MainActivity) : MainController.presenter {
                 longitude,
                 Constants.NOMINATIM_ZOOM_LVL,
                 Constants.NOMINATIM_ZOOM_FORMAT,
-                view.sharedPreferences.getString(Constants.NOMINATIM_LANGUAGE, "ru") ?: "ru"
+                view.getCurrentLanguage().toLanguageTag()
             ).observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribe({
@@ -159,6 +157,7 @@ class MainPresenter(val view: MainActivity) : MainController.presenter {
 
         getAdressesDisposable = RetrofitHelper.apiService(Constants.BASE_URL)
             .getClientAddresses(
+                view.getCurrentLanguage().toLanguageTag(),
                 Constants.HIVE_PROFILE,
                 NaiveHmacSigner.DateSignature(),
                 NaiveHmacSigner.AuthSignature(
@@ -184,7 +183,7 @@ class MainPresenter(val view: MainActivity) : MainController.presenter {
         var findAddressDisposable: Disposable? = null
 
         findAddressDisposable = RetrofitHelper.apiService(Constants.BASE_URL)
-            .getCurrentAddress(Constants.HIVE_PROFILE, "${latitude} ${longitude}")
+            .getCurrentAddress(view.getCurrentLanguage().toLanguageTag(),Constants.HIVE_PROFILE, "${latitude} ${longitude}")
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribe({
@@ -222,6 +221,7 @@ class MainPresenter(val view: MainActivity) : MainController.presenter {
     override fun getBonuses(latitude: Double, longitude: Double): Disposable {
         return RetrofitHelper.apiService(Constants.BASE_URL)
             .getBonuses(
+                view.getCurrentLanguage().toLanguageTag(),
                 "${latitude} ${longitude}",
                 Constants.HIVE_PROFILE,
                 NaiveHmacSigner.DateSignature(),
@@ -263,10 +263,8 @@ class MainPresenter(val view: MainActivity) : MainController.presenter {
             })
     }
 
-    override fun getRoute(origin: Point, destination: Point, driverRoute: Boolean): Disposable {
-        val listCoordinates = ArrayList<RouteCoordinates>()
-        listCoordinates.add(RouteCoordinates(origin.latitude(), origin.longitude(), null))
-        listCoordinates.add(RouteCoordinates(destination.latitude(), destination.longitude(), null))
+    override fun getRoute( listCoordinates: ArrayList<RouteCoordinates>, driverRoute: Boolean): Disposable {
+
 
         return RetrofitHelper.apiService(Constants.BASE_URL_MAPZEN)
             .getRoute(GetRouteRequest(listCoordinates, "auto", "ru-RU", "none"))
@@ -277,8 +275,6 @@ class MainPresenter(val view: MainActivity) : MainController.presenter {
                     val decoded = PolyLineUtils.decode(it.body()!!.trip.legs[0].shape, 6)
                     if (!driverRoute)
                         view.drawRoute(decoded)
-                    else if (driverRoute && it.body()!!.trip.summary.length > 1.0)
-                        view.drawDriverRoute(decoded, origin)
                 } else {
                     view.onErrorGetRoute()
                 }
@@ -291,6 +287,7 @@ class MainPresenter(val view: MainActivity) : MainController.presenter {
     override fun getAvailableCars(latitude: Double, longitude: Double, tariff: Long): Disposable {
         return RetrofitHelper.apiService(Constants.BASE_URL)
             .getAvailableCars(
+                view.getCurrentLanguage().toLanguageTag(),
                 Constants.HIVE_PROFILE,
                 "$latitude $longitude",
                 GetCarsRequest(CarPaymentMethod("cash"), tariff)
@@ -316,7 +313,9 @@ class MainPresenter(val view: MainActivity) : MainController.presenter {
     override fun getAvailableService(latitude: Double, longitude: Double): Disposable {
 
         return RetrofitHelper.apiService(Constants.BASE_URL)
-            .getAvailableService(Constants.HIVE_PROFILE, "$latitude $longitude")
+            .getAvailableService(
+                view.getCurrentLanguage().toLanguageTag(),
+                Constants.HIVE_PROFILE, "$latitude $longitude")
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribe({
@@ -330,7 +329,9 @@ class MainPresenter(val view: MainActivity) : MainController.presenter {
 
     override fun getPaymentMethods(latitude: Double, longitude: Double): Disposable {
         return RetrofitHelper.apiService(Constants.BASE_URL)
-            .getPaymentOptions(Constants.HIVE_PROFILE, "$latitude $longitude")
+            .getPaymentOptions(
+                view.getCurrentLanguage().toLanguageTag(),
+                Constants.HIVE_PROFILE, "$latitude $longitude")
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribe({
@@ -345,6 +346,7 @@ class MainPresenter(val view: MainActivity) : MainController.presenter {
     override fun createOrder(createOrderRequest: CreateOrderRequest): Disposable {
         return RetrofitHelper.apiService(Constants.BASE_URL)
             .createOrder(
+                view.getCurrentLanguage().toLanguageTag(),
                 Constants.HIVE_PROFILE,
                 NaiveHmacSigner.DateSignature(),
                 NaiveHmacSigner.AuthSignature(
@@ -371,6 +373,7 @@ class MainPresenter(val view: MainActivity) : MainController.presenter {
     override fun getOngoingOrder(): Disposable {
         return RetrofitHelper.apiService(Constants.BASE_URL)
             .getClientOrders(
+                view.getCurrentLanguage().toLanguageTag(),
                 Constants.HIVE_PROFILE,
                 NaiveHmacSigner.DateSignature(),
                 NaiveHmacSigner.AuthSignature(
@@ -398,6 +401,7 @@ class MainPresenter(val view: MainActivity) : MainController.presenter {
     override fun notifyDriver(orderID: Long): Disposable {
         return RetrofitHelper.apiService(Constants.BASE_URL)
             .notifyDriver(
+                view.getCurrentLanguage().toLanguageTag(),
                 Constants.HIVE_PROFILE,
                 NaiveHmacSigner.DateSignature(),
                 NaiveHmacSigner.AuthSignature(
@@ -420,6 +424,7 @@ class MainPresenter(val view: MainActivity) : MainController.presenter {
     override fun notifyDriver(orderID: Long, rateOrderBody: RateOrderBody): Disposable {
         return RetrofitHelper.apiService(Constants.BASE_URL)
             .rateOrder(
+                view.getCurrentLanguage().toLanguageTag(),
                 Constants.HIVE_PROFILE,
                 NaiveHmacSigner.DateSignature(),
                 NaiveHmacSigner.AuthSignature(
@@ -443,6 +448,7 @@ class MainPresenter(val view: MainActivity) : MainController.presenter {
     override fun cancelOrder(orderID: Long): Disposable {
         return RetrofitHelper.apiService(Constants.BASE_URL)
             .cancelOrder(
+                view.getCurrentLanguage().toLanguageTag(),
                 Constants.HIVE_PROFILE,
                 NaiveHmacSigner.DateSignature(),
                 NaiveHmacSigner.AuthSignature(

@@ -96,7 +96,7 @@ class SearchFragment : BaseFragment(), SearchAdapter.SearchItemClickListener,
         }
 
         imageMap.setOnClickListener {
-            (activity as MainActivity).onDestinationPickClicked()
+            (activity as MainActivity).onDestinationPickClicked(Constants.DESTINATION_PICK_ORDEDR)
 //            imageMap.setImageResource(R.drawable.ic_done)
 
 
@@ -110,6 +110,7 @@ class SearchFragment : BaseFragment(), SearchAdapter.SearchItemClickListener,
         searchDisposables.add(
             RetrofitHelper.apiService(Constants.BASE_URL)
                 .getAddressHistory(
+                    (activity as MainActivity).getCurrentLanguage().toLanguageTag(),
                     Constants.HIVE_PROFILE,
                     NaiveHmacSigner.DateSignature(),
                     NaiveHmacSigner.AuthSignature(
@@ -164,7 +165,7 @@ class SearchFragment : BaseFragment(), SearchAdapter.SearchItemClickListener,
                     Constants.GEOCODE_COUNTRY,
                     Constants.GEOCODE_TOKEN,
                     Constants.GEOCODE_LIMIT,
-                    (activity as MainActivity).sharedPreferences.getString(Constants.NOMINATIM_LANGUAGE,"ru") ?: "ru",
+                    (activity as MainActivity).getCurrentLanguage().toLanguageTag(),
                     Constants.GEOCODE_SOURCE
                 )
                 .observeOn(AndroidSchedulers.mainThread())
@@ -207,6 +208,7 @@ class SearchFragment : BaseFragment(), SearchAdapter.SearchItemClickListener,
 
 
     override fun onSearchClicked(latitude: Double, longitude: Double, title: String) {
+        (activity as MainActivity).hideKeyboard()
         (activity as MainActivity).onBottomSheetSearchItemClicked(latitude, longitude, title)
     }
 

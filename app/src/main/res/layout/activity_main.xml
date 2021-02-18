@@ -46,6 +46,20 @@
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
+            <com.romainpiel.shimmer.ShimmerTextView
+                android:id="@+id/textViewDrawingAddress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                android:text="@string/creating_route"
+                app:layout_constraintLeft_toRightOf="@id/rvMenu"
+                app:layout_constraintRight_toLeftOf="@id/lottieWeather"
+                app:layout_constraintTop_toTopOf="@id/lottieWeather"
+                app:layout_constraintBottom_toBottomOf="@id/lottieWeather"
+                android:fontFamily="@font/g_bold"
+                android:textColor="@color/purple_200"
+                android:textSize="17sp"
+                />
 
             <androidx.constraintlayout.widget.Guideline
                 android:id="@+id/guideline"
@@ -60,11 +74,11 @@
                 android:layout_width="54dp"
                 android:layout_height="54dp"
                 android:layout_marginStart="16dp"
-                android:layout_marginTop="52dp"
+                app:layout_constraintBottom_toBottomOf="@id/lottieWeather"
                 android:background="@drawable/bc_btn_menu"
                 android:clickable="true"
                 app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+                app:layout_constraintTop_toTopOf="@id/lottieWeather">
 
                 <ImageView
                     android:layout_width="20dp"
@@ -339,6 +353,7 @@
 
             <FrameLayout
                 android:id="@+id/frameReady"
+                android:clickable="true"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -475,7 +490,7 @@
             <com.google.android.material.card.MaterialCardView
 
                 android:id="@+id/cardNext"
-                android:layout_width="84dp"
+                android:layout_width="wrap_content"
                 android:layout_height="48dp"
                 android:layout_alignParentEnd="true"
                 android:layout_margin="8dp"
@@ -484,8 +499,11 @@
                 app:cardElevation="4dp">
 
                 <TextView
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginStart="16dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:gravity="center"
                     android:layout_gravity="center"
                     android:fontFamily="@font/g_bold"
                     android:text="@string/next"
