@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    tools:context=".ui.payment.AddCardActivity">
+
+
+    <RelativeLayout
+        android:id="@+id/rvBack"
+        android:layout_width="54dp"
+        android:layout_height="54dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="52dp"
+        android:background="@drawable/bc_btn_menu"
+        android:clickable="true"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="13dp"
+            android:layout_centerInParent="true"
+            android:padding="2dp"
+            android:rotation="90"
+            android:src="@drawable/ic_arrow_bottom" />
+
+
+    </RelativeLayout>
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="70dp"
+        android:fontFamily="@font/g_bold"
+        android:gravity="center"
+        android:text="Добавить карту"
+        android:textColor="@color/purple_200"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="@id/rvBack"
+        app:layout_constraintLeft_toRightOf="@id/rvBack"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@id/rvBack" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@id/rvReady"
+        app:layout_constraintTop_toBottomOf="@id/rvBack"
+        android:overScrollMode="never"
+        >
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        >
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_begin="20dp"
+            app:layout_constraintGuide_percent="0.6"
+            />
+
+        <TextView
+            android:id="@+id/text2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            android:fontFamily="@font/gilroy_meidum"
+            android:gravity="center"
+            android:text="Выберите дизайн карты"
+            android:textColor="@color/purple_200"
+            android:textSize="18sp"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            />
+
+
+        <androidx.viewpager.widget.ViewPager
+            android:id="@+id/mViewPager"
+            android:layout_width="wrap_content"
+            android:layout_height="248dp"
+            android:overScrollMode="never"
+            android:layout_marginTop="8dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/text2" />
+
+
+        <TextView
+            android:id="@+id/text1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:fontFamily="@font/gilroy_meidum"
+            android:gravity="center"
+            android:text="Пожалуйста, введите данные карты"
+            android:textColor="@color/purple_200"
+            android:textSize="18sp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/mViewPager" />
+
+        <EditText
+            android:id="@+id/editTextCardNumber"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="18dp"
+            android:layout_marginEnd="16dp"
+            android:background="@drawable/bc_btn_rounded"
+            android:digits="0123456789 "
+            android:fontFamily="@font/g_regular"
+            android:hint="0000 0000 0000 0000"
+            android:imeOptions="actionDone"
+            android:inputType="numberDecimal"
+            android:maxLength="19"
+            android:paddingLeft="28dp"
+            android:textColor="@color/black"
+            android:textColorHint="#A8A7A7"
+            android:typeface="monospace"
+            app:layout_constraintDimensionRatio="5.5:1"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/text1" />
+
+        <TextView
+            android:id="@+id/text3"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:fontFamily="@font/gilroy_meidum"
+            android:gravity="center"
+            android:text="Срок действия карты"
+            android:textColor="@color/purple_200"
+            android:textSize="18sp"
+            app:layout_constraintRight_toLeftOf="@id/editTextExpiryDate"
+            app:layout_constraintLeft_toLeftOf="@id/editTextCardNumber"
+            app:layout_constraintTop_toTopOf="@id/editTextExpiryDate"
+            />
+
+
+        <EditText
+            android:id="@+id/editTextExpiryDate"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintDimensionRatio="4:2"
+            android:gravity="center"
+            android:layout_marginTop="18dp"
+            android:layout_marginEnd="16dp"
+            android:background="@drawable/bc_btn_rnd"
+            android:digits="0123456789 "
+            android:fontFamily="@font/g_regular"
+            android:hint="00/00"
+            android:imeOptions="actionDone"
+            android:inputType="numberDecimal"
+            android:maxLength="5"
+            android:textColor="@color/black"
+            android:textColorHint="#A8A7A7"
+            android:typeface="monospace"
+            app:layout_constraintLeft_toLeftOf="@id/guideline4"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/editTextCardNumber" />
+
+
+        <EditText
+            android:id="@+id/editTextCardName"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="18dp"
+            android:layout_marginEnd="16dp"
+            android:background="@drawable/bc_btn_rounded"
+            android:fontFamily="@font/g_regular"
+            android:hint="Название карты"
+            android:imeOptions="actionDone"
+            android:paddingTop="24dp"
+            android:paddingBottom="24dp"
+            android:inputType="textPersonName"
+            android:maxLength="19"
+            android:paddingLeft="28dp"
+            android:textColor="@color/black"
+            android:textColorHint="#A8A7A7"
+            android:typeface="monospace"
+            app:layout_constraintDimensionRatio="5.5:1"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/editTextExpiryDate"
+            />
+
+
+        <LinearLayout
+            android:id="@+id/linearMakeMain"
+            android:visibility="gone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintTop_toBottomOf="@id/editTextCardName"
+            android:gravity="center"
+            android:layout_marginTop="18dp"
+            >
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/gilroy_meidum"
+                android:gravity="center"
+                android:text="Сделать основную карту"
+                android:textColor="@color/purple_200"
+                android:textSize="18sp"
+                app:layout_constraintRight_toLeftOf="@id/editTextExpiryDate"
+                app:layout_constraintLeft_toLeftOf="@id/editTextCardNumber"
+                app:layout_constraintTop_toTopOf="@id/editTextExpiryDate"
+                />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/switchFilter"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginEnd="18dp"
+                android:thumb="@drawable/thumb_selector"
+                app:track="@drawable/track_selector"
+                />
+
+
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/imageViewScanCard"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="16dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:padding="12dp"
+            android:src="@drawable/ic_card_add"
+            app:layout_constraintBottom_toBottomOf="@id/editTextCardNumber"
+            app:layout_constraintRight_toRightOf="@id/editTextCardNumber"
+            app:layout_constraintTop_toTopOf="@id/editTextCardNumber" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+
+
+
+    <RelativeLayout
+        android:id="@+id/rvReady"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginStart="18dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="18dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/bc_button_purple_disabled"
+        android:clickable="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent">
+
+        <TextView
+            android:id="@+id/textReady"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:fontFamily="@font/g_bold"
+            android:text="Добавить"
+            android:textColor="@color/white"
+            android:textSize="16sp" />
+
+        <ProgressBar
+            android:id="@+id/progressReady"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_centerInParent="true"
+            android:indeterminateTint="@color/white"
+            android:visibility="gone" />
+
+    </RelativeLayout>
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

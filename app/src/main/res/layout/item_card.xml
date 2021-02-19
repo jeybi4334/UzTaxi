@@ -2,26 +2,33 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="228dp"
+    android:layout_height="248dp"
     android:gravity="top"
     android:orientation="vertical">
 
-    <me.jeybi.uztaxi.utils.CustomLinearLayout
+    <me.jeybi.uztaxi.utils.CustomConstraintLayout
         android:id="@+id/item_root"
         android:layout_width="match_parent"
-        android:layout_height="228dp"
+        android:layout_height="248dp"
         android:background="@android:color/transparent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        >
+
+
 
         <com.google.android.material.card.MaterialCardView
             android:layout_marginStart="16dp"
             android:layout_marginTop="4dp"
             android:id="@+id/item_content"
-            android:layout_width="330dp"
-            android:layout_height="206dp"
+            android:layout_width="360dp"
+            android:layout_height="210dp"
             android:background="@android:color/black"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            android:layout_marginBottom="8dp"
             app:cardCornerRadius="16dp"
-            app:cardElevation="3dp">
+            app:cardElevation="4dp"
+            >
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/layoutCard"
@@ -35,7 +42,7 @@
                     android:layout_height="32dp"
                     android:layout_marginTop="16dp"
                     android:layout_marginEnd="18dp"
-                    android:src="@drawable/ic_bank_kdb"
+                    android:src="@drawable/ic_logo_white"
                     app:layout_constraintRight_toRightOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
@@ -54,10 +61,13 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="18dp"
-                    android:ellipsize="end"
+                    android:layout_marginEnd="18dp"
                     android:fontFamily="@font/g_regular"
+                    android:gravity="start"
                     android:maxLines="1"
-                    android:text="8600 0329 2535 6966"
+
+                    android:ellipsize="end"
+                    android:text="0000 0000 0000 0000"
                     android:textColor="@color/white"
                     android:textSize="24sp"
                     app:layout_constraintBottom_toBottomOf="@id/imageUzcard"
@@ -67,12 +77,13 @@
                 <TextView
                     android:id="@+id/textViewCardOwner"
                     android:layout_width="0dp"
+
                     android:layout_height="wrap_content"
                     android:layout_marginStart="18dp"
+                    android:layout_marginEnd="12dp"
                     android:ellipsize="end"
                     android:fontFamily="@font/g_semi_bold"
                     android:maxLines="1"
-                    android:text="Jaloliddin Boltaev"
                     android:textColor="@color/white"
                     android:textSize="18sp"
                     app:layout_constraintBottom_toBottomOf="@id/imageBankLogo"
@@ -85,11 +96,11 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="18dp"
+                    android:layout_marginBottom="10dp"
                     android:ellipsize="end"
                     android:fontFamily="@font/g_bold"
                     android:maxLines="1"
-                    android:text="07/25"
-                    android:layout_marginBottom="10dp"
+                    android:text="00/00"
                     android:textColor="@color/white"
                     android:textSize="18sp"
                     app:layout_constraintBottom_toTopOf="@id/textViewCardNumber"
@@ -102,6 +113,28 @@
         </com.google.android.material.card.MaterialCardView>
 
 
-    </me.jeybi.uztaxi.utils.CustomLinearLayout>
+        <RelativeLayout
+            android:id="@+id/rvDeleteCard"
+            android:scaleX="0"
+            android:scaleY="0"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:background="@drawable/bc_circle_white"
+            app:layout_constraintRight_toRightOf="@id/item_content"
+            app:layout_constraintLeft_toRightOf="@id/item_content"
+            app:layout_constraintBottom_toTopOf="@id/item_content"
+            app:layout_constraintTop_toTopOf="@id/item_content"
+            >
+
+            <ImageView
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@drawable/ic_cancel_route"
+                android:layout_centerInParent="true"
+                />
+
+        </RelativeLayout>
+
+    </me.jeybi.uztaxi.utils.CustomConstraintLayout>
 
 </LinearLayout>

@@ -13,7 +13,8 @@ import me.jeybi.uztaxi.ui.auth.AuthenticationActivity
 import me.jeybi.uztaxi.ui.history.OrderHistoryActivity
 import me.jeybi.uztaxi.ui.info.InfoActivity
 import me.jeybi.uztaxi.ui.main.MainActivity
-import me.jeybi.uztaxi.ui.payment.CardsActivity
+import me.jeybi.uztaxi.ui.payment.AddCardActivity
+import me.jeybi.uztaxi.ui.payment.CreditCardsActivity
 import me.jeybi.uztaxi.ui.settings.SettingsActivity
 import me.jeybi.uztaxi.utils.Constants
 
@@ -22,11 +23,15 @@ class NavigationFragment : BaseFragment() {
     override fun setLayoutId(): Int {
         return R.layout.navigation_menu
     }
+    var BONUS = 0.0
 
     override fun onViewDidCreate(savedInstanceState: Bundle?) {
 
         lottieProfile.setOnClickListener{
-            startActivity(Intent(activity,CardsActivity::class.java))
+            val intent = Intent(activity,CreditCardsActivity::class.java)
+            intent.putExtra("lat",(activity as MainActivity).START_POINT_LAT)
+            intent.putExtra("lon",(activity as MainActivity).START_POINT_LON)
+            startActivity(intent)
         }
 
         textNavigation0.setOnClickListener{
@@ -99,6 +104,7 @@ class NavigationFragment : BaseFragment() {
     }
 
     public fun onBonusReady(bonus: Double){
+        BONUS = bonus
         textViewBonus.text = "$bonus ${getString(R.string.currency)}"
     }
 

@@ -16,6 +16,7 @@ import com.akexorcist.localizationactivity.core.OnLocaleChangedListener
 import com.mapbox.mapboxsdk.Mapbox
 import me.jeybi.uztaxi.R
 import me.jeybi.uztaxi.UzTaxiApplication
+import me.jeybi.uztaxi.utils.Constants
 import java.util.*
 
 
@@ -23,6 +24,8 @@ abstract class BaseActivity : AppCompatActivity(), OnLocaleChangedListener {
 
     lateinit var sharedPreferences: SharedPreferences
     private val localizationDelegate = LocalizationActivityDelegate(this)
+    var HIVE_TOKEN: String = ""
+    var HIVE_USER_ID: Long = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         localizationDelegate.addOnLocaleChangedListener(this)
@@ -31,6 +34,7 @@ abstract class BaseActivity : AppCompatActivity(), OnLocaleChangedListener {
         setTitle(R.string.main_acitivty_title)
 //        window.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
 //            WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
+
 
         window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
@@ -44,6 +48,9 @@ abstract class BaseActivity : AppCompatActivity(), OnLocaleChangedListener {
 
         Mapbox.getInstance(this, getString(R.string.mapbox_access_token))
         sharedPreferences = (application as UzTaxiApplication).sharedPreferences
+        HIVE_TOKEN = sharedPreferences.getString(Constants.HIVE_USER_TOKEN, "") ?: ""
+        HIVE_USER_ID = sharedPreferences.getLong(Constants.HIVE_USER_ID, 0)
+
         setContentView(setLayoutId())
         title = "base"
         onViewDidCreate(savedInstanceState)

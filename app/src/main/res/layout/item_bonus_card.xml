@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="248dp"
+    android:gravity="top"
+    android:orientation="vertical">
+
+    <me.jeybi.uztaxi.utils.CustomConstraintLayout
+        android:id="@+id/item_root"
+        android:layout_width="match_parent"
+        android:layout_height="248dp"
+        android:background="@android:color/transparent"
+        android:orientation="vertical"
+        >
+
+
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="4dp"
+            android:id="@+id/item_content"
+            android:layout_width="360dp"
+            android:layout_height="210dp"
+            android:background="@android:color/black"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            android:layout_marginBottom="8dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="4dp"
+            >
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layoutCard"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/ic_card_type_5">
+
+                <ImageView
+                    android:id="@+id/imageBankLogo"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginEnd="18dp"
+                    android:src="@drawable/ic_wallet"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <ImageView
+                    android:id="@+id/imageUzcard"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_marginEnd="18dp"
+                    android:layout_marginBottom="24dp"
+                    android:src="@drawable/ic_logo_white"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintRight_toRightOf="parent" />
+
+                <TextView
+                    android:id="@+id/textViewCardBonus"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="18dp"
+                    android:layout_marginEnd="18dp"
+                    android:fontFamily="@font/g_regular"
+                    android:gravity="start"
+                    android:maxLines="1"
+
+                    android:ellipsize="end"
+                    android:text="0 UZS"
+                    android:textColor="@color/white"
+                    android:textSize="24sp"
+                    app:layout_constraintBottom_toBottomOf="@id/imageUzcard"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toLeftOf="@id/imageUzcard" />
+
+                <TextView
+                    android:id="@+id/textViewCardOwner"
+                    android:layout_width="0dp"
+                    android:text="Бонусная карта"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="18dp"
+                    android:layout_marginEnd="12dp"
+                    android:ellipsize="end"
+                    android:fontFamily="@font/g_semi_bold"
+                    android:maxLines="1"
+                    android:textColor="@color/white"
+                    android:textSize="18sp"
+                    app:layout_constraintBottom_toBottomOf="@id/imageBankLogo"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toLeftOf="@id/imageBankLogo"
+                    app:layout_constraintTop_toTopOf="@id/imageBankLogo" />
+
+                <TextView
+                    android:id="@+id/textViewWalletNumber"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="18dp"
+                    android:layout_marginBottom="10dp"
+                    android:ellipsize="end"
+                    android:fontFamily="@font/g_bold"
+                    android:maxLines="1"
+                    android:text="• • • 4334"
+                    android:textColor="@color/white"
+                    android:textSize="18sp"
+                    app:layout_constraintBottom_toTopOf="@id/textViewCardBonus"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toLeftOf="@id/imageBankLogo" />
+
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+
+    </me.jeybi.uztaxi.utils.CustomConstraintLayout>
+
+</LinearLayout>

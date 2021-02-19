@@ -2,13 +2,32 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="56dp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="horizontal"
     android:gravity="center_vertical"
     android:background="?attr/selectableItemBackground"
     android:id="@+id/parentPaymentMethod"
     >
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardPaymentMethod"
+        android:visibility="gone"
+        android:layout_width="42dp"
+        android:layout_height="28dp"
+        app:cardCornerRadius="4dp"
+        android:layout_marginStart="12dp"
+        >
+
+        <RelativeLayout
+            android:id="@+id/rvCardPayment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/ic_card_type_1"
+            />
+
+
+    </com.google.android.material.card.MaterialCardView>
 
     <ImageView
         android:id="@+id/imageViewPaymentMethod"

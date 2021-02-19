@@ -7,10 +7,11 @@ import androidx.room.RoomDatabase
 import me.jeybi.uztaxi.utils.Constants
 
 
-@Database(entities = [AddressEntity::class],version = Constants.DATABASE_VERSION)
+@Database(version = Constants.DATABASE_VERSION, entities = [AddressEntity::class,CreditCardEntity::class])
 abstract class UzTaxiDatabase : RoomDatabase(){
 
     abstract fun getAddressDAO() : AddressDAO
+    abstract fun getCardDAO() : CreditCardDAO
 
     companion object {
         @Volatile

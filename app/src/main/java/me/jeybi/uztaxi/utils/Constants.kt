@@ -5,8 +5,8 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.drawable.Drawable
 import android.util.DisplayMetrics
-import android.util.Log
 import com.mapbox.mapboxsdk.geometry.LatLng
+import me.jeybi.uztaxi.R
 import java.text.DecimalFormat
 import java.util.*
 import kotlin.math.abs
@@ -20,9 +20,11 @@ class Constants {
 
         val DATABASE_NAME = "uztaxi_database"
 
-        const val DATABASE_VERSION = 1
+        const val DATABASE_VERSION = 5
 
         const val TABLE_ADDRESS = "table_address"
+        const val TABLE_CARDS = "table_cards"
+
 
         const val CALL_CENTER_NUMBER = "1191"
 
@@ -47,6 +49,8 @@ class Constants {
         val BASE_URL_GEOCODE = "https://api.geocode.earth/v1/"
 
         val HIVE_MILLENIUM = "2e4129784c2e080a5b19bc01c495496d"
+
+        val BASE_URL_PAYME = "https://checkout.paycom.uz/"
 
         val HIVE_PROFILE = "2a3ae3c1da9c04320737424a4dbd2683"
 
@@ -92,7 +96,7 @@ class Constants {
         val MODE_DRIVER_CAME = 10006
         val MODE_RIDE_STARTED = 10007
 
-
+        val MAIN_CREDIT_CARD = "main_credit_card"
 
         val ORDER_STATUS_RECIEVER = "me.jeybi.uztaxi.utils.ORDER_STATUS_RECEIVER"
 
@@ -173,6 +177,12 @@ class Constants {
         val ALIES_TYPE_TOURIST = 16
         val ALIES_TYPE_GARDEN = 22
         val ALIES_TYPE_CROSSROAD = 2
+
+        val CARD_TYPE_PLASTIC = 110010020
+        val CARD_TYPE_WALLET = 110010021
+        val CARD_TYPE_CREATE = 110010022
+        val CARD_TYPE_STYLE = 110010023
+
 
 
         //// SETTINGS_CONSTANTS
@@ -265,348 +275,207 @@ class Constants {
             return Math.round(value * scale) / scale
         }
 
+        fun getCardBankIcon(cardNumber: String) : Int{
+            return when {
+                cardNumber.replace(" ","").startsWith("860002") -> R.drawable.ic_bank_nbu
+                cardNumber.replace(" ","").startsWith("860003") -> R.drawable.ic_bank_sqb
+                cardNumber.replace(" ","").startsWith("860004") -> R.drawable.ic_bank_agro
+                cardNumber.replace(" ","").startsWith("860005") -> R.drawable.ic_bank_mikrokredit
+                cardNumber.replace(" ","").startsWith("860006") -> R.drawable.ic_bank_xalq
+                cardNumber.replace(" ","").startsWith("860008") -> R.drawable.ic_bank_savdogar
+                cardNumber.replace(" ","").startsWith("860009") -> R.drawable.ic_bank_qqb
+                cardNumber.replace(" ","").startsWith("860011") -> R.drawable.ic_bank_turon
+                cardNumber.replace(" ","").startsWith("860012") -> R.drawable.ic_bank_hamkor
+                cardNumber.replace(" ","").startsWith("860013") -> R.drawable.ic_bank_asaka
+                cardNumber.replace(" ","").startsWith("860014") -> R.drawable.ic_bank_ipak
+                cardNumber.replace(" ","").startsWith("860020") -> R.drawable.ic_bank_ziraat
+                cardNumber.replace(" ","").startsWith("860030") -> R.drawable.ic_bank_trast
+                cardNumber.replace(" ","").startsWith("860031") -> R.drawable.ic_bank_aloqa
+                cardNumber.replace(" ","").startsWith("860033") -> R.drawable.ic_bank_ipoteka
+                cardNumber.replace(" ","").startsWith("860034") -> R.drawable.ic_bank_kdb
+                cardNumber.replace(" ","").startsWith("860038") -> R.drawable.ic_bank_turkiston
+                cardNumber.replace(" ","").startsWith("860043") -> R.drawable.ic_bank_saderat
+                cardNumber.replace(" ","").startsWith("860048") -> R.drawable.ic_bank_universal
+                cardNumber.replace(" ","").startsWith("860049") -> R.drawable.ic_bank_kapital
+                cardNumber.replace(" ","").startsWith("860049") -> R.drawable.ic_bank_kapital
+                cardNumber.replace(" ","").startsWith("860050") -> R.drawable.ic_bank_ravnaq
+                cardNumber.replace(" ","").startsWith("860051") -> R.drawable.ic_bank_davr
+                cardNumber.replace(" ","").startsWith("860053") -> R.drawable.ic_bank_infin
+                cardNumber.replace(" ","").startsWith("860055") -> R.drawable.ic_bank_asia
+                cardNumber.replace(" ","").startsWith("860056") -> R.drawable.ic_bank_hi_tech
+                cardNumber.replace(" ","").startsWith("860057") -> R.drawable.ic_bank_ofb
+                cardNumber.replace(" ","").startsWith("860058") -> R.drawable.ic_bank_madad
+                cardNumber.replace(" ","").startsWith("860059") -> R.drawable.ic_bank_agroexpo
+                cardNumber.replace(" ","").startsWith("860060") -> R.drawable.ic_bank_poytaxt
+                cardNumber.replace(" ","").startsWith("860061") -> R.drawable.ic_bank_tenge
+                cardNumber.replace(" ","").startsWith("860062") -> R.drawable.ic_bank_tbc
 
-        fun transliterate(message: String): String {
-            val abcCyr = charArrayOf(
-                ' ',
-                'а',
-                'б',
-                'в',
-                'г',
-                'д',
-                'е',
-                'ё',
-                'ж',
-                'з',
-                'и',
-                'й',
-                'к',
-                'л',
-                'м',
-                'н',
-                'о',
-                'п',
-                'р',
-                'с',
-                'т',
-                'у',
-                'ф',
-                'х',
-                'ц',
-                'ч',
-                'ш',
-                'щ',
-                'ъ',
-                'ы',
-                'ь',
-                'э',
-                'ю',
-                'я',
-                'А',
-                'Б',
-                'В',
-                'Г',
-                'Д',
-                'Е',
-                'Ё',
-                'Ж',
-                'З',
-                'И',
-                'Й',
-                'К',
-                'Л',
-                'М',
-                'Н',
-                'О',
-                'П',
-                'Р',
-                'С',
-                'Т',
-                'У',
-                'Ф',
-                'Х',
-                'Ц',
-                'Ч',
-                'Ш',
-                'Щ',
-                'Ъ',
-                'Ы',
-                'Ь',
-                'Э',
-                'Ю',
-                'Я',
-                'a',
-                'b',
-                'c',
-                'd',
-                'e',
-                'f',
-                'g',
-                'h',
-                'i',
-                'j',
-                'k',
-                'l',
-                'm',
-                'n',
-                'o',
-                'p',
-                'q',
-                'r',
-                's',
-                't',
-                'u',
-                'v',
-                'w',
-                'x',
-                'y',
-                'z',
-                'A',
-                'B',
-                'C',
-                'D',
-                'E',
-                'F',
-                'G',
-                'H',
-                'I',
-                'J',
-                'K',
-                'L',
-                'M',
-                'N',
-                'O',
-                'P',
-                'Q',
-                'R',
-                'S',
-                'T',
-                'U',
-                'V',
-                'W',
-                'X',
-                'Y',
-                'Z'
-            )
-            val abcLat = arrayOf(
-                " ",
-                "a",
-                "b",
-                "v",
-                "g",
-                "d",
-                "e",
-                "e",
-                "zh",
-                "z",
-                "i",
-                "y",
-                "k",
-                "l",
-                "m",
-                "n",
-                "o",
-                "p",
-                "r",
-                "s",
-                "t",
-                "u",
-                "f",
-                "h",
-                "ts",
-                "ch",
-                "sh",
-                "sch",
-                "",
-                "i",
-                "",
-                "e",
-                "ju",
-                "ja",
-                "A",
-                "B",
-                "V",
-                "G",
-                "D",
-                "E",
-                "E",
-                "Zh",
-                "Z",
-                "I",
-                "Y",
-                "K",
-                "L",
-                "M",
-                "N",
-                "O",
-                "P",
-                "R",
-                "S",
-                "T",
-                "U",
-                "F",
-                "H",
-                "Ts",
-                "Ch",
-                "Sh",
-                "Sch",
-                "",
-                "I",
-                "",
-                "E",
-                "Ju",
-                "Ja",
-                "a",
-                "b",
-                "c",
-                "d",
-                "e",
-                "f",
-                "g",
-                "h",
-                "i",
-                "j",
-                "k",
-                "l",
-                "m",
-                "n",
-                "o",
-                "p",
-                "q",
-                "r",
-                "s",
-                "t",
-                "u",
-                "v",
-                "w",
-                "x",
-                "y",
-                "z",
-                "A",
-                "B",
-                "C",
-                "D",
-                "E",
-                "F",
-                "G",
-                "H",
-                "I",
-                "J",
-                "K",
-                "L",
-                "M",
-                "N",
-                "O",
-                "P",
-                "Q",
-                "R",
-                "S",
-                "T",
-                "U",
-                "V",
-                "W",
-                "X",
-                "Y",
-                "Z"
-            )
-            val builder = StringBuilder()
-            for (i in 0 until message.length) {
-                for (x in abcCyr.indices) {
-                    if (message[i] == abcCyr[x]) {
-                        builder.append(abcLat[x])
+                else -> R.drawable.ic_logo_white
+            }
+        }
+
+        fun getBankProviderIcon(cardNumber: String) : Int{
+            return when{
+                cardNumber.startsWith("8600") -> R.drawable.ic_uzcard
+                cardNumber.startsWith("9860") -> R.drawable.ic_bank_humo
+                else-> R.drawable.ic_uzcard
+            }
+        }
+
+        fun getHumoBankIcon(cardNumber: String) : Int{
+            return when {
+                cardNumber.replace(" ","").startsWith("986001") -> R.drawable.ic_bank_ipoteka
+                cardNumber.replace(" ","").startsWith("986002") -> R.drawable.ic_bank_sqb
+                cardNumber.replace(" ","").startsWith("986003") -> R.drawable.ic_bank_agro
+                cardNumber.replace(" ","").startsWith("986004") -> R.drawable.ic_bank_asaka
+                cardNumber.replace(" ","").startsWith("986006") -> R.drawable.ic_bank_qqb
+                cardNumber.replace(" ","").startsWith("986008") -> R.drawable.ic_bank_xalq
+                cardNumber.replace(" ","").startsWith("986009") -> R.drawable.ic_bank_asia
+                cardNumber.replace(" ","").startsWith("986010") -> R.drawable.ic_bank_kapital
+                cardNumber.replace(" ","").startsWith("986012") -> R.drawable.ic_bank_nbu
+                cardNumber.replace(" ","").startsWith("986013") -> R.drawable.ic_bank_mikrokredit
+                cardNumber.replace(" ","").startsWith("986014") -> R.drawable.ic_bank_savdogar
+                cardNumber.replace(" ","").startsWith("986015") -> R.drawable.ic_bank_turon
+                cardNumber.replace(" ","").startsWith("986016") -> R.drawable.ic_bank_hamkor
+                cardNumber.replace(" ","").startsWith("986017") -> R.drawable.ic_bank_ipak
+                cardNumber.replace(" ","").startsWith("986018") -> R.drawable.ic_bank_trast
+                cardNumber.replace(" ","").startsWith("986019") -> R.drawable.ic_bank_aloqa
+                cardNumber.replace(" ","").startsWith("986020") -> R.drawable.ic_bank_kdb
+                cardNumber.replace(" ","").startsWith("986021") -> R.drawable.ic_bank_turkiston
+                cardNumber.replace(" ","").startsWith("986023") -> R.drawable.ic_bank_universal
+                cardNumber.replace(" ","").startsWith("986024") -> R.drawable.ic_bank_ravnaq
+                cardNumber.replace(" ","").startsWith("986025") -> R.drawable.ic_bank_davr
+                cardNumber.replace(" ","").startsWith("986026") -> R.drawable.ic_bank_infin
+                cardNumber.replace(" ","").startsWith("986027") -> R.drawable.ic_bank_ofb
+                cardNumber.replace(" ","").startsWith("986028") -> R.drawable.ic_bank_hi_tech
+                cardNumber.replace(" ","").startsWith("986029") -> R.drawable.ic_bank_ziraat
+                cardNumber.replace(" ","").startsWith("986030") -> R.drawable.ic_bank_saderat
+                cardNumber.replace(" ","").startsWith("986031") -> R.drawable.ic_bank_agroexpo
+                cardNumber.replace(" ","").startsWith("986032") -> R.drawable.ic_bank_madad
+                cardNumber.replace(" ","").startsWith("986033") -> R.drawable.ic_bank_poytaxt
+                cardNumber.replace(" ","").startsWith("986034") -> R.drawable.ic_bank_tenge
+                cardNumber.replace(" ","").startsWith("986035") -> R.drawable.ic_bank_tbc
+                else -> R.drawable.ic_logo_white
+            }
+        }
+
+        fun maskCardNumber(cardNumber: String, mask: String): String {
+
+            // format the number
+            var index = 0
+            val maskedNumber = StringBuilder()
+            for (i in 0 until mask.length) {
+                val c = mask[i]
+                when (c) {
+                    '#' -> {
+                        maskedNumber.append(cardNumber[index])
+                        index++
+                    }
+                    '•' -> {
+                        maskedNumber.append(" $c ")
+                        index++
+                    }
+                    ' '->{
+                        maskedNumber.append(" ")
+                        index++
+                    }
+                    else -> {
+                        maskedNumber.append(c)
                     }
                 }
             }
-            return builder.toString()
+
+            // return the masked number
+            return maskedNumber.toString()
         }
 
-        fun getFormattedPrice(price : Double) : String{
+        fun getFormattedPrice(price: Double) : String{
             val decimalFormat = DecimalFormat("###,###")
-            return decimalFormat.format(price).replace(",",".")
+            return decimalFormat.format(price).replace(",", ".")
         }
 
         fun getRandomIcon() : String{
             val random = Random()
-           return getCarIcon(random.nextInt(350).toFloat()  )
+           return getCarIcon(random.nextInt(350).toFloat())
         }
 
-        fun getCarIcon(rotation : Float) : String{
+        fun getCarIcon(rotation: Float) : String{
             val rotateFormatter = DecimalFormat("#.#")
 
-           return when (abs(rotateFormatter.format(rotation).replace(",",".").toFloat())) {
-                in 0f..2.4f -> "fleet-0"
-                in 2.5f..7.4f -> "fleet-5"
-                in 7.5f..12.4f -> "fleet-10"
-                in 12.5f..17.4f -> "fleet-15"
-                in 17.5f..22.4f -> "fleet-20"
-                in 22.5f..27.4f -> "fleet-25"
-                in 27.5f..32.4f -> "fleet-30"
-                in 32.5f..37.4f -> "fleet-35"
-                in 37.5f..42.4f -> "fleet-40"
-                in 42.5f..47.4f -> "fleet-45"
-                in 47.5f..52.4f -> "fleet-50"
-                in 52.5f..57.4f -> "fleet-55"
-                in 57.5f..62.4f -> "fleet-60"
-                in 62.5f..67.4f -> "fleet-65"
-                in 67.5f..72.4f -> "fleet-70"
-                in 72.5f..77.4f -> "fleet-75"
-                in 77.5f..82.4f -> "fleet-80"
-                in 82.5f..87.4f -> "fleet-85"
-                in 87.5f..92.4f -> "fleet-90"
-                in 92.5f..97.4f -> "fleet-95"
-                in 97.5f..102.4f -> "fleet-100"
-                in 102.5f..107.4f -> "fleet-105"
-                in 107.5f..112.4f -> "fleet-110"
-                in 112.5f..117.4f -> "fleet-115"
-                in 117.5f..122.4f -> "fleet-120"
-                in 122.5f..127.4f -> "fleet-125"
-                in 127.5f..132.4f -> "fleet-130"
-                in 132.5f..137.4f -> "fleet-135"
-                in 137.5f..142.4f -> "fleet-140"
-                in 142.5f..147.4f -> "fleet-145"
-                in 147.5f..152.4f -> "fleet-150"
-                in 152.5f..157.4f -> "fleet-155"
-                in 157.5f..162.4f -> "fleet-160"
-                in 162.5f..167.4f -> "fleet-165"
-                in 167.5f..172.4f -> "fleet-170"
-                in 172.5f..177.4f -> "fleet-175"
-                in 177.5f..182.4f -> "fleet-180"
-                in 182.5f..187.4f -> "fleet-185"
-                in 187.5f..192.4f -> "fleet-190"
-                in 192.5f..197.4f -> "fleet-195"
-                in 197.5f..202.4f -> "fleet-200"
-                in 202.5f..207.4f -> "fleet-205"
-                in 207.5f..212.4f -> "fleet-210"
-                in 212.5f..217.4f -> "fleet-215"
-                in 217.5f..222.4f -> "fleet-220"
-                in 222.5f..227.4f -> "fleet-225"
-                in 227.5f..232.4f -> "fleet-230"
-                in 232.5f..237.4f -> "fleet-235"
-                in 237.5f..242.4f -> "fleet-240"
-                in 242.5f..247.4f -> "fleet-245"
-                in 247.5f..252.4f -> "fleet-250"
-                in 252.5f..257.4f -> "fleet-255"
-                in 257.5f..262.4f -> "fleet-260"
-                in 262.5f..267.4f -> "fleet-265"
-                in 267.5f..272.4f -> "fleet-270"
-                in 272.5f..277.4f -> "fleet-275"
-                in 277.5f..282.4f -> "fleet-280"
-                in 282.5f..287.4f -> "fleet-285"
-                in 287.5f..292.4f -> "fleet-290"
-                in 292.5f..297.4f -> "fleet-295"
-                in 297.5f..302.4f -> "fleet-300"
-                in 302.5f..307.4f -> "fleet-305"
-                in 307.5f..312.4f -> "fleet-310"
-                in 312.5f..317.4f -> "fleet-315"
-                in 317.5f..322.4f -> "fleet-320"
-                in 322.5f..327.4f -> "fleet-325"
-                in 327.5f..332.4f -> "fleet-330"
-                in 332.5f..337.4f -> "fleet-335"
-                in 337.5f..342.4f -> "fleet-340"
-                in 342.5f..347.4f -> "fleet-345"
-                in 347.5f..352.4f -> "fleet-350"
-                in 352.5f..357.4f -> "fleet-355"
-                in 357.5f..360.0f -> "fleet-0"
+           return when (abs(rotateFormatter.format(rotation).replace(",", ".").toFloat())) {
+               in 0f..2.4f -> "fleet-0"
+               in 2.5f..7.4f -> "fleet-5"
+               in 7.5f..12.4f -> "fleet-10"
+               in 12.5f..17.4f -> "fleet-15"
+               in 17.5f..22.4f -> "fleet-20"
+               in 22.5f..27.4f -> "fleet-25"
+               in 27.5f..32.4f -> "fleet-30"
+               in 32.5f..37.4f -> "fleet-35"
+               in 37.5f..42.4f -> "fleet-40"
+               in 42.5f..47.4f -> "fleet-45"
+               in 47.5f..52.4f -> "fleet-50"
+               in 52.5f..57.4f -> "fleet-55"
+               in 57.5f..62.4f -> "fleet-60"
+               in 62.5f..67.4f -> "fleet-65"
+               in 67.5f..72.4f -> "fleet-70"
+               in 72.5f..77.4f -> "fleet-75"
+               in 77.5f..82.4f -> "fleet-80"
+               in 82.5f..87.4f -> "fleet-85"
+               in 87.5f..92.4f -> "fleet-90"
+               in 92.5f..97.4f -> "fleet-95"
+               in 97.5f..102.4f -> "fleet-100"
+               in 102.5f..107.4f -> "fleet-105"
+               in 107.5f..112.4f -> "fleet-110"
+               in 112.5f..117.4f -> "fleet-115"
+               in 117.5f..122.4f -> "fleet-120"
+               in 122.5f..127.4f -> "fleet-125"
+               in 127.5f..132.4f -> "fleet-130"
+               in 132.5f..137.4f -> "fleet-135"
+               in 137.5f..142.4f -> "fleet-140"
+               in 142.5f..147.4f -> "fleet-145"
+               in 147.5f..152.4f -> "fleet-150"
+               in 152.5f..157.4f -> "fleet-155"
+               in 157.5f..162.4f -> "fleet-160"
+               in 162.5f..167.4f -> "fleet-165"
+               in 167.5f..172.4f -> "fleet-170"
+               in 172.5f..177.4f -> "fleet-175"
+               in 177.5f..182.4f -> "fleet-180"
+               in 182.5f..187.4f -> "fleet-185"
+               in 187.5f..192.4f -> "fleet-190"
+               in 192.5f..197.4f -> "fleet-195"
+               in 197.5f..202.4f -> "fleet-200"
+               in 202.5f..207.4f -> "fleet-205"
+               in 207.5f..212.4f -> "fleet-210"
+               in 212.5f..217.4f -> "fleet-215"
+               in 217.5f..222.4f -> "fleet-220"
+               in 222.5f..227.4f -> "fleet-225"
+               in 227.5f..232.4f -> "fleet-230"
+               in 232.5f..237.4f -> "fleet-235"
+               in 237.5f..242.4f -> "fleet-240"
+               in 242.5f..247.4f -> "fleet-245"
+               in 247.5f..252.4f -> "fleet-250"
+               in 252.5f..257.4f -> "fleet-255"
+               in 257.5f..262.4f -> "fleet-260"
+               in 262.5f..267.4f -> "fleet-265"
+               in 267.5f..272.4f -> "fleet-270"
+               in 272.5f..277.4f -> "fleet-275"
+               in 277.5f..282.4f -> "fleet-280"
+               in 282.5f..287.4f -> "fleet-285"
+               in 287.5f..292.4f -> "fleet-290"
+               in 292.5f..297.4f -> "fleet-295"
+               in 297.5f..302.4f -> "fleet-300"
+               in 302.5f..307.4f -> "fleet-305"
+               in 307.5f..312.4f -> "fleet-310"
+               in 312.5f..317.4f -> "fleet-315"
+               in 317.5f..322.4f -> "fleet-320"
+               in 322.5f..327.4f -> "fleet-325"
+               in 327.5f..332.4f -> "fleet-330"
+               in 332.5f..337.4f -> "fleet-335"
+               in 337.5f..342.4f -> "fleet-340"
+               in 342.5f..347.4f -> "fleet-345"
+               in 347.5f..352.4f -> "fleet-350"
+               in 352.5f..357.4f -> "fleet-355"
+               in 357.5f..360.0f -> "fleet-0"
                 else -> ""
             }
         }

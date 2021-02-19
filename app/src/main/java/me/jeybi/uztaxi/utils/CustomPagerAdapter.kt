@@ -1,60 +1,98 @@
-package me.jeybi.uztaxi.utils;
+package me.jeybi.uztaxi.utils
 
-import android.app.Activity;
-import android.view.View;
-
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentPagerAdapter;
-import androidx.viewpager.widget.ViewPager;
-
-import me.jeybi.uztaxi.R;
-
-public class CustomPagerAdapter extends FragmentPagerAdapter implements ViewPager.PageTransformer {
-    public final static float BIG_SCALE = 1.0f;
-    public final static float SMALL_SCALE = 0.7f;
-    public final static float DIFF_SCALE = BIG_SCALE - SMALL_SCALE;
-
-    int PAGES = 5;
-    int FIRST_PAGE = 0;
+import android.view.View
+import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentPagerAdapter
+import androidx.viewpager.widget.ViewPager
+import me.jeybi.uztaxi.R
+import me.jeybi.uztaxi.database.CreditCardEntity
 
 
-    private Activity mContext;
-    private FragmentManager mFragmentManager;
-    private float mScale;
+class CustomPagerAdapter(
+    val fragmentManager: FragmentManager?,
+    val cardData: ArrayList<CreditCardEntity>
+) : FragmentPagerAdapter(fragmentManager!!,BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT ), ViewPager.PageTransformer {
 
-    public CustomPagerAdapter(Activity context, FragmentManager fragmentManager) {
-        super(fragmentManager);
-        this.mFragmentManager = fragmentManager;
-        this.mContext = context;
-    }
+    var PAGES = 4
+    var FIRST_PAGE = 0
+    private var mScale = 0f
 
-    @Override
-    public Fragment getItem(int position) {
-        // make the first mViewPager bigger than others
-        if (position == FIRST_PAGE)
-            mScale = BIG_SCALE;
-        else
-            mScale = SMALL_SCALE;
+    val fragmentsList = ArrayList<CustomFragment>()
 
-        return new CustomFragment(position, mScale);
-    }
-
-    @Override
-    public int getCount() {
-        return PAGES;
-    }
-
-    @Override
-    public void transformPage(View page, float position) {
-        CustomLinearLayout myLinearLayout = (CustomLinearLayout) page.findViewById(R.id.item_root);
-        float scale = BIG_SCALE;
-        if (position > 0) {
-            scale = scale - position * DIFF_SCALE;
-        } else {
-            scale = scale + position * DIFF_SCALE;
+    fun clearAll(){
+        for (frag in fragmentsList){
+            fragmentManager?.beginTransaction()?.remove(frag)?.commit()
         }
-        if (scale < 0) scale = 0;
-        myLinearLayout.setScaleBoth(scale);
+        fragmentsList.clear()
+    }
+
+    override fun getItem(position: Int): Fragment {
+        // make the first mViewPager bigger than others
+        mScale = if (position == FIRST_PAGE) BIG_SCALE else SMALL_SCALE
+
+        var newFragment : CustomFragment? = null
+
+
+
+        if (cardData.size==0){
+            newFragment = CustomFragment(position, mScale, Constants.CARD_TYPE_STYLE, 1000, null)
+        }else{
+            val creditCard = cardData[position]
+
+            newFragment = when (creditCard.cardDesign) {
+                1001 -> {
+                    CustomFragment(position, mScale, Constants.CARD_TYPE_CREATE, 1001, null)
+                }
+                1003 -> {
+                    CustomFragment(position, mScale, Constants.CARD_TYPE_WALLET, 1003, null)
+                }
+                else -> {
+                    CustomFragment(
+                        position,
+                        mScale,
+                        Constants.CARD_TYPE_PLASTIC,
+                        creditCard.cardDesign,
+                        creditCard
+                    )
+                }
+            }
+        }
+
+        fragmentsList.add(position, newFragment)
+        return newFragment
+    }
+
+
+    override fun destroyItem(container: ViewGroup, position: Int, `object`: Any) {
+        super.destroyItem(container, position, `object`)
+    }
+
+    fun getCurentFragment(position: Int) : CustomFragment{
+        return fragmentsList[position]
+    }
+
+
+    override fun getCount(): Int {
+        return if (cardData.size==0) PAGES else cardData.size
+    }
+
+    override fun transformPage(page: View, position: Float) {
+        val myLinearLayout = page.findViewById<View>(R.id.item_root) as CustomConstraintLayout
+        var scale = BIG_SCALE
+        scale = if (position > 0) {
+            scale - position * DIFF_SCALE
+        } else {
+            scale + position * DIFF_SCALE
+        }
+        if (scale < 0) scale = 0f
+        myLinearLayout.setScaleBoth(scale)
+    }
+
+    companion object {
+        const val BIG_SCALE = 1.0f
+        const val SMALL_SCALE = 0.7f
+        const val DIFF_SCALE = BIG_SCALE - SMALL_SCALE
     }
 }

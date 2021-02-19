@@ -23,8 +23,6 @@ class OrderHistoryActivity : BaseActivity() {
 
     val disposables = CompositeDisposable()
 
-    var  HIVE_TOKEN =  ""
-    var HIVE_USER_ID = 0L
 
     override fun onViewDidCreate(savedInstanceState: Bundle?) {
 
@@ -68,6 +66,7 @@ class OrderHistoryActivity : BaseActivity() {
                          if (it.isSuccessful&&it.body()!=null){
                              swipeRefreshLayout.isRefreshing = false
                              recyclerViewOrderHistory.adapter = OrderHistoryAdapter(this,it.body()!!)
+                             recyclerViewOrderHistory.scheduleLayoutAnimation()
                          }
                 },{
 

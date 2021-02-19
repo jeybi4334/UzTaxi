@@ -17,7 +17,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.UzTaxi"
         android:usesCleartextTraffic="true">
-        <activity android:name=".ui.payment.CardsActivity"></activity>
+        <activity android:name=".ui.payment.CreditCardsActivity"></activity>
+        <activity
+            android:name=".ui.payment.AddCardActivity"
+            android:windowSoftInputMode="adjustPan" />
         <activity android:name=".ui.settings.SettingsActivity" />
         <activity
             android:name=".ui.info.InfoActivity"

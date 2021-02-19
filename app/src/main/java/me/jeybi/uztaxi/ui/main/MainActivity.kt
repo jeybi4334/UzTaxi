@@ -129,8 +129,6 @@ class MainActivity : BaseActivity(), MainController.view,
 
     var ORDER_STATE = Constants.ORDER_STATE_NOT_CREATED
 
-    var HIVE_TOKEN: String = ""
-    var HIVE_USER_ID: Long = 0
 
     val IMAGE_ID = "image-taxi-car"
 
@@ -163,8 +161,7 @@ class MainActivity : BaseActivity(), MainController.view,
 
     override fun onViewDidCreate(savedInstanceState: Bundle?) {
         presenter = MainPresenter(this)
-        HIVE_TOKEN = sharedPreferences.getString(Constants.HIVE_USER_TOKEN, "") ?: ""
-        HIVE_USER_ID = sharedPreferences.getLong(Constants.HIVE_USER_ID, 0)
+
 
         mLocationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager?
         presenter.checkIfAuthenticated()

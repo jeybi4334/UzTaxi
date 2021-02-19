@@ -4,17 +4,20 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.util.AttributeSet;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 import static me.jeybi.uztaxi.utils.CustomPagerAdapter.BIG_SCALE;
 
-public class CustomLinearLayout extends LinearLayout {
+public class CustomConstraintLayout extends ConstraintLayout {
     private float mScale = BIG_SCALE;
 
-    public CustomLinearLayout(Context context, AttributeSet attrs) {
+    public CustomConstraintLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public CustomLinearLayout(Context context) {
+    public CustomConstraintLayout(Context context) {
         super(context);
     }
 
