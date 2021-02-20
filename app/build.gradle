@@ -93,6 +93,8 @@ dependencies {
     //// SHIMMER TEXTVIEW
     implementation 'com.romainpiel.shimmer:library:1.4.0@aar'
 
+    implementation 'com.google.android:flexbox:2.0.1'
+
     ///// FIREBASE
     implementation platform('com.google.firebase:firebase-bom:26.2.0')
     implementation 'com.google.firebase:firebase-firestore-ktx'

@@ -2565,10 +2565,10 @@ class MainActivity : BaseActivity(), MainController.view,
                             ).observeOn(AndroidSchedulers.mainThread())
                             .subscribeOn(Schedulers.io())
                             .subscribe({
-                                Log.d("DSADASASa","ADDED ADRESS")
+                                if(searchCancelListener!=null&&searchCancelListener is SearchFragment)
+                                (searchCancelListener as SearchFragment).loadSavedAdresses()
                                 dialog.dismiss()
                             },{
-                                Log.d("DSADASASa","CANCEL ${it}")
                             })
                     )
                 }

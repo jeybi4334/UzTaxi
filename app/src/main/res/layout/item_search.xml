@@ -13,7 +13,7 @@
         android:layout_height="32dp"
         android:padding="10dp"
         android:alpha="0.7"
-        android:layout_marginStart="16dp"
+        android:layout_marginStart="4dp"
         android:src="@drawable/icon_start"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"

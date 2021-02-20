@@ -4,26 +4,27 @@ import android.graphics.Color
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.KeyEvent
 import android.view.View
-import android.view.animation.AccelerateInterpolator
 import android.view.inputmethod.EditorInfo
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.flexbox.*
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.bottom_sheet_search.*
 import me.jeybi.uztaxi.R
+import me.jeybi.uztaxi.UzTaxiApplication
 import me.jeybi.uztaxi.model.*
 import me.jeybi.uztaxi.network.RetrofitHelper
 import me.jeybi.uztaxi.ui.BaseFragment
+import me.jeybi.uztaxi.ui.adapters.AddressAdapter
 import me.jeybi.uztaxi.ui.adapters.SearchAdapter
 import me.jeybi.uztaxi.ui.main.MainActivity
 import me.jeybi.uztaxi.ui.main.MainController
 import me.jeybi.uztaxi.utils.Constants
-import me.jeybi.uztaxi.utils.NaiveHmacSigner
+
 
 class SearchFragment : BaseFragment(), SearchAdapter.SearchItemClickListener,
     MainController.SearchCancelListener {
@@ -37,23 +38,20 @@ class SearchFragment : BaseFragment(), SearchAdapter.SearchItemClickListener,
 
     override fun onViewDidCreate(savedInstanceState: Bundle?) {
 
-        recyclerViewSearchHistory.layoutManager = LinearLayoutManager(activity)
-
-        loadOrdersHistory()
-
         rvWhereTo.setOnClickListener {
             editTextSearch.isFocusable = true
             editTextSearch.isFocusableInTouchMode = true
             editTextSearch.requestFocus()
             editTextSearch.setHintTextColor(Color.parseColor("#D6CAD9"))
             (activity as MainActivity).onSearchClicked(this)
-            rvFromWhere.visibility = View.VISIBLE
-            editTextFromWhere.setText((activity as MainActivity).CURRENT_ADDRESS)
-            editTextFromWhere.isFocusable = true
-            editTextFromWhere.isFocusableInTouchMode = true
+//            rvFromWhere.visibility = View.VISIBLE
+//            editTextFromWhere.setText((activity as MainActivity).CURRENT_ADDRESS)
+//            editTextFromWhere.isFocusable = true
+//            editTextFromWhere.isFocusableInTouchMode = true
 
         }
 
+        loadSavedAdresses()
 
         rvDelivery.setOnClickListener {
 
@@ -72,6 +70,8 @@ class SearchFragment : BaseFragment(), SearchAdapter.SearchItemClickListener,
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 if (count > 1 && s != null) {
                     searchGeocode(s.toString())
+                } else {
+                    loadSavedAdresses()
                 }
             }
 
@@ -105,48 +105,38 @@ class SearchFragment : BaseFragment(), SearchAdapter.SearchItemClickListener,
 
     }
 
-    private fun loadOrdersHistory() {
+    fun loadSavedAdresses() {
+        textViewNoAddress.visibility = View.GONE
+        progressBarSearch.visibility = View.GONE
+        (activity as MainActivity).mainDisposables
+            .add(
+                (activity!!.application as UzTaxiApplication).uzTaxiDatabase
+                    .getAddressDAO().getAddresses()
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeOn(Schedulers.io())
+                    .subscribe({
 
-        progressBarSearch.visibility = View.VISIBLE
-        searchDisposables.add(
-            RetrofitHelper.apiService(Constants.BASE_URL)
-                .getAddressHistory(
-                    (activity as MainActivity).getCurrentLanguage().toLanguageTag(),
-                    Constants.HIVE_PROFILE,
-                    NaiveHmacSigner.DateSignature(),
-                    NaiveHmacSigner.AuthSignature(
-                        (activity as MainActivity).HIVE_USER_ID,
-                        (activity as MainActivity).HIVE_TOKEN,
-                        "GET",
-                        "/api/client/mobile/2.0/history"
-                    )
-                )
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
-                .subscribe({
-                    if (it.isSuccessful&&it.body()!=null) {
-                        textViewNoAddress.visibility = View.GONE
 
-                        val geocodes = ArrayList<GeocodeFeature>()
-                        for (item in it.body()!!){
-                            if (item.route.size>1){
-                                val geocodeFeature = GeocodeFeature("", Geometry("", arrayListOf(item.route[1].position!!.lon,item.route[1].position!!.lat)),
-                                    GeocodeProperty("","",item.route[1].name,null,null,null,null,null)
-                                )
-                                geocodes.add(geocodeFeature)
-                            }
+                        val flexboxLayoutManager = FlexboxLayoutManager(activity).apply {
+                            flexWrap = FlexWrap.WRAP
+                            flexDirection = FlexDirection.ROW
+                            alignItems = AlignItems.STRETCH
                         }
 
-                        recyclerViewSearchHistory.adapter = SearchAdapter(activity!!,geocodes,this)
-                    }
-                    progressBarSearch.visibility = View.GONE
-//                    textViewNoAddress.visibility = View.GONE
-                }, {
-                    progressBarSearch.visibility = View.GONE
-//                    textViewNoAddress.visibility = View.GONE
-                })
-        )
 
+                        recyclerViewSearchHistory.layoutManager = flexboxLayoutManager
+
+
+//                        recyclerViewSearchHistory.layoutManager = StaggeredGridLayoutManager(
+//                            2,
+//                            StaggeredGridLayoutManager.VERTICAL
+//                        )
+
+                        recyclerViewSearchHistory.adapter = AddressAdapter(it)
+                    }, {
+
+                    })
+            )
     }
 
     private fun searchGeocode(keyWord: String) {
@@ -174,9 +164,18 @@ class SearchFragment : BaseFragment(), SearchAdapter.SearchItemClickListener,
                 .subscribe({
                     when (it.code()) {
                         Constants.STATUS_SUCCESSFUL -> {
-                            if (it.body() != null ) {
+                            if (it.body() != null) {
                                 progressBarSearch.visibility = View.GONE
-                                recyclerViewSearchHistory.adapter = SearchAdapter(activity!!,it.body()!!.features, this)
+                                recyclerViewSearchHistory.layoutManager = LinearLayoutManager(
+                                    activity,
+                                    LinearLayoutManager.VERTICAL,
+                                    false
+                                )
+                                recyclerViewSearchHistory.adapter = SearchAdapter(
+                                    activity!!,
+                                    it.body()!!.features,
+                                    this
+                                )
                             } else {
                                 onCouldntFindAnything()
                             }
@@ -214,18 +213,18 @@ class SearchFragment : BaseFragment(), SearchAdapter.SearchItemClickListener,
     }
 
     override fun onSearchCancel() {
-        rvFromWhere.visibility = View.GONE
-        editTextFromWhere.setText("")
-        (activity as MainActivity).hideKeyboard()
-        editTextFromWhere.isFocusable = false
-        editTextFromWhere.isFocusableInTouchMode = false
+//        rvFromWhere.visibility = View.GONE
+//        editTextFromWhere.setText("")
+//        (activity as MainActivity).hideKeyboard()
+//        editTextFromWhere.isFocusable = false
+//        editTextFromWhere.isFocusableInTouchMode = false
     }
 
     override fun onSearchStart() {
-        rvFromWhere.visibility = View.VISIBLE
-        editTextFromWhere.setText((activity as MainActivity).CURRENT_ADDRESS)
-        editTextFromWhere.isFocusable = true
-        editTextFromWhere.isFocusableInTouchMode = true
+//        rvFromWhere.visibility = View.VISIBLE
+//        editTextFromWhere.setText((activity as MainActivity).CURRENT_ADDRESS)
+//        editTextFromWhere.isFocusable = true
+//        editTextFromWhere.isFocusableInTouchMode = true
     }
 
 
