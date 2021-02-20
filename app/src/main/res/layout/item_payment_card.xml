@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="56dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:background="?attr/selectableItemBackground"
+    android:id="@+id/parentPaymentMethod"
+    >
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardPaymentMethod"
+        android:visibility="visible"
+        android:layout_width="42dp"
+        android:layout_height="28dp"
+        app:cardCornerRadius="4dp"
+        android:layout_marginStart="12dp"
+        >
+
+        <RelativeLayout
+            android:id="@+id/rvCardPayment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/ic_card_type_1"
+            />
+
+
+    </com.google.android.material.card.MaterialCardView>
+
+  <LinearLayout
+      android:layout_width="0dp"
+      android:layout_weight="1"
+      android:layout_height="match_parent"
+      android:orientation="vertical"
+      android:gravity="center"
+      >
+
+      <TextView
+          android:id="@+id/textViewCardName"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:text="UzCard"
+          android:textSize="16sp"
+          android:textColor="#303030"
+          android:fontFamily="@font/g_semi_bold"
+          android:gravity="start"
+          android:ellipsize="end"
+          android:maxLines="1"
+          android:layout_marginStart="12dp"
+          />
+
+      <TextView
+          android:id="@+id/textViewCarNum"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:text="• • • 4334"
+          android:textSize="14sp"
+          android:textColor="#C6C4CA"
+          android:fontFamily="@font/g_semi_bold"
+          android:gravity="start"
+          android:ellipsize="end"
+          android:maxLines="1"
+          android:layout_marginStart="12dp"
+          />
+
+
+  </LinearLayout>
+
+    <ImageView
+        android:id="@+id/imageViewDone"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginEnd="8dp"
+        android:src="@drawable/ic_done"
+        android:padding="12dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:clickable="true"
+        />
+
+</LinearLayout>

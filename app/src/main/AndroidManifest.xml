@@ -17,7 +17,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.UzTaxi"
         android:usesCleartextTraffic="true">
-        <activity android:name=".ui.payment.CreditCardsActivity"></activity>
+
+        <activity android:name=".ui.payment.CreditCardsActivity"
+            >
+
+        </activity>
         <activity
             android:name=".ui.payment.AddCardActivity"
             android:windowSoftInputMode="adjustPan" />
@@ -27,7 +31,9 @@
             android:label="@string/title_activity_info"
             android:theme="@style/Theme.UzTaxi.NoActionBar" />
         <activity android:name=".ui.history.OrderHistoryActivity" />
-        <activity android:name=".ui.address.AddressActivity" />
+        <activity android:name=".ui.address.AddAddressActivity"
+            android:windowSoftInputMode="adjustPan"
+            />
         <activity
             android:name=".ui.auth.AuthenticationActivity"
             android:windowSoftInputMode="stateVisible|adjustResize" />

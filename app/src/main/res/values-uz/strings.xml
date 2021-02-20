@@ -34,6 +34,7 @@
     <string name="intro_4_content">Safaringiz uchun bonuslarga ega bo\'ling va bonuslarni to\'lov o\'rnida foydalaning.</string>
     <string name="couldnot_find_anything">So\'rovingiz bo\'yicha xech qanday ma\'lumot topilmadi:(</string>
     <string name="cash">Naqd</string>
+    <string name="pay_cash">Naqd to\'lov</string>
     <string name="minimum_bonus_to_use">Bonusdan foydalanishning eng kam miqdori: 1000 so\'m.</string>
     <string name="not_enough_bonus">Hisobingizdagi mablag\' yetarli emas</string>
     <string name="clarifying_address">manzil aniqlanmoqda…</string>

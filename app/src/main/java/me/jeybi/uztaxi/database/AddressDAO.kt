@@ -20,9 +20,9 @@ interface AddressDAO {
     fun getAddresses(): Single<List<AddressEntity>>
 
     @Delete
-    fun deleteCar(addressEntity: AddressEntity) : Completable
+    fun deleteAddress(addressEntity: AddressEntity) : Completable
 
     @Update
-    fun updateCar(addressEntity: AddressEntity)
+    fun updateAddress(addressEntity: AddressEntity)
 
 }

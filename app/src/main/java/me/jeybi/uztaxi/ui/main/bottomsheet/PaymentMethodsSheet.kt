@@ -45,12 +45,9 @@ class PaymentMethodsSheet(val paymentMethods : ArrayList<PaymentMethod>) : Botto
 
         for (paymentMethod in paymentMethods){
             val itemView = LayoutInflater.from(view.context).inflate(R.layout.item_payment_method,linearParent,false)
+
             if (paymentMethod.kind=="cash") {
-                itemView.findViewById<TextView>(R.id.textViewPaymentType).text = getString(R.string.cash)
-                itemView.findViewById<ImageView>(R.id.imageViewPaymentMethod).setImageResource(R.drawable.ic_cash)
-            }else{
-                itemView.findViewById<TextView>(R.id.textViewPaymentType).text = paymentMethod.kind
-                itemView.findViewById<ImageView>(R.id.imageViewPaymentMethod).setImageResource(R.drawable.uzcard)
+//                itemView.findViewById<TextView>(R.id.textViewPaymentType).text = getString(R.string.pay_cash)
             }
 
             itemView.findViewById<LinearLayout>(R.id.parentPaymentMethod).setOnClickListener {
@@ -70,11 +67,11 @@ class PaymentMethodsSheet(val paymentMethods : ArrayList<PaymentMethod>) : Botto
                 .subscribeOn(Schedulers.io())
                 .subscribe({
                            for (card in it){
-                               val itemView = LayoutInflater.from(activity).inflate(R.layout.item_payment_method,linearParent,false)
-                               itemView.findViewById<TextView>(R.id.textViewPaymentType).text = Constants.maskCardNumber(card.cardNumber,"#### •••• •••• ####")
+                               val itemView = LayoutInflater.from(activity).inflate(R.layout.item_payment_card,linearParent,false)
+
+                               itemView.findViewById<TextView>(R.id.textViewCardName).text = card.cardName
+                               itemView.findViewById<TextView>(R.id.textViewCarNum).text = Constants.maskCardNumber(card.cardNumber,"#### •••• •••• ####")
                                itemView.findViewById<ImageView>(R.id.imageViewDone).visibility = View.GONE
-                               itemView.findViewById<ImageView>(R.id.imageViewPaymentMethod).visibility = View.GONE
-                               itemView.findViewById<MaterialCardView>(R.id.cardPaymentMethod).visibility = View.VISIBLE
 
 
 

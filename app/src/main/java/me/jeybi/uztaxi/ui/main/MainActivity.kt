@@ -20,6 +20,8 @@ import android.location.LocationListener
 import android.location.LocationManager
 import android.net.Uri
 import android.os.Bundle
+import android.os.StrictMode
+import android.os.StrictMode.VmPolicy
 import android.provider.Settings
 import android.util.Log
 import android.view.LayoutInflater
@@ -42,6 +44,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.LottieDrawable
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.firebase.messaging.FirebaseMessaging
 import com.mapbox.android.gestures.MoveGestureDetector
 import com.mapbox.geojson.*
@@ -57,6 +60,7 @@ import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.plugins.localization.LocalizationPlugin
 import com.mapbox.mapboxsdk.plugins.localization.MapLocale
+import com.mapbox.mapboxsdk.snapshotter.MapSnapshotter
 import com.mapbox.mapboxsdk.style.expressions.Expression.*
 import com.mapbox.mapboxsdk.style.layers.*
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory.*
@@ -83,6 +87,8 @@ import kotlinx.android.synthetic.main.bottom_sheet_where.*
 import kotlinx.android.synthetic.main.bottomsheet_map.*
 import kotlinx.android.synthetic.main.item_search.*
 import me.jeybi.uztaxi.R
+import me.jeybi.uztaxi.UzTaxiApplication
+import me.jeybi.uztaxi.database.AddressEntity
 import me.jeybi.uztaxi.model.*
 import me.jeybi.uztaxi.network.RetrofitHelper
 import me.jeybi.uztaxi.ui.BaseActivity
@@ -260,6 +266,9 @@ class MainActivity : BaseActivity(), MainController.view,
                 setUpSocketForDrivers()
                 val localizationPlugin = LocalizationPlugin(mapView!!, mapboxMap, it)
 
+                val builder = VmPolicy.Builder()
+                StrictMode.setVmPolicy(builder.build())
+
                 try {
 
                     localizationPlugin.setMapLanguage(
@@ -420,7 +429,7 @@ class MainActivity : BaseActivity(), MainController.view,
                     rvReady.isClickable = false
                     rvReady.setBackgroundResource(R.drawable.bc_button_purple_disabled)
 
-                    if (CURRENT_MODE == Constants.MODE_SEARCH_WHERE || CURRENT_MODE == Constants.MODE_DESTINATION_PICK || CURRENT_MODE==Constants.MODE_DESTINATION_PICK_STOP || CURRENT_MODE==Constants.MODE_DESTINATION_PICK_EDIT) {
+                    if (CURRENT_MODE == Constants.MODE_SEARCH_WHERE || CURRENT_MODE == Constants.MODE_DESTINATION_PICK || CURRENT_MODE == Constants.MODE_DESTINATION_PICK_STOP || CURRENT_MODE == Constants.MODE_DESTINATION_PICK_EDIT) {
                         rotatePointerRectangleAnimation()
                         imageViewCloudTop.animate().translationY(-200f).alpha(0.6f)
                             .setInterpolator(AccelerateInterpolator()).setDuration(800).start()
@@ -528,7 +537,7 @@ class MainActivity : BaseActivity(), MainController.view,
                     val mapLat = mapLatLng.latitude
                     val mapLong = mapLatLng.longitude
 
-                    if (CURRENT_MODE == Constants.MODE_SEARCH_WHERE || CURRENT_MODE == Constants.MODE_DESTINATION_PICK || CURRENT_MODE == Constants.MODE_DESTINATION_PICK_STOP || CURRENT_MODE == Constants.MODE_DESTINATION_PICK_ADDRESS|| CURRENT_MODE == Constants.MODE_DESTINATION_PICK_EDIT)
+                    if (CURRENT_MODE == Constants.MODE_SEARCH_WHERE || CURRENT_MODE == Constants.MODE_DESTINATION_PICK || CURRENT_MODE == Constants.MODE_DESTINATION_PICK_STOP || CURRENT_MODE == Constants.MODE_DESTINATION_PICK_ADDRESS || CURRENT_MODE == Constants.MODE_DESTINATION_PICK_EDIT)
 //                        mainDisposables.add(presenter.findCurrentAddress(mapLat, mapLong))
                         mainDisposables.add(presenter.reverseGeocode(mapLat, mapLong))
 
@@ -558,8 +567,6 @@ class MainActivity : BaseActivity(), MainController.view,
 //                                    "through"
 //                                )
 //                            )
-
-
 
 
 //                            ROUTE_LIST.add(
@@ -719,7 +726,7 @@ class MainActivity : BaseActivity(), MainController.view,
 
                         carsList.add(car)
                     }
-                        if (carsList.size>0)
+                    if (carsList.size > 0)
                         onCarsAvailabe(carsList)
 
 
@@ -880,10 +887,22 @@ class MainActivity : BaseActivity(), MainController.view,
 //                        )
 //                    )
 
-                    ROUTE_DATA.add(RouteItem(false,shortOrderInfo.route[0].name,shortOrderInfo.route[0].position!!.lat,
-                        shortOrderInfo.route[0].position!!.lon))
-                    ROUTE_DATA.add(RouteItem(false,shortOrderInfo.route[1].name,shortOrderInfo.route[1].position!!.lat,
-                        shortOrderInfo.route[1].position!!.lon))
+                    ROUTE_DATA.add(
+                        RouteItem(
+                            false,
+                            shortOrderInfo.route[0].name,
+                            shortOrderInfo.route[0].position!!.lat,
+                            shortOrderInfo.route[0].position!!.lon
+                        )
+                    )
+                    ROUTE_DATA.add(
+                        RouteItem(
+                            false,
+                            shortOrderInfo.route[1].name,
+                            shortOrderInfo.route[1].position!!.lat,
+                            shortOrderInfo.route[1].position!!.lon
+                        )
+                    )
 
 //                    ROUTE_LIST.add(
 //                        RouteCoordinates(
@@ -895,8 +914,14 @@ class MainActivity : BaseActivity(), MainController.view,
 
                     var routeToDraw = ArrayList<RouteCoordinates>()
 
-                    for (rot in shortOrderInfo.route){
-                        routeToDraw.add(RouteCoordinates(rot.position!!.lat,rot.position.lon,"through"))
+                    for (rot in shortOrderInfo.route) {
+                        routeToDraw.add(
+                            RouteCoordinates(
+                                rot.position!!.lat,
+                                rot.position.lon,
+                                "through"
+                            )
+                        )
                     }
 
                     mainDisposables.add(
@@ -1020,8 +1045,14 @@ class MainActivity : BaseActivity(), MainController.view,
 
                 var routeToDraw = ArrayList<RouteCoordinates>()
 
-                for (rot in orderInfo.route){
-                    routeToDraw.add(RouteCoordinates(rot.address.position!!.lat,rot.address.position.lon,"through"))
+                for (rot in orderInfo.route) {
+                    routeToDraw.add(
+                        RouteCoordinates(
+                            rot.address.position!!.lat,
+                            rot.address.position.lon,
+                            "through"
+                        )
+                    )
                 }
 
 
@@ -1239,7 +1270,7 @@ class MainActivity : BaseActivity(), MainController.view,
     }
 
     override fun onDestinationPickClicked(action: Int) {
-        showDestinationPickPage(action,0.0,0.0)
+        showDestinationPickPage(action, 0.0, 0.0)
     }
 
 
@@ -1268,7 +1299,7 @@ class MainActivity : BaseActivity(), MainController.view,
         AddresSearchFragment().show(supportFragmentManager, "searchStopPoint")
     }
 
-    override  fun onChangeRouteLocationClicked(lat : Double,lon : Double){
+    override  fun onChangeRouteLocationClicked(lat: Double, lon: Double){
         val position = CameraPosition.Builder()
             .target(LatLng(lat, lon))
             .zoom(16.0)
@@ -1277,21 +1308,28 @@ class MainActivity : BaseActivity(), MainController.view,
 
         mapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(position))
 
-        showDestinationPickPage(Constants.DESTINATION_PICK_EDIT,lat,lon)
+        showDestinationPickPage(Constants.DESTINATION_PICK_EDIT, lat, lon)
     }
-    override fun onRemoveRouteClicked(lat:Double,lon :Double,position: Int,removedItem : RouteItem){
+    override fun onRemoveRouteClicked(
+        lat: Double,
+        lon: Double,
+        position: Int,
+        removedItem: RouteItem
+    ){
         ROUTE_DATA.remove(removedItem)
 
-        imageViewCloudTop.animate().scaleY(8f).setDuration(400).setInterpolator(AccelerateInterpolator()).start()
+        imageViewCloudTop.animate().scaleY(8f).setDuration(400).setInterpolator(
+            AccelerateInterpolator()
+        ).start()
         textViewDrawingAddress.visibility = View.VISIBLE
         shimmer.start(textViewDrawingAddress)
 
         val routeToDraw = ArrayList<RouteCoordinates>()
         val routePoints =  ArrayList<RouteItem>()
         routePoints.addAll(ROUTE_DATA)
-        routePoints.add(0,RouteItem(false,START_POINT_NAME,START_POINT_LAT,START_POINT_LON))
+        routePoints.add(0, RouteItem(false, START_POINT_NAME, START_POINT_LAT, START_POINT_LON))
         for (rot in routePoints){
-            routeToDraw.add(RouteCoordinates(rot.lat,rot.lon,"through"))
+            routeToDraw.add(RouteCoordinates(rot.lat, rot.lon, "through"))
         }
 
         mainDisposables.add(
@@ -1306,7 +1344,9 @@ class MainActivity : BaseActivity(), MainController.view,
 
     override fun drawRoute(route: ArrayList<Point>) {
 
-        imageViewCloudTop.animate().scaleY(1f).setDuration(400).setInterpolator(AccelerateInterpolator()).start()
+        imageViewCloudTop.animate().scaleY(1f).setDuration(400).setInterpolator(
+            AccelerateInterpolator()
+        ).start()
         textViewDrawingAddress.visibility = View.GONE
         shimmer.cancel()
 
@@ -1326,7 +1366,7 @@ class MainActivity : BaseActivity(), MainController.view,
 
             recyclerViewRoute.layoutManager = LinearLayoutManager(this)
 
-            recyclerViewRoute.adapter = RouteAdapter(ROUTE_DATA,this,this)
+            recyclerViewRoute.adapter = RouteAdapter(ROUTE_DATA, this, this)
             itemTouchHelper.attachToRecyclerView(recyclerViewRoute)
 
 
@@ -1459,7 +1499,7 @@ class MainActivity : BaseActivity(), MainController.view,
 
             val routePoints =  ArrayList<RouteItem>()
             routePoints.addAll(ROUTE_DATA)
-            routePoints.add(0,RouteItem(false,START_POINT_NAME,START_POINT_LAT,START_POINT_LON))
+            routePoints.add(0, RouteItem(false, START_POINT_NAME, START_POINT_LAT, START_POINT_LON))
 
             for ((counter, rot) in routePoints.withIndex()){
                 if (counter!=0&&counter!=routePoints.size-1){
@@ -1778,7 +1818,7 @@ class MainActivity : BaseActivity(), MainController.view,
 
     }
 
-    fun showDestinationPickPage(action: Int,lat : Double,lon : Double) {
+    fun showDestinationPickPage(action: Int, lat: Double, lon: Double) {
         END_POINT_NAME = ""
         rvReady.isClickable = false
         rvReady.setBackgroundResource(R.drawable.bc_button_purple_disabled)
@@ -1815,7 +1855,7 @@ class MainActivity : BaseActivity(), MainController.view,
             Constants.DESTINATION_PICK_ADDRESS -> {
                 CURRENT_MODE = Constants.MODE_DESTINATION_PICK_ADDRESS
             }
-            Constants.DESTINATION_PICK_EDIT->{
+            Constants.DESTINATION_PICK_EDIT -> {
                 CURRENT_MODE = Constants.MODE_DESTINATION_PICK_EDIT
             }
 
@@ -1850,15 +1890,22 @@ class MainActivity : BaseActivity(), MainController.view,
 
                 Constants.DESTINATION_PICK_ORDEDR -> {
 //                    ROUTE_DATA.add(RouteItem(false,END_POINT_NAME,END_POINT_LAT,END_POINT_LON))
-                    ROUTE_DATA.add(RouteItem(false,END_POINT_NAME,END_POINT_LAT,END_POINT_LON))
+                    ROUTE_DATA.add(RouteItem(false, END_POINT_NAME, END_POINT_LAT, END_POINT_LON))
                     if (progressReady.visibility != View.VISIBLE) {
 
                         val routeToDraw = ArrayList<RouteCoordinates>()
-                       val routePoints =  ArrayList<RouteItem>()
+                        val routePoints = ArrayList<RouteItem>()
                         routePoints.addAll(ROUTE_DATA)
-                        routePoints.add(0,RouteItem(false,START_POINT_NAME,START_POINT_LAT,START_POINT_LON))
-                        for (rot in routePoints){
-                            routeToDraw.add(RouteCoordinates(rot.lat,rot.lon,"through"))
+                        routePoints.add(
+                            0, RouteItem(
+                                false,
+                                START_POINT_NAME,
+                                START_POINT_LAT,
+                                START_POINT_LON
+                            )
+                        )
+                        for (rot in routePoints) {
+                            routeToDraw.add(RouteCoordinates(rot.lat, rot.lon, "through"))
                         }
 
                         textReady.visibility = View.GONE
@@ -1874,7 +1921,7 @@ class MainActivity : BaseActivity(), MainController.view,
                 }
 
                 Constants.DESTINATION_PICK_STOP -> {
-                    ROUTE_DATA.add(RouteItem(false,END_POINT_NAME,END_POINT_LAT,END_POINT_LON))
+                    ROUTE_DATA.add(RouteItem(false, END_POINT_NAME, END_POINT_LAT, END_POINT_LON))
 
                     recyclerViewRoute.adapter?.notifyDataSetChanged()
 
@@ -1884,11 +1931,18 @@ class MainActivity : BaseActivity(), MainController.view,
 
                         val routeToDraw = ArrayList<RouteCoordinates>()
 
-                        val routePoints =  ArrayList<RouteItem>()
+                        val routePoints = ArrayList<RouteItem>()
                         routePoints.addAll(ROUTE_DATA)
-                        routePoints.add(0,RouteItem(false,START_POINT_NAME,START_POINT_LAT,START_POINT_LON))
-                        for (rot in routePoints){
-                            routeToDraw.add(RouteCoordinates(rot.lat,rot.lon,"through"))
+                        routePoints.add(
+                            0, RouteItem(
+                                false,
+                                START_POINT_NAME,
+                                START_POINT_LAT,
+                                START_POINT_LON
+                            )
+                        )
+                        for (rot in routePoints) {
+                            routeToDraw.add(RouteCoordinates(rot.lat, rot.lon, "through"))
                         }
 
                         mainDisposables.add(
@@ -1901,16 +1955,17 @@ class MainActivity : BaseActivity(), MainController.view,
                     }
 
                 }
-                Constants.DESTINATION_PICK_EDIT->{
+                Constants.DESTINATION_PICK_EDIT -> {
                     var REMOVE_INDEX = 0
-                    for ((index,rot) in ROUTE_DATA.withIndex()){
-                        if(rot.lat==lat&&rot.lon==lon){
-                            REMOVE_INDEX= index
+                    for ((index, rot) in ROUTE_DATA.withIndex()) {
+                        if (rot.lat == lat && rot.lon == lon) {
+                            REMOVE_INDEX = index
                         }
                     }
                     ROUTE_DATA.removeAt(REMOVE_INDEX)
-                    ROUTE_DATA.add(REMOVE_INDEX,
-                        RouteItem(false,EDIT_POINT_NAME,EDIT_POINT_LAT,EDIT_POINT_LON)
+                    ROUTE_DATA.add(
+                        REMOVE_INDEX,
+                        RouteItem(false, EDIT_POINT_NAME, EDIT_POINT_LAT, EDIT_POINT_LON)
                     )
                     recyclerViewRoute.adapter?.notifyDataSetChanged()
 
@@ -1920,11 +1975,18 @@ class MainActivity : BaseActivity(), MainController.view,
 
                         val routeToDraw = ArrayList<RouteCoordinates>()
 
-                        val routePoints =  ArrayList<RouteItem>()
+                        val routePoints = ArrayList<RouteItem>()
                         routePoints.addAll(ROUTE_DATA)
-                        routePoints.add(0,RouteItem(false,START_POINT_NAME,START_POINT_LAT,START_POINT_LON))
-                        for (rot in routePoints){
-                            routeToDraw.add(RouteCoordinates(rot.lat,rot.lon,"through"))
+                        routePoints.add(
+                            0, RouteItem(
+                                false,
+                                START_POINT_NAME,
+                                START_POINT_LAT,
+                                START_POINT_LON
+                            )
+                        )
+                        for (rot in routePoints) {
+                            routeToDraw.add(RouteCoordinates(rot.lat, rot.lon, "through"))
                         }
 
                         mainDisposables.add(
@@ -2411,7 +2473,7 @@ class MainActivity : BaseActivity(), MainController.view,
 
         if (!MAP_MOVING) {
             pointerRectangle.animate().scaleY(3f).scaleX(3f)
-                .setListener(object  : Animator.AnimatorListener{
+                .setListener(object : Animator.AnimatorListener {
                     override fun onAnimationStart(animation: Animator?) {
 
                     }
@@ -2480,7 +2542,40 @@ class MainActivity : BaseActivity(), MainController.view,
 
 
     override fun onAddAddressClicked() {
-        AddresSearchFragment().show(supportFragmentManager, "add_address")
+
+        val width = 380
+        val height = 380
+
+        val options = MapSnapshotter.Options(width, height)
+            .withStyle(mapBoxStyle.uri)
+            .withCameraPosition(mapboxMap.cameraPosition)
+            .withPixelRatio(2f)
+        MapSnapshotter(this, options).start { snapshot ->
+            AddAddressSheet(snapshot.bitmap,object : AddAddressSheet.OnAddressAddListener{
+                override fun onAddClicked(addressName: String, alias: Int, instuctions: String,dialog : BottomSheetDialogFragment) {
+                    mainDisposables.add(
+                        (application as UzTaxiApplication).uzTaxiDatabase
+                            .getAddressDAO().insertAddress(
+                                AddressEntity(
+                                    0,
+                                    START_POINT_LAT,
+                                    START_POINT_LON,
+                                    addressName,alias,"",instuctions
+                                )
+                            ).observeOn(AndroidSchedulers.mainThread())
+                            .subscribeOn(Schedulers.io())
+                            .subscribe({
+                                Log.d("DSADASASa","ADDED ADRESS")
+                                dialog.dismiss()
+                            },{
+                                Log.d("DSADASASa","CANCEL ${it}")
+                            })
+                    )
+                }
+            }).show(supportFragmentManager, "addaddress")
+        }
+
+
     }
 
     override fun onBottomSheetSearchItemClicked(
@@ -2492,15 +2587,15 @@ class MainActivity : BaseActivity(), MainController.view,
         END_POINT_LAT = latitude
         END_POINT_LON = longitude
 
-        ROUTE_DATA.add(RouteItem(false,title,latitude,longitude))
+        ROUTE_DATA.add(RouteItem(false, title, latitude, longitude))
 
         val routeToDraw = ArrayList<RouteCoordinates>()
 
         val routePoints =  ArrayList<RouteItem>()
         routePoints.addAll(ROUTE_DATA)
-        routePoints.add(0,RouteItem(false,START_POINT_NAME,START_POINT_LAT,START_POINT_LON))
+        routePoints.add(0, RouteItem(false, START_POINT_NAME, START_POINT_LAT, START_POINT_LON))
         for (rot in routePoints){
-            routeToDraw.add(RouteCoordinates(rot.lat,rot.lon,"through"))
+            routeToDraw.add(RouteCoordinates(rot.lat, rot.lon, "through"))
         }
 
         mainDisposables.add(
@@ -2603,7 +2698,7 @@ class MainActivity : BaseActivity(), MainController.view,
 //                ROUTE_DATA.add(RouteItem(false,END_POINT_NAME,END_POINT_LAT,END_POINT_LON))
 //                textViewDestination.text = END_POINT_NAME
             }
-            Constants.MODE_DESTINATION_PICK_EDIT->{
+            Constants.MODE_DESTINATION_PICK_EDIT -> {
                 EDIT_POINT_NAME = if (details != "") details else name
                 rvReady.isClickable = true
                 rvReady.setBackgroundResource(R.drawable.bc_button_purple)
@@ -3235,7 +3330,7 @@ class MainActivity : BaseActivity(), MainController.view,
                 }
                 Constants.MODE_CREATE_ORDER -> {
                     if (END_POINT_LAT != 0.0)
-                        showDestinationPickPage(Constants.DESTINATION_PICK_ORDEDR,0.0,0.0)
+                        showDestinationPickPage(Constants.DESTINATION_PICK_ORDEDR, 0.0, 0.0)
                     else
                         showSearchWherePage()
                 }
@@ -3919,16 +4014,20 @@ class MainActivity : BaseActivity(), MainController.view,
         //    Specifying START and END also allows
         //    more organic dragging than just specifying UP and DOWN.
         val simpleItemTouchCallback =
-            object : ItemTouchHelper.SimpleCallback(UP or
-                    DOWN,
+            object : ItemTouchHelper.SimpleCallback(
+                UP or
+                        DOWN,
 //                    or
 //                    START or
 //                    END,
-                0) {
+                0
+            ) {
 
-                override fun onMove(recyclerView: RecyclerView,
-                                    viewHolder: RecyclerView.ViewHolder,
-                                    target: RecyclerView.ViewHolder): Boolean {
+                override fun onMove(
+                    recyclerView: RecyclerView,
+                    viewHolder: RecyclerView.ViewHolder,
+                    target: RecyclerView.ViewHolder
+                ): Boolean {
 
                     val adapter = recyclerView.adapter as RouteAdapter
                     val from = viewHolder.adapterPosition
@@ -3937,7 +4036,7 @@ class MainActivity : BaseActivity(), MainController.view,
                     //    MainRecyclerViewAdapter. You need to implement
                     //    reordering of the backing model inside the method.
 
-                    adapter.moveItem(viewHolder,target ,from, to)
+                    adapter.moveItem(viewHolder, target, from, to)
                     // 3. Tell adapter to render the model update.
                     adapter.notifyItemMoved(from, to)
 
@@ -3953,12 +4052,21 @@ class MainActivity : BaseActivity(), MainController.view,
 
                     val routePoints =  ArrayList<RouteItem>()
                     routePoints.addAll(ROUTE_DATA)
-                    routePoints.add(0,RouteItem(false,START_POINT_NAME,START_POINT_LAT,START_POINT_LON))
+                    routePoints.add(
+                        0, RouteItem(
+                            false,
+                            START_POINT_NAME,
+                            START_POINT_LAT,
+                            START_POINT_LON
+                        )
+                    )
                     for (rot in routePoints){
-                        routeToDraw.add(RouteCoordinates(rot.lat,rot.lon,"through"))
+                        routeToDraw.add(RouteCoordinates(rot.lat, rot.lon, "through"))
                     }
 
-                    imageViewCloudTop.animate().scaleY(8f).setDuration(400).setInterpolator(AccelerateInterpolator()).start()
+                    imageViewCloudTop.animate().scaleY(8f).setDuration(400).setInterpolator(
+                        AccelerateInterpolator()
+                    ).start()
                     textViewDrawingAddress.visibility = View.VISIBLE
                     shimmer.start(textViewDrawingAddress)
 
@@ -3971,12 +4079,14 @@ class MainActivity : BaseActivity(), MainController.view,
 
                     recyclerView.postDelayed({
                         adapter.notifyDataSetChanged()
-                    },500)
+                    }, 500)
 
                     return true
                 }
-                override fun onSwiped(viewHolder: RecyclerView.ViewHolder,
-                                      direction: Int) {
+                override fun onSwiped(
+                    viewHolder: RecyclerView.ViewHolder,
+                    direction: Int
+                ) {
                     // 4. Code block for horizontal swipe.
                     //    ItemTouchHelper handles horizontal swipe as well, but
                     //    it is not relevant with reordering. Ignoring here.

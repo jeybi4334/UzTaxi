@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.drawable.Drawable
 import android.util.DisplayMetrics
+import android.view.View
 import com.mapbox.mapboxsdk.geometry.LatLng
 import me.jeybi.uztaxi.R
 import java.text.DecimalFormat
@@ -20,7 +21,7 @@ class Constants {
 
         val DATABASE_NAME = "uztaxi_database"
 
-        const val DATABASE_VERSION = 5
+        const val DATABASE_VERSION = 6
 
         const val TABLE_ADDRESS = "table_address"
         const val TABLE_CARDS = "table_cards"
@@ -45,6 +46,7 @@ class Constants {
         val BASE_URL_MAPZEN = "https://api.stadiamaps.com/"
 
         val BASE_URL_NOMINATIM = "https://nominatim.openstreetmap.org/"
+//        val BASE_URL_NOMINATIM = "http://192.168.0.116:7070/"
 
         val BASE_URL_GEOCODE = "https://api.geocode.earth/v1/"
 
@@ -178,6 +180,10 @@ class Constants {
         val ALIES_TYPE_GARDEN = 22
         val ALIES_TYPE_CROSSROAD = 2
 
+        val ALIES_TYPE_HOME = 101
+        val ALIES_TYPE_WORK = 102
+        val ALIES_TYPE_GYM = 103
+
         val CARD_TYPE_PLASTIC = 110010020
         val CARD_TYPE_WALLET = 110010021
         val CARD_TYPE_CREATE = 110010022
@@ -243,6 +249,14 @@ class Constants {
             canvas.setBitmap(bitmap)
             drawable.setBounds(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)
             drawable.draw(canvas)
+            return bitmap
+        }
+
+        fun getBitmapFromView(view: View): Bitmap {
+            val bitmap =
+                Bitmap.createBitmap(view.width, view.height, Bitmap.Config.ARGB_8888)
+            val canvas = Canvas(bitmap)
+            view.draw(canvas)
             return bitmap
         }
 

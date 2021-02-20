@@ -10,25 +10,6 @@
     android:id="@+id/parentPaymentMethod"
     >
 
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/cardPaymentMethod"
-        android:visibility="gone"
-        android:layout_width="42dp"
-        android:layout_height="28dp"
-        app:cardCornerRadius="4dp"
-        android:layout_marginStart="12dp"
-        >
-
-        <RelativeLayout
-            android:id="@+id/rvCardPayment"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@drawable/ic_card_type_1"
-            />
-
-
-    </com.google.android.material.card.MaterialCardView>
-
     <ImageView
         android:id="@+id/imageViewPaymentMethod"
         android:layout_width="48dp"
@@ -37,9 +18,8 @@
         app:layout_constraintTop_toBottomOf="@id/recyclerViewCars"
         android:layout_marginTop="4dp"
         android:layout_marginStart="12dp"
-        android:paddingLeft="8dp"
         android:paddingRight="8dp"
-        android:src="@drawable/ic_cash"
+        android:src="@drawable/ic_money"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:clickable="true"
         />
@@ -49,7 +29,7 @@
         android:layout_width="0dp"
         android:layout_weight="1"
         android:layout_height="wrap_content"
-        android:text="@string/cash"
+        android:text="@string/pay_cash"
         android:textSize="18sp"
         android:textColor="#303030"
         android:fontFamily="@font/g_semi_bold"

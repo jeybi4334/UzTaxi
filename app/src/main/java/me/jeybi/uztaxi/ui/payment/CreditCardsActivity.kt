@@ -53,25 +53,45 @@ class CreditCardsActivity : BaseActivity() {
         }
 
         rvEdit.setOnClickListener {
+            for(frag in mAdapter!!.fragmentsList){
+                frag.editCardClicked(object :
+                    CustomFragment.OnDeleteClick {
+                    override fun onDeletedClicked() {
+                        if (cardData.size>2){
+                            cardsDisposable.add(
+                                (application as UzTaxiApplication).uzTaxiDatabase.getCardDAO()
+                                    .deleteCard(cardData[mViewPager.currentItem].id)
+                                    .observeOn(AndroidSchedulers.mainThread())
+                                    .subscribeOn(Schedulers.io())
+                                    .subscribe({
+                                        loadCardsFromDatabase()
+                                    },{
 
-            mAdapter?.getCurentFragment(mViewPager.currentItem)?.editCardClicked(object :
-                CustomFragment.OnDeleteClick {
-                override fun onDeletedClicked() {
-                    if (cardData.size>2){
-                       cardsDisposable.add(
-                           (application as UzTaxiApplication).uzTaxiDatabase.getCardDAO()
-                               .deleteCard(cardData[mViewPager.currentItem].id)
-                               .observeOn(AndroidSchedulers.mainThread())
-                               .subscribeOn(Schedulers.io())
-                               .subscribe({
-                                  loadCardsFromDatabase()
-                               },{
-
-                               })
-                       )
+                                    })
+                            )
+                        }
                     }
-                }
-            })
+                })
+            }
+
+//            mAdapter?.getCurentFragment(mViewPager.currentItem)?.editCardClicked(object :
+//                CustomFragment.OnDeleteClick {
+//                override fun onDeletedClicked() {
+//                    if (cardData.size>2){
+//                       cardsDisposable.add(
+//                           (application as UzTaxiApplication).uzTaxiDatabase.getCardDAO()
+//                               .deleteCard(cardData[mViewPager.currentItem].id)
+//                               .observeOn(AndroidSchedulers.mainThread())
+//                               .subscribeOn(Schedulers.io())
+//                               .subscribe({
+//                                  loadCardsFromDatabase()
+//                               },{
+//
+//                               })
+//                       )
+//                    }
+//                }
+//            })
         }
 
         loadTransactions()
@@ -169,7 +189,7 @@ class CreditCardsActivity : BaseActivity() {
                     mViewPager.adapter = mAdapter!!
                     mViewPager.setPageTransformer(false, mAdapter!!)
                     mViewPager.currentItem = 0
-                    mViewPager.offscreenPageLimit = 3
+                    mViewPager.offscreenPageLimit = 6
                     mViewPager.pageMargin = -200
                     getBonus()
                 },{

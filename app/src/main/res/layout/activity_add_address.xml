@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    tools:context=".ui.address.AddAddressActivity">
+
+
+    <RelativeLayout
+        android:id="@+id/rvBack"
+        android:layout_width="54dp"
+        android:layout_height="54dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="52dp"
+        android:background="@drawable/bc_btn_menu"
+        android:clickable="true"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="13dp"
+            android:layout_centerInParent="true"
+            android:padding="2dp"
+            android:rotation="90"
+            android:src="@drawable/ic_arrow_bottom" />
+
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/textTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="70dp"
+        android:fontFamily="@font/gilroy_meidum"
+        android:gravity="center"
+        android:text="Добавить адрес"
+        android:textColor="@color/purple_200"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="@id/rvBack"
+        app:layout_constraintLeft_toRightOf="@id/rvBack"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@id/rvBack" />
+
+
+    <ScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/rvBack"
+        app:layout_constraintBottom_toTopOf="@id/buttonAddAddress"
+        android:overScrollMode="never"
+        android:paddingBottom="24dp"
+        android:clipToPadding="false"
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            >
+
+            <EditText
+                android:id="@+id/editTextAddressName"
+                android:layout_width="match_parent"
+                android:layout_height="72dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="24dp"
+                android:layout_marginEnd="10dp"
+                android:maxLines="1"
+                android:background="@drawable/bc_auth_num"
+                android:fontFamily="@font/g_regular"
+                android:hint="Название адреса"
+                android:imeOptions="actionDone"
+                android:paddingStart="28dp"
+                android:textColor="@color/black"
+                android:textColorHint="#C0C2C9"
+                android:typeface="monospace"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/textTitle" />
+
+            <ImageView
+                android:id="@+id/imageViewMap"
+                android:layout_width="match_parent"
+                android:layout_height="160dp"
+                android:layout_marginEnd="18dp"
+                android:layout_marginStart="16dp"
+                android:scaleType="centerCrop"
+                android:layout_marginTop="16dp"
+                />
+
+<!--            <RelativeLayout-->
+<!--                android:id="@+id/rvAddAddressLocation"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="200dp"-->
+<!--                android:layout_marginStart="10dp"-->
+<!--                android:layout_marginEnd="10dp"-->
+<!--                android:background="@drawable/bc_auth_num"-->
+<!--                app:layout_constraintLeft_toLeftOf="parent"-->
+<!--                app:layout_constraintRight_toRightOf="parent"-->
+<!--                app:layout_constraintTop_toBottomOf="@id/editTextAddressName">-->
+
+<!--               -->
+<!--                -->
+<!--                -->
+<!--&lt;!&ndash;                <ImageView&ndash;&gt;-->
+<!--&lt;!&ndash;                    android:id="@+id/imageViewAddressChangeLocation"&ndash;&gt;-->
+<!--&lt;!&ndash;                    android:layout_width="48dp"&ndash;&gt;-->
+<!--&lt;!&ndash;                    android:layout_height="48dp"&ndash;&gt;-->
+<!--&lt;!&ndash;                    android:layout_alignParentEnd="true"&ndash;&gt;-->
+<!--&lt;!&ndash;                    android:layout_centerVertical="true"&ndash;&gt;-->
+<!--&lt;!&ndash;                    android:layout_marginEnd="16dp"&ndash;&gt;-->
+<!--&lt;!&ndash;                    android:background="?attr/selectableItemBackgroundBorderless"&ndash;&gt;-->
+<!--&lt;!&ndash;                    android:paddingStart="12dp"&ndash;&gt;-->
+<!--&lt;!&ndash;                    android:paddingTop="12dp"&ndash;&gt;-->
+<!--&lt;!&ndash;                    android:paddingEnd="12dp"&ndash;&gt;-->
+<!--&lt;!&ndash;                    android:paddingBottom="16dp"&ndash;&gt;-->
+<!--&lt;!&ndash;                    android:src="@drawable/ic_map_small" />&ndash;&gt;-->
+
+
+<!--            </RelativeLayout>-->
+
+            <TextView
+                android:id="@+id/textView1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="12dp"
+                android:textSize="15sp"
+                android:fontFamily="@font/gilroy_meidum"
+                android:text="Выберите тип адреса (необязательно)"
+                android:textColor="@color/purple_200"
+                />
+
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerViewAddressTypes"
+                android:layout_width="match_parent"
+                android:overScrollMode="never"
+                android:paddingStart="16dp"
+                android:clipToPadding="false"
+                android:paddingEnd="18dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/textView1"
+                android:layout_marginTop="16dp"
+                >
+
+
+            </androidx.recyclerview.widget.RecyclerView>
+
+            <EditText
+                android:id="@+id/editTextInstructions"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="10dp"
+                android:maxLines="5"
+                android:minLines="5"
+                android:gravity="start|top"
+                android:paddingTop="24dp"
+                android:paddingBottom="24dp"
+                android:background="@drawable/bc_auth_num"
+                android:fontFamily="@font/g_regular"
+                android:paddingEnd="24dp"
+                android:hint="Инструкции для водителя..."
+                android:imeOptions="actionDone"
+                android:paddingStart="28dp"
+                android:textColor="@color/black"
+                android:textColorHint="#C0C2C9"
+                android:typeface="monospace"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/recyclerViewAddressTypes"
+                />
+
+
+
+
+        </LinearLayout>
+
+    </ScrollView>
+
+    <RelativeLayout
+        android:id="@+id/buttonAddAddress"
+        android:clickable="true"
+        android:layout_width="0dp"
+        android:layout_height="52dp"
+        android:background="@drawable/bc_login_button"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="24dp"
+        android:layout_marginEnd="18dp"
+        android:layout_marginStart="18dp"
+
+        >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Добавить"
+            android:fontFamily="@font/g_bold"
+            android:layout_centerInParent="true"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            />
+
+    </RelativeLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

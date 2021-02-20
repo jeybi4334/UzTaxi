@@ -11,6 +11,8 @@ data class AddressEntity(
     val latitude : Double,
     val longitude : Double,
     val title : String,
-    val block : Int,
-    val address : String
+    val alies : Int,
+    val address : String,
+    val instructions : String
+
 )

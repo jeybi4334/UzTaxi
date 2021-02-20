@@ -33,7 +33,8 @@
     <string name="intro_4_title">Любой метод оплаты</string>
     <string name="intro_4_content">Вы можете добавить свою карту UzCard или HumoCard, чтобы оплатить поездку и получать кэшбэк в реальном времени с каждой успешной поездки.</string>
     <string name="couldnot_find_anything">Мы не смогли найти ничего по вашему запросу :(</string>
-    <string name="cash">Наличные</string>
+    <string name="cash">Оплатить наличными</string>
+    <string name="pay_cash">Оплатить наличными</string>
     <string name="minimum_bonus_to_use">Минимальная сумма бонуса для использования: 1000 сум.</string>
     <string name="not_enough_bonus">У вас недостаточно денег на балансе</string>
     <string name="clarifying_address">уточняем адрес…</string>

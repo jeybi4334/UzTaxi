@@ -61,6 +61,7 @@ class SearchFragment : BaseFragment(), SearchAdapter.SearchItemClickListener,
 
         rvAddAddress.setOnClickListener {
             (activity as MainActivity).onAddAddressClicked()
+
         }
 
         editTextSearch.addTextChangedListener(object : TextWatcher {
