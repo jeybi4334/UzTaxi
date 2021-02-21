@@ -132,7 +132,7 @@ class SearchFragment : BaseFragment(), SearchAdapter.SearchItemClickListener,
 //                            StaggeredGridLayoutManager.VERTICAL
 //                        )
 
-                        recyclerViewSearchHistory.adapter = AddressAdapter(it)
+                        recyclerViewSearchHistory.adapter = AddressAdapter( ArrayList(it),null,null)
                     }, {
 
                     })

@@ -8,7 +8,9 @@ import android.util.DisplayMetrics
 import android.view.View
 import com.mapbox.mapboxsdk.geometry.LatLng
 import me.jeybi.uztaxi.R
+import java.text.DateFormat
 import java.text.DecimalFormat
+import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.abs
 
@@ -21,7 +23,7 @@ class Constants {
 
         val DATABASE_NAME = "uztaxi_database"
 
-        const val DATABASE_VERSION = 6
+        const val DATABASE_VERSION = 8
 
         const val TABLE_ADDRESS = "table_address"
         const val TABLE_CARDS = "table_cards"
@@ -238,6 +240,11 @@ class Constants {
                 .displayMetrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT)
         }
 
+        fun getCurrentTime() : String{
+            val dateFormat : DateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
+            val date: Date = Date();
+            return dateFormat.format(date)
+        }
 
          fun getBitmap(drawable: Drawable): Bitmap? {
             val canvas = Canvas()

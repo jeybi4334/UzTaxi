@@ -13,6 +13,7 @@ data class AddressEntity(
     val title : String,
     val alies : Int,
     val address : String,
-    val instructions : String
-
+    val instructions : String,
+    val updateDate : String,
+    var position : Long
 )

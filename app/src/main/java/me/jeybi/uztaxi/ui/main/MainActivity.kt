@@ -2553,21 +2553,32 @@ class MainActivity : BaseActivity(), MainController.view,
         MapSnapshotter(this, options).start { snapshot ->
             AddAddressSheet(snapshot.bitmap,object : AddAddressSheet.OnAddressAddListener{
                 override fun onAddClicked(addressName: String, alias: Int, instuctions: String,dialog : BottomSheetDialogFragment) {
+                    var entity = AddressEntity(
+                        0,
+                        START_POINT_LAT,
+                        START_POINT_LON,
+                        addressName,alias,"",
+                        instuctions,
+                        Constants.getCurrentTime(),
+                        0
+                    )
                     mainDisposables.add(
                         (application as UzTaxiApplication).uzTaxiDatabase
-                            .getAddressDAO().insertAddress(
-                                AddressEntity(
-                                    0,
-                                    START_POINT_LAT,
-                                    START_POINT_LON,
-                                    addressName,alias,"",instuctions
-                                )
-                            ).observeOn(AndroidSchedulers.mainThread())
+                            .getAddressDAO().insertAddress(entity)
+                            .observeOn(AndroidSchedulers.mainThread())
                             .subscribeOn(Schedulers.io())
                             .subscribe({
-                                if(searchCancelListener!=null&&searchCancelListener is SearchFragment)
-                                (searchCancelListener as SearchFragment).loadSavedAdresses()
-                                dialog.dismiss()
+                                entity.position = it
+                                mainDisposables.add(
+                                    (application as UzTaxiApplication).uzTaxiDatabase
+                                        .getAddressDAO().updateAddress(it.toInt(),it)
+                                        .observeOn(AndroidSchedulers.mainThread())
+                                        .subscribeOn(Schedulers.io())
+                                        .subscribe({
+                                            if(searchCancelListener!=null&&searchCancelListener is SearchFragment)
+                                                (searchCancelListener as SearchFragment).loadSavedAdresses()
+                                            dialog.dismiss()
+                                        },{}))
                             },{
                             })
                     )
@@ -2881,6 +2892,8 @@ class MainActivity : BaseActivity(), MainController.view,
     override fun onResume() {
         super.onResume()
         mapView?.onResume()
+        if(searchCancelListener!=null&&searchCancelListener is SearchFragment)
+            (searchCancelListener as SearchFragment).loadSavedAdresses()
 //        mainDisposables.add(presenter.getOngoingOrder())
     }
 

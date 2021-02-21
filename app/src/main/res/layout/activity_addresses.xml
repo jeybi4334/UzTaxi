@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    tools:context=".ui.address.AddressesActivity"
+    >
+
+
+    <RelativeLayout
+        android:id="@+id/rvBack"
+        android:layout_width="54dp"
+        android:layout_height="54dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="52dp"
+        android:background="@drawable/bc_btn_menu"
+        android:clickable="true"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="13dp"
+            android:layout_centerInParent="true"
+            android:padding="2dp"
+            android:rotation="90"
+            android:src="@drawable/ic_arrow_bottom" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/rvEdit"
+        android:layout_width="54dp"
+        android:layout_height="54dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="52dp"
+        android:background="@drawable/bc_btn_menu"
+        android:clickable="true"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+
+        >
+
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="15dp"
+            android:layout_centerInParent="true"
+            android:src="@drawable/ic_pencil" />
+
+
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/textTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="70dp"
+        android:fontFamily="@font/gilroy_meidum"
+        android:gravity="center"
+        android:text="@string/my_addreses"
+        android:textColor="@color/purple_200"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="@id/rvBack"
+        app:layout_constraintLeft_toRightOf="@id/rvBack"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@id/rvBack" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewAddresses"
+        android:layout_width="match_parent"
+        android:nestedScrollingEnabled="true"
+        app:layout_constraintTop_toBottomOf="@id/rvBack"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp"
+        android:clipToPadding="false"
+        android:layoutAnimation="@anim/layout_animation"
+        android:overScrollMode="never"
+        android:paddingTop="12dp"
+        android:paddingBottom="56dp"
+        />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -9,6 +9,7 @@ import androidx.appcompat.app.AlertDialog
 import kotlinx.android.synthetic.main.navigation_menu.*
 import me.jeybi.uztaxi.R
 import me.jeybi.uztaxi.ui.BaseFragment
+import me.jeybi.uztaxi.ui.address.AddressesActivity
 import me.jeybi.uztaxi.ui.auth.AuthenticationActivity
 import me.jeybi.uztaxi.ui.history.OrderHistoryActivity
 import me.jeybi.uztaxi.ui.info.InfoActivity
@@ -36,6 +37,9 @@ class NavigationFragment : BaseFragment() {
 
         textNavigation0.setOnClickListener{
             activity?.startActivity(Intent(activity, OrderHistoryActivity::class.java))
+        }
+        textNavigation1.setOnClickListener{
+            activity?.startActivity(Intent(activity, AddressesActivity::class.java))
         }
 
         textNavigation2.setOnClickListener {
