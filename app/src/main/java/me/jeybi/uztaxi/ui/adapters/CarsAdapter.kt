@@ -37,14 +37,19 @@ class CarsAdapter(
     }
 
     override fun onBindViewHolder(holder: CarsHolder, position: Int) {
-        holder.rvCar.tag = "${position}"
+        holder.itemView.tag = "${position}"
         val item = items[position]
 
-        val jsonObject: JsonObject = JsonParser.parseString(item.name).asJsonObject
+        try {
+            val jsonObject: JsonObject = JsonParser.parseString(item.name).asJsonObject
 
-        if (jsonObject.isJsonObject){
+            if (jsonObject.isJsonObject){
                 holder.textViewTarrifName.text = jsonObject.get((context as MainActivity).getCurrentLanguage().toLanguageTag()).asString
+            }
+        }catch (exception : IllegalStateException){
+            holder.textViewTarrifName.text = item.name
         }
+
 
 
 
@@ -65,7 +70,7 @@ class CarsAdapter(
                 holder.imageViewCar.setImageResource(R.drawable.scooter)
             }
             Constants.CAR_TYPE_PEREGON -> {
-                holder.imageViewCar.setImageResource(R.drawable.malibu)
+                holder.imageViewCar.setImageResource(R.drawable.spark)
             }
             else->{
                 holder.imageViewCar.setImageResource(R.drawable.scooter)
@@ -79,6 +84,7 @@ class CarsAdapter(
             holder.textViewPrice.text = "${decimalFormat.format(item.minCost)} ${context.getString(R.string.currency)}${context.getString(
                 R.string.from
             )}"
+
         holder.rvCar.setOnClickListener {
 
             listener.onTariffChosen(item.id, shimmer, holder.textViewPrice, item.options)
@@ -103,6 +109,8 @@ class CarsAdapter(
                         "#B1B1B1"
                     )
                 )
+            }else if (previousItem!=null&&previousItem!!.tag == holder.itemView.tag){
+                listener.onTarifReclicked(item)
             }
 
             previousItem = holder.rvCar
@@ -128,5 +136,6 @@ class CarsAdapter(
             textViewPrice: ShimmerTextView,
             options: ArrayList<TariffOption>
         )
+        fun onTarifReclicked(tariff: ServiceTariff)
     }
 }

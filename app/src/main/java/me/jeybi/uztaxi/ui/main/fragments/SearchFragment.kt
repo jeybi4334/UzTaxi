@@ -132,7 +132,7 @@ class SearchFragment : BaseFragment(), SearchAdapter.SearchItemClickListener,
 //                            StaggeredGridLayoutManager.VERTICAL
 //                        )
 
-                        recyclerViewSearchHistory.adapter = AddressAdapter( ArrayList(it),null,null)
+                        recyclerViewSearchHistory.adapter = AddressAdapter( ArrayList(it),activity,null)
                     }, {
 
                     })
@@ -144,7 +144,6 @@ class SearchFragment : BaseFragment(), SearchAdapter.SearchItemClickListener,
         textViewNoAddress.visibility = View.GONE
         recyclerViewSearchHistory.adapter = null
         searchDisposables.add(
-//            RetrofitHelper.apiService(Constants.BASE_URL_MILLENIUM)
             RetrofitHelper.apiService(Constants.BASE_URL_GEOCODE)
                 .geocode(
                     keyWord,

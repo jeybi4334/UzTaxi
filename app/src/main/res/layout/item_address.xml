@@ -83,7 +83,7 @@
             app:layout_constraintTop_toTopOf="@id/imageViewPoint"
             app:layout_constraintLeft_toLeftOf="@id/imageViewPoint"
             app:layout_constraintRight_toRightOf="@id/imageViewPoint"
-            android:src="@drawable/ic_address_work"
+            android:src="@drawable/ic_address_point"
             app:tint="@color/white"
             android:layout_marginTop="8dp"
             />

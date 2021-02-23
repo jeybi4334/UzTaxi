@@ -409,6 +409,36 @@
 
                     </RelativeLayout>
 
+                    <RelativeLayout
+                        android:id="@+id/rvNoService"
+                        android:visibility="gone"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        app:layout_constraintRight_toLeftOf="@id/rvCall"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/divider2"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginEnd="18dp"
+                        android:layout_marginStart="18dp"
+                        android:layout_marginBottom="48dp"
+                        android:clickable="true"
+                        >
+
+                        <TextView
+                            android:id="@+id/textNoService"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerInParent="true"
+                            android:text="Мы пока не можем предоставлять наши услуги в этом регионе."
+                            android:fontFamily="@font/g_semi_bold"
+                            android:textColor="@color/black"
+                            android:gravity="center"
+                            android:textSize="16sp"
+                            />
+
+
+                    </RelativeLayout>
+
                     <include
                         android:id="@+id/modeCreateOrder"
                         android:visibility="gone"

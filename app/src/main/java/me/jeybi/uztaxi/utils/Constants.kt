@@ -47,8 +47,8 @@ class Constants {
 
         val BASE_URL_MAPZEN = "https://api.stadiamaps.com/"
 
-        val BASE_URL_NOMINATIM = "https://nominatim.openstreetmap.org/"
-//        val BASE_URL_NOMINATIM = "http://192.168.0.116:7070/"
+//        val BASE_URL_NOMINATIM = "https://nominatim.openstreetmap.org/"
+        val BASE_URL_NOMINATIM = "http://map.uz.taxi:7070/"
 
         val BASE_URL_GEOCODE = "https://api.geocode.earth/v1/"
 
@@ -203,7 +203,7 @@ class Constants {
         val SETTINGS_DEMO_CAR = "settings_demo_car"
 
         //// DEFAULT VALUES
-        val DEFAULT_TILT_MAP = 20.0
+        val DEFAULT_TILT_MAP = 30.0
 
 
 

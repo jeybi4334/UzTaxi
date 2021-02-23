@@ -29,6 +29,7 @@ interface MainController {
         fun onBottomSheetSearchItemClicked(latitude: Double, longitude: Double,title : String)
 
         fun onTariffsReady(tariffs : ArrayList<ServiceTariff>)
+        fun onServiceNotAvailable()
 
         fun onPaymentMethodsReady(paymentMethods : ArrayList<PaymentMethod>)
 
@@ -86,6 +87,8 @@ interface MainController {
         fun cancelOrder(orderID: Long) : Disposable
 
         fun notifyDriver(orderID : Long,rateOrderBody: RateOrderBody): Disposable
+
+        fun addCarImages()
     }
 
     interface SearchCancelListener{

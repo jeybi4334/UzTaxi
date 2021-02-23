@@ -108,6 +108,7 @@ interface ApiClient {
     ): Single<Response<ArrayList<SearchedAddress>>>
 
 
+
     @GET("client/mobile/1.0/address/geocoding")
     fun geocodePoint(
         @Header("Accept-Language") language : String,
@@ -226,7 +227,7 @@ interface ApiClient {
     ): Single<Response<ArrayList<ShortOrderInfo>>>
 
 
-    @GET("reverse.php")
+    @GET("reverse")
     fun reverseGeocode(
         @Query("lat")
         lat: Double,

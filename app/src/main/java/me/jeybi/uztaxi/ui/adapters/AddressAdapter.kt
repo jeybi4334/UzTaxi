@@ -16,6 +16,7 @@ import com.google.android.flexbox.FlexboxLayoutManager
 import me.jeybi.uztaxi.R
 import me.jeybi.uztaxi.database.AddressEntity
 import me.jeybi.uztaxi.ui.address.AddressesActivity
+import me.jeybi.uztaxi.ui.main.MainActivity
 import me.jeybi.uztaxi.utils.Constants
 
 class AddressAdapter(var data : ArrayList<AddressEntity>, val activity : Activity?,val onItemMoveListener: OnItemMoveListener?) : RecyclerView.Adapter<AddressAdapter.AddressHolder>() {
@@ -40,6 +41,11 @@ class AddressAdapter(var data : ArrayList<AddressEntity>, val activity : Activit
             data.removeAt(position)
         }
 
+        if (activity!=null&&activity is MainActivity)
+        holder.constraintAddress.setOnClickListener {
+            activity.onBottomSheetSearchItemClicked(address.latitude,address.longitude,address.title)
+        }
+
         when(address.alies){
             Constants.ALIES_TYPE_HOME->{
                 holder.imageAddressAlias.setImageResource(R.drawable.ic_address_home)
@@ -58,6 +64,9 @@ class AddressAdapter(var data : ArrayList<AddressEntity>, val activity : Activit
             }
             Constants.ALIES_TYPE_GYM->{
                 holder.imageAddressAlias.setImageResource(R.drawable.ic_address_gym)
+            }
+            else->{
+                holder.imageAddressAlias.setImageResource(R.drawable.ic_address_point)
             }
         }
         if (activity!=null&&activity is AddressesActivity) {
@@ -99,5 +108,6 @@ class AddressAdapter(var data : ArrayList<AddressEntity>, val activity : Activit
         val imageAddressAlias = view.findViewById<ImageView>(R.id.imageAddressAlias)
         val parentAddress = view.findViewById<FrameLayout>(R.id.parentAddress)
         val rvDeleteAddress= view.findViewById<RelativeLayout>(R.id.rvDeleteAddress)
+        val constraintAddress= view.findViewById<ConstraintLayout>(R.id.constraintAddress)
     }
 }

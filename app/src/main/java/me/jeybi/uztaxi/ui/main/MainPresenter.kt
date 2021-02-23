@@ -3,15 +3,21 @@ package me.jeybi.uztaxi.ui.main
 import android.Manifest
 import android.Manifest.permission.ACCESS_COARSE_LOCATION
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.provider.Settings
 import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
+import com.airbnb.lottie.LottieAnimationView
+import com.airbnb.lottie.LottieDrawable
 import com.google.android.gms.common.util.Base64Utils
 import com.mapbox.geojson.Point
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import me.jeybi.uztaxi.R
 import me.jeybi.uztaxi.model.*
 import me.jeybi.uztaxi.network.RetrofitHelper
 import me.jeybi.uztaxi.utils.Constants
@@ -320,7 +326,13 @@ class MainPresenter(val view: MainActivity) : MainController.presenter {
             .subscribeOn(Schedulers.io())
             .subscribe({
                 if (it.isSuccessful) {
-                    view.onTariffsReady(it.body()!!.tariffs)
+                    if(it.body()!=null){
+                        if (it.body()!!.kind=="service"){
+                            view.onTariffsReady(it.body()!!.tariffs)
+                        }else{
+                            view.onServiceNotAvailable()
+                        }
+                    }
                 }
             }, {
 
@@ -470,5 +482,676 @@ class MainPresenter(val view: MainActivity) : MainController.presenter {
 
     }
 
+    fun playLottie(
+        view: LottieAnimationView,
+        fileName: String,
+        INFINITE: Boolean,
+        REVERSE: Boolean
+    ) {
+        view.setAnimation(fileName)
+        if (INFINITE)
+            view.repeatCount = LottieDrawable.INFINITE
+        if (REVERSE)
+            view.repeatMode = LottieDrawable.REVERSE
+        view.playAnimation()
+    }
+
+    override fun addCarImages() {
+        val mapBoxStyle = view.mapBoxStyle
+        val resources = view.resources
+        val IMAGE_ID = "image-taxi-car"
+
+        val carImage = Bitmap.createScaledBitmap(
+            BitmapFactory.decodeResource(resources, R.drawable.car_map),
+            64,
+            128,
+            true
+        )
+
+
+        mapBoxStyle.addImage(IMAGE_ID, carImage)
+
+
+        mapBoxStyle.addImage(
+            "finish-image",
+            Constants.getBitmap(
+                ResourcesCompat.getDrawable(
+                    resources,
+                    R.drawable.ic_marker_finish,
+                    null
+                )!!
+            )!!
+        )
+
+        mapBoxStyle.addImage(
+            "start-image",
+            Constants.getBitmap(
+                ResourcesCompat.getDrawable(
+                    resources,
+                    R.drawable.ic_marker_start,
+                    null
+                )!!
+            )!!
+        )
+
+        mapBoxStyle.addImage(
+            "stop-image",
+            Constants.getBitmap(
+                ResourcesCompat.getDrawable(
+                    resources,
+                    R.drawable.ic_marker_stop,
+                    null
+                )!!
+            )!!
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-0", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_0),
+                286, 286,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-5", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_5),
+                286, 286,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-10",
+            Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_10),
+                286, 286,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-15", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_15),
+                286, 286,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-20",
+            Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_20),
+                286, 286,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-25", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_25),
+                286, 286,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-30",
+            Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_30),
+                286, 286,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-35", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_35),
+                286, 286,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-40",
+            Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_40),
+                286, 286,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-45", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_45),
+                286, 286,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-50",
+            Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_50),
+                286, 286,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-55", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_55),
+                286, 286,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-60",
+            Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_60),
+                286, 286,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-65", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_65),
+                286, 286,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-70",
+            Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_70),
+                286, 286,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-75", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_75),
+                286, 286,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-80",
+            Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_80),
+                286, 286,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-85", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_85),
+                286, 286,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-90",
+            Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_90),
+                286, 286,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-95", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_95),
+                286, 286,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-100", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_100),
+                286, 286,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-105", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_105),
+                286, 286,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-110",
+            Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_110),
+                286, 286,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-115", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_115),
+                286, 286,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-120",
+            Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_120),
+                286, 286,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-125", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_125),
+                286, 286,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-130",
+            Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_130),
+                286, 286,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-135", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_135),
+                286, 286,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-140",
+            Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_140),
+                286, 286,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-145", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_145),
+                286, 286,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-150",
+            Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_150),
+                286, 286,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-155", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_155),
+                286, 286,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-160",
+            Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_160),
+                286, 286,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-165", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_165),
+                286, 286,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-170",
+            Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_170),
+                286, 286,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-175", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_175),
+                286, 286,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-180",
+            Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_180),
+                286, 286,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-185", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_185),
+                286, 286,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-190", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_190),
+                286, 286,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-195", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_195),
+                286, 286,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-200",
+            Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_200),
+                286, 286,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-205", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_205),
+                286, 286,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-210",
+            Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_210),
+                286, 286,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-215", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_215),
+                286, 286,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-220",
+            Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_220),
+                286, 286,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-225", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_225),
+                286, 286,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-230",
+            Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_230),
+                286, 286,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-235", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_235),
+                286, 286,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-240",
+            Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_240),
+                286, 286,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-245", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_245),
+                286, 286,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-250",
+            Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_250),
+                286, 286,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-255", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_255),
+                286, 286,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-260",
+            Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_260),
+                286, 286,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-265", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_265),
+                286, 286,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-270",
+            Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_270),
+                286, 286,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-275", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_275),
+                286, 286,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-280",
+            Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_280),
+                286, 286,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-285", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_285),
+                286, 286,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-290", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_290),
+                286, 286,
+                true
+            )
+        )
+        mapBoxStyle.addImage(
+            "fleet-295", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_295),
+                286, 286,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-300",
+            Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_300),
+                286, 286,
+                true
+            )
+        )
+        mapBoxStyle.addImage(
+            "fleet-305", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_305),
+                286, 286,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-310",
+            Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_310),
+                286, 286,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-315", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_315),
+                286, 286,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-320",
+            Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_320),
+                286, 286,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-325", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_325),
+                286, 286,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-330",
+            Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_330),
+                286, 286,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-335", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_335),
+                286, 286,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-340",
+            Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_340),
+                286, 286,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-345", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_345),
+                286, 286,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-350",
+            Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_350),
+                286, 286,
+                true
+            )
+        )
+
+        mapBoxStyle.addImage(
+            "fleet-355", Bitmap.createScaledBitmap(
+                BitmapFactory.decodeResource(resources, R.drawable.fleet_355),
+                286, 286,
+                true
+            )
+        )
+
+
+    }
 
 }
