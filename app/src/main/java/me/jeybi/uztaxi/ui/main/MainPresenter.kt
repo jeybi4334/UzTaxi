@@ -32,6 +32,7 @@ import java.util.*
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
 import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 
 class MainPresenter(val view: MainActivity) : MainController.presenter {
@@ -55,6 +56,7 @@ class MainPresenter(val view: MainActivity) : MainController.presenter {
                 Manifest.permission.ACCESS_FINE_LOCATION,
                 // WRITE_EXTERNAL_STORAGE is required in order to show the map
                 Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.READ_EXTERNAL_STORAGE,
                 ACCESS_COARSE_LOCATION
             )
         )
@@ -105,7 +107,12 @@ class MainPresenter(val view: MainActivity) : MainController.presenter {
                 Constants.HIVE_PROFILE,
                 null,
                 NaiveHmacSigner.DateSignature(),
-                NaiveHmacSigner.AuthSignature(view.HIVE_USER_ID, view.HIVE_TOKEN, "POST", "/api/client/mobile/1.0/registration/fcm"),
+                NaiveHmacSigner.AuthSignature(
+                    view.HIVE_USER_ID,
+                    view.HIVE_TOKEN,
+                    "POST",
+                    "/api/client/mobile/1.0/registration/fcm"
+                ),
 
 
                 RegisterFCMRequest(token)
@@ -142,14 +149,14 @@ class MainPresenter(val view: MainActivity) : MainController.presenter {
 
                     if (it.body()!!.name != null) {
                         address.append(it.body()!!.name)
-                        if (it.body()!!.address.road!=null)
-                        details.append("${it.body()!!.address.road}")
-                        if (it.body()!!.address.house_number!=null)
+                        if (it.body()!!.address.road != null)
+                            details.append("${it.body()!!.address.road}")
+                        if (it.body()!!.address.house_number != null)
                             details.append(", ${it.body()!!.address.house_number}")
-                    }else{
+                    } else {
                         address.append(it.body()!!.display_name)
                     }
-                    view.onAddressFound(address.toString(),details.toString())
+                    view.onAddressFound(address.toString(), details.toString())
                 }
             }, {
 
@@ -189,7 +196,11 @@ class MainPresenter(val view: MainActivity) : MainController.presenter {
         var findAddressDisposable: Disposable? = null
 
         findAddressDisposable = RetrofitHelper.apiService(Constants.BASE_URL)
-            .getCurrentAddress(view.getCurrentLanguage().toLanguageTag(),Constants.HIVE_PROFILE, "${latitude} ${longitude}")
+            .getCurrentAddress(
+                view.getCurrentLanguage().toLanguageTag(),
+                Constants.HIVE_PROFILE,
+                "${latitude} ${longitude}"
+            )
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribe({
@@ -209,10 +220,10 @@ class MainPresenter(val view: MainActivity) : MainController.presenter {
                                     if (address != "" && component.level == 9)
                                         address += ", ${component.name}"
                                 }
-                                view.onAddressFound(address,"")
+                                view.onAddressFound(address, "")
 
                             } else
-                                view.onAddressFound("","")
+                                view.onAddressFound("", "")
                         }
                     }
 
@@ -269,22 +280,54 @@ class MainPresenter(val view: MainActivity) : MainController.presenter {
             })
     }
 
-    override fun getRoute( listCoordinates: ArrayList<RouteCoordinates>, driverRoute: Boolean): Disposable {
+    //    override fun getRoute( listCoordinates: ArrayList<RouteCoordinates>, driverRoute: Boolean): Disposable {
+//
+//
+//        return RetrofitHelper.apiService(Constants.BASE_URL_UZ_TAXI_NAVIGATION)
+//            .getRoute(GetRouteRequest(listCoordinates, "auto", "ru-RU", "none"))
+//            .observeOn(AndroidSchedulers.mainThread())
+//            .subscribeOn(Schedulers.io())
+//            .subscribe({
+//                if (it.isSuccessful && it.body() != null) {
+//                    val decoded = PolyLineUtils.decode(it.body()!!.trip.legs[0].shape, 6)
+//                    if (!driverRoute)
+//                        view.drawRoute(decoded)
+//                } else {
+//                    Log.d("DSADASDSADSADAS","${it}")
+//                    view.onErrorGetRoute()
+//                }
+//            }, {
+//                Log.d("DSADASDSADSADAS","${it}")
+//                view.onErrorGetRoute()
+//            })
+//
+//    }
+    override fun getRoute(
+        listCoordinates: ArrayList<RouteCoordinates>,
+        driverRoute: Boolean
+    ): Disposable {
+
+        val routeMap = ArrayList<String>()
+        for (coordinate in listCoordinates){
+            routeMap.add("${coordinate.lat},${coordinate.lon}")
+        }
 
 
-        return RetrofitHelper.apiService(Constants.BASE_URL_MAPZEN)
-            .getRoute(GetRouteRequest(listCoordinates, "auto", "ru-RU", "none"))
+        return RetrofitHelper.apiService(Constants.BASE_URL_UZ_TAXI_NAVIGATION)
+            .getRoute(routeMap,"car","uz",true)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribe({
                 if (it.isSuccessful && it.body() != null) {
-                    val decoded = PolyLineUtils.decode(it.body()!!.trip.legs[0].shape, 6)
+                    val decoded = PolyLineUtils.decode(it.body()!!.paths[0].points, 5)
                     if (!driverRoute)
                         view.drawRoute(decoded)
                 } else {
+                    Log.d("DSADASDSADSADAS", "${it}")
                     view.onErrorGetRoute()
                 }
             }, {
+                Log.d("DSADASDSADSADAS", "${it}")
                 view.onErrorGetRoute()
             })
 
@@ -303,8 +346,8 @@ class MainPresenter(val view: MainActivity) : MainController.presenter {
             .subscribe({
                 if (it.isSuccessful) {
                     val carsList = ArrayList<GetCarResponse>()
-                    for ((counter, car) in it.body()!!.withIndex()){
-                        if (counter<5){
+                    for ((counter, car) in it.body()!!.withIndex()) {
+                        if (counter < 5) {
                             carsList.add(car)
                         }
                     }
@@ -321,15 +364,16 @@ class MainPresenter(val view: MainActivity) : MainController.presenter {
         return RetrofitHelper.apiService(Constants.BASE_URL)
             .getAvailableService(
                 view.getCurrentLanguage().toLanguageTag(),
-                Constants.HIVE_PROFILE, "$latitude $longitude")
+                Constants.HIVE_PROFILE, "$latitude $longitude"
+            )
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribe({
                 if (it.isSuccessful) {
-                    if(it.body()!=null){
-                        if (it.body()!!.kind=="service"){
+                    if (it.body() != null) {
+                        if (it.body()!!.kind == "service") {
                             view.onTariffsReady(it.body()!!.tariffs)
-                        }else{
+                        } else {
                             view.onServiceNotAvailable()
                         }
                     }
@@ -343,7 +387,8 @@ class MainPresenter(val view: MainActivity) : MainController.presenter {
         return RetrofitHelper.apiService(Constants.BASE_URL)
             .getPaymentOptions(
                 view.getCurrentLanguage().toLanguageTag(),
-                Constants.HIVE_PROFILE, "$latitude $longitude")
+                Constants.HIVE_PROFILE, "$latitude $longitude"
+            )
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribe({

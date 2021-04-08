@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.drawable.Drawable
+import android.location.Location
 import android.util.DisplayMetrics
 import android.view.View
 import com.mapbox.mapboxsdk.geometry.LatLng
@@ -21,9 +22,9 @@ class Constants {
 
         val APPLICATION_PREFERENCES = "application_prefs"
 
-        val DATABASE_NAME = "uztaxi_database"
+        val DATABASE_NAME = "uztaxi_db"
 
-        const val DATABASE_VERSION = 8
+        const val DATABASE_VERSION = 1
 
         const val TABLE_ADDRESS = "table_address"
         const val TABLE_CARDS = "table_cards"
@@ -45,12 +46,14 @@ class Constants {
 
         val BASE_URL_OPENWEATHER = "https://api.openweathermap.org/data/2.5/"
 
-        val BASE_URL_MAPZEN = "https://api.stadiamaps.com/"
+//        val BASE_URL_MAPZEN = "https://api.stadiamaps.com/"
+        val BASE_URL_UZ_TAXI_NAVIGATION = "http://map.uz.taxi:8989/"
 
 //        val BASE_URL_NOMINATIM = "https://nominatim.openstreetmap.org/"
         val BASE_URL_NOMINATIM = "http://map.uz.taxi:7070/"
 
-        val BASE_URL_GEOCODE = "https://api.geocode.earth/v1/"
+//        val BASE_URL_GEOCODE = "https://api.geocode.earth/v1/"
+        val BASE_URL_GEOCODE = "http://map.uz.taxi:4000/v1/"
 
         val HIVE_MILLENIUM = "2e4129784c2e080a5b19bc01c495496d"
 
@@ -290,6 +293,17 @@ class Constants {
             return rotation
         }
 
+
+        fun distanceTo(lat1 : Double,lon1 : Double,lat2 : Double,lon2 : Double) : Float{
+            val point1 = Location("point1")
+            point1.latitude = lat1
+            point1.longitude = lon1
+            val point2 = Location("point2")
+            point2.latitude = lat2
+            point2.longitude = lon2
+
+                return point1.distanceTo(point2)
+        }
 
         fun roundAvoid(value: Double, places: Int): Double {
             val scale = Math.pow(10.0, places.toDouble())

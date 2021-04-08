@@ -351,6 +351,29 @@
 
 
 
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardBack"
+                android:visibility="gone"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_margin="8dp"
+                app:cardBackgroundColor="@color/white"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="4dp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/frameReady"
+                >
+
+                <ImageView
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_gravity="center"
+                    android:rotation="90"
+                    android:src="@drawable/ic_arrow_bottom"
+                    />
+
+            </com.google.android.material.card.MaterialCardView>
+
             <FrameLayout
                 android:id="@+id/frameReady"
                 android:clickable="true"

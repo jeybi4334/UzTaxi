@@ -13,6 +13,7 @@ import me.jeybi.uztaxi.model.GeocodingResponse
 import me.jeybi.uztaxi.model.SearchItemModel
 import me.jeybi.uztaxi.model.SearchedAddress
 import me.jeybi.uztaxi.utils.Constants
+import me.jeybi.uztaxi.utils.setSafeOnClickListener
 
 class SearchAdapter(
 //    val items: ArrayList<SearchedAddress>
@@ -120,7 +121,7 @@ class SearchAdapter(
         holder.textViewSearchDistance.text =
             "${Constants.roundAvoid(item.properties.distance, 2)} ${context.getString(R.string.km)}"
 
-        holder.itemView.setOnClickListener {
+        holder.itemView.setSafeOnClickListener {
 //            if (item.position != null) listener.onSearchClicked(item.position.lat, item.position.lon,holder.textViewTitle.text.toString())
 
             listener.onSearchClicked(

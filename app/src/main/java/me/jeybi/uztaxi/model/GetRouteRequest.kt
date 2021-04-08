@@ -31,7 +31,7 @@ data class RouteLeg(
 )
 
 data class RouteSummary(
-    val time : Int,
+    val time : Double,
     val length : Float,
     val max_lon : Double,
     val max_lat : Double,

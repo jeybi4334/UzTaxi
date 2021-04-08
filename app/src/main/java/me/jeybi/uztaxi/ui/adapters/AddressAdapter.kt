@@ -1,6 +1,7 @@
 package me.jeybi.uztaxi.ui.adapters
 
 import android.app.Activity
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -18,6 +19,7 @@ import me.jeybi.uztaxi.database.AddressEntity
 import me.jeybi.uztaxi.ui.address.AddressesActivity
 import me.jeybi.uztaxi.ui.main.MainActivity
 import me.jeybi.uztaxi.utils.Constants
+import me.jeybi.uztaxi.utils.setSafeOnClickListener
 
 class AddressAdapter(var data : ArrayList<AddressEntity>, val activity : Activity?,val onItemMoveListener: OnItemMoveListener?) : RecyclerView.Adapter<AddressAdapter.AddressHolder>() {
 
@@ -40,9 +42,17 @@ class AddressAdapter(var data : ArrayList<AddressEntity>, val activity : Activit
             onItemMoveListener?.onItemRemoved(address.id,position)
             data.removeAt(position)
         }
+        if (activity!=null&&activity is MainActivity){
+            val distance = Constants.distanceTo((activity as MainActivity).START_POINT_LAT,(activity as MainActivity).START_POINT_LON,address.latitude,address.longitude)
+
+
+            val time = ((distance.toInt() * 3600) / 10000) / 70
+
+            holder.textViewAddressTime.text = "$time ${activity.getString(R.string.minute)}"
+        }
 
         if (activity!=null&&activity is MainActivity)
-        holder.constraintAddress.setOnClickListener {
+        holder.constraintAddress.setSafeOnClickListener {
             activity.onBottomSheetSearchItemClicked(address.latitude,address.longitude,address.title)
         }
 

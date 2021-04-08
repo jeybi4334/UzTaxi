@@ -128,10 +128,22 @@ interface ApiClient {
     ): Single<Response<WeatherResponse>>
 
 
-    @POST("route?api_key=f105994c-4760-4888-a39b-bb9b2d07f66c")
+//    @POST("route?api_key=f105994c-4760-4888-a39b-bb9b2d07f66c")
+//    fun getRoute(
+//        @Body getRouteRequest: GetRouteRequest
+//    ): Single<Response<GetRouteResponse>>
+
+    @GET("route")
     fun getRoute(
-        @Body getRouteRequest: GetRouteRequest
-    ): Single<Response<GetRouteResponse>>
+        @Query("point",encoded = true) points : List<String>,
+        @Query("vehicle")
+        vehicle: String,
+        @Query("locale")
+        locale: String,
+        @Query("calc_points")
+        calc_points: Boolean
+    ): Single<Response<GraphopperNavResponse>>
+
 
 
     @POST("client/mobile/4.0/orders")

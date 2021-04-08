@@ -193,7 +193,16 @@ class CreditCardsActivity : BaseActivity() {
                     mViewPager.pageMargin = -200
                     getBonus()
                 },{
+                    cardData.add(CreditCardEntity(0,"","","",1003))
+                    cardData.add(CreditCardEntity(0,"","","",1001))
 
+                    mAdapter = CustomPagerAdapter(supportFragmentManager, cardData)
+                    mViewPager.adapter = mAdapter!!
+                    mViewPager.setPageTransformer(false, mAdapter!!)
+                    mViewPager.currentItem = 0
+                    mViewPager.offscreenPageLimit = 6
+                    mViewPager.pageMargin = -200
+                    getBonus()
                 })
         )
     }

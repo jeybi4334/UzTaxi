@@ -1,10 +1,7 @@
 package me.jeybi.uztaxi.ui.main
 
 import android.Manifest
-import android.animation.Animator
-import android.animation.ObjectAnimator
-import android.animation.TypeEvaluator
-import android.animation.ValueAnimator
+import android.animation.*
 import android.animation.ValueAnimator.AnimatorUpdateListener
 import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
@@ -18,8 +15,6 @@ import android.location.LocationListener
 import android.location.LocationManager
 import android.net.Uri
 import android.os.Bundle
-import android.os.StrictMode
-import android.os.StrictMode.VmPolicy
 import android.provider.Settings
 import android.util.Log
 import android.view.LayoutInflater
@@ -57,13 +52,13 @@ import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.Style
 import com.mapbox.mapboxsdk.plugins.localization.LocalizationPlugin
 import com.mapbox.mapboxsdk.plugins.localization.MapLocale
-import com.mapbox.mapboxsdk.snapshotter.MapSnapshot
 import com.mapbox.mapboxsdk.snapshotter.MapSnapshotter
 import com.mapbox.mapboxsdk.style.expressions.Expression.*
 import com.mapbox.mapboxsdk.style.layers.*
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory.*
 import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
+import com.mapbox.turf.TurfMeasurement
 import com.romainpiel.shimmer.Shimmer
 import com.romainpiel.shimmer.ShimmerTextView
 import io.reactivex.Observable
@@ -165,6 +160,8 @@ class MainActivity : BaseActivity(), MainController.view,
         presenter.checkIfAuthenticated()
 
 
+//        NavigationMapRoute
+
     }
 
 
@@ -258,8 +255,8 @@ class MainActivity : BaseActivity(), MainController.view,
                 setUpSocketForDrivers()
                 val localizationPlugin = LocalizationPlugin(mapView!!, mapboxMap, it)
 
-                val builder = VmPolicy.Builder()
-                StrictMode.setVmPolicy(builder.build())
+//                val builder = VmPolicy.Builder()
+//                StrictMode.setVmPolicy(builder.build())
 
                 try {
 
@@ -611,6 +608,28 @@ class MainActivity : BaseActivity(), MainController.view,
 
     }
 
+    private fun clearMovingCars() {
+        movingCarPositions.clear()
+        movingCarGeoJsonSources.clear()
+        movingCarAnimations.clear()
+        movingCarAnimationListeners.clear()
+
+        movingCarRotations.clear()
+
+
+
+        for (layer in mapBoxStyle.layers) {
+            if (layer.id.startsWith("moving-layer"))
+                mapBoxStyle.removeLayer(layer)
+        }
+
+        for (source in mapBoxStyle.sources) {
+            if (source.id.startsWith("moving-source"))
+                mapBoxStyle.removeSource(source)
+        }
+
+    }
+
     var OLD_SEARCH_POINT_LAT = 0.0
     var OLD_SEARCH_POINT_LON = 0.0
 
@@ -777,7 +796,7 @@ class MainActivity : BaseActivity(), MainController.view,
         requestCurrentLocation()
     }
 
-    fun drawOnGoingOrderRoute(shortOrderInfo: ShortOrderInfo){
+    fun drawOnGoingOrderRoute(shortOrderInfo: ShortOrderInfo) {
         ROUTE_DATA.add(
             RouteItem(
                 false,
@@ -787,8 +806,8 @@ class MainActivity : BaseActivity(), MainController.view,
             )
         )
 
-        for ((index, destination) in shortOrderInfo.route.withIndex()){
-            if (index!=0&&index!=shortOrderInfo.route.size-1){
+        for ((index, destination) in shortOrderInfo.route.withIndex()) {
+            if (index != 0 && index != shortOrderInfo.route.size - 1) {
                 val view = LayoutInflater.from(this).inflate(
                     R.layout.item_destination,
                     linearDestinations,
@@ -831,8 +850,8 @@ class MainActivity : BaseActivity(), MainController.view,
 
     override fun onOnGoingOrderFound(shortOrderInfo: ShortOrderInfo) {
 
-        bottomSheetBehaviour.peekHeight = 0
-        bottomSheetBehaviour.state = BottomSheetBehavior.STATE_COLLAPSED
+        bottomSheetBehaviour.isHideable = true
+        bottomSheetBehaviour.state = BottomSheetBehavior.STATE_HIDDEN
 
         createOrderPositionDisposable(shortOrderInfo.id)
 
@@ -903,8 +922,8 @@ class MainActivity : BaseActivity(), MainController.view,
     fun onOnGoingOrderChange(oderID: Long, orderInfo: OrderInfo) {
 
 
-        bottomSheetBehaviour.peekHeight = 0
-        bottomSheetBehaviour.state = BottomSheetBehavior.STATE_COLLAPSED
+        bottomSheetBehaviour.isHideable = true
+        bottomSheetBehaviour.state = BottomSheetBehavior.STATE_HIDDEN
 
         rvCallDriver.setOnClickListener {
             if (orderInfo.assignee?.call?.numbers != null && orderInfo.assignee.call.numbers.size > 0) {
@@ -924,6 +943,8 @@ class MainActivity : BaseActivity(), MainController.view,
         when (orderInfo.state) {
 
             Constants.ORDER_STATE_ASSIGNED -> {
+                mSocket?.disconnect()
+                clearMovingCars()
 
                 val carPointOLD = Location("pointOLD")
                 carPointOLD.latitude = START_POINT_LAT
@@ -1002,12 +1023,14 @@ class MainActivity : BaseActivity(), MainController.view,
             }
             Constants.ORDER_STATE_EXECUTING -> {
 
-                textViewCarName.text = "${orderInfo.assignee?.car?.model} - ${orderInfo.assignee?.car?.color}"
+                textViewCarName.text =
+                    "${orderInfo.assignee?.car?.model} - ${orderInfo.assignee?.car?.color}"
                 textViewCarNumber.text = "${orderInfo.assignee?.car?.regNum}"
 
                 val decimalFormat = DecimalFormat("###,###")
 
-                textViewRate.text = "${decimalFormat.format(ORDER_COST)} ${getString(R.string.currency)}"
+                textViewRate.text =
+                    "${decimalFormat.format(ORDER_COST)} ${getString(R.string.currency)}"
                 if (orderInfo.assignee != null)
                     when (orderInfo.assignee!!.car.alias) {
                         Constants.CAR_ALIAS_NEXIA -> {
@@ -1074,6 +1097,8 @@ class MainActivity : BaseActivity(), MainController.view,
     private fun showFoundCarInfo(orderID: Long) {
         lottieAnimation.cancelAnimation()
         lottieAnimation.visibility = View.GONE
+        mSocket?.disconnect()
+        clearMovingCars()
 
         if (CURRENT_MODE == Constants.MODE_CAR_FOUND || CURRENT_MODE == Constants.MODE_DRIVER_CAME)
             modeDriverFound.visibility = View.VISIBLE
@@ -1212,13 +1237,12 @@ class MainActivity : BaseActivity(), MainController.view,
 
     lateinit var routeLineSource: GeoJsonSource
 
-    var routeLineData = ArrayList<Point>()
 
-    override fun onRouteAddClicked(){
+    override fun onRouteAddClicked() {
         AddresSearchFragment().show(supportFragmentManager, "searchStopPoint")
     }
 
-    override  fun onChangeRouteLocationClicked(lat: Double, lon: Double){
+    override fun onChangeRouteLocationClicked(lat: Double, lon: Double) {
         val position = CameraPosition.Builder()
             .target(LatLng(lat, lon))
             .zoom(16.0)
@@ -1229,12 +1253,13 @@ class MainActivity : BaseActivity(), MainController.view,
 
         showDestinationPickPage(Constants.DESTINATION_PICK_EDIT, lat, lon)
     }
+
     override fun onRemoveRouteClicked(
         lat: Double,
         lon: Double,
         position: Int,
         removedItem: RouteItem
-    ){
+    ) {
         ROUTE_DATA.remove(removedItem)
 
         imageViewCloudTop.animate().scaleY(8f).setDuration(400).setInterpolator(
@@ -1244,10 +1269,10 @@ class MainActivity : BaseActivity(), MainController.view,
         shimmer.start(textViewDrawingAddress)
 
         val routeToDraw = ArrayList<RouteCoordinates>()
-        val routePoints =  ArrayList<RouteItem>()
+        val routePoints = ArrayList<RouteItem>()
         routePoints.addAll(ROUTE_DATA)
         routePoints.add(0, RouteItem(false, START_POINT_NAME, START_POINT_LAT, START_POINT_LON))
-        for (rot in routePoints){
+        for (rot in routePoints) {
             routeToDraw.add(RouteCoordinates(rot.lat, rot.lon, "through"))
         }
 
@@ -1261,6 +1286,9 @@ class MainActivity : BaseActivity(), MainController.view,
         recyclerViewRoute.adapter?.notifyItemRemoved(position)
     }
 
+    var routeLineData = ArrayList<Point>()
+    var routeCoordinateList = ArrayList<Point>()
+
     override fun drawRoute(route: ArrayList<Point>) {
 
         imageViewCloudTop.animate().scaleY(1f).setDuration(400).setInterpolator(
@@ -1269,13 +1297,15 @@ class MainActivity : BaseActivity(), MainController.view,
         textViewDrawingAddress.visibility = View.GONE
         shimmer.cancel()
 
-        bottomSheetBehaviour.peekHeight = 0
-        bottomSheetBehaviour.state = BottomSheetBehavior.STATE_COLLAPSED
+//        bottomSheetBehaviour.setPeekHeight(-500, true)
+        bottomSheetBehaviour.isHideable = true
+        bottomSheetBehaviour.state = BottomSheetBehavior.STATE_HIDDEN
 
 
         routeLineData.clear()
-        routeLineData.addAll(route)
-
+        routeCoordinateList.clear()
+        routeCoordinateList.addAll(route)
+        routeIndex = 0
         ROUTE_DRAWN = true
 
 
@@ -1293,8 +1323,8 @@ class MainActivity : BaseActivity(), MainController.view,
             textReady.visibility = View.VISIBLE
             progressReady.visibility = View.GONE
 
-            bottomSheetBehaviour.peekHeight = 0
-            bottomSheetBehaviour.state = BottomSheetBehavior.STATE_COLLAPSED
+            bottomSheetBehaviour.isHideable = true
+            bottomSheetBehaviour.state = BottomSheetBehavior.STATE_HIDDEN
 
             CURRENT_MODE = Constants.MODE_CREATE_ORDER
             rvReady.visibility = View.GONE
@@ -1302,7 +1332,7 @@ class MainActivity : BaseActivity(), MainController.view,
                 .setInterpolator(AccelerateInterpolator()).start()
 
             modeCreateOrder.visibility = View.VISIBLE
-
+            cardBack.visibility = View.VISIBLE
 
             cardGPS.visibility = View.GONE
             cardNext.visibility = View.GONE
@@ -1376,14 +1406,14 @@ class MainActivity : BaseActivity(), MainController.view,
 
             removeRoute()
 
-
+            routeLineData.add(route[0])
 
             routeLineSource = GeoJsonSource(
                 "line-source",
                 FeatureCollection.fromFeatures(
                     arrayOf(
                         Feature.fromGeometry(
-                            LineString.fromLngLats(route)
+                            LineString.fromLngLats(routeLineData)
                         )
                     )
                 ), GeoJsonOptions().withLineMetrics(true)
@@ -1405,6 +1435,7 @@ class MainActivity : BaseActivity(), MainController.view,
             )
 
 
+
             mapBoxStyle.addSource(
                 GeoJsonSource(
                     "start-source", Feature.fromGeometry(
@@ -1416,12 +1447,12 @@ class MainActivity : BaseActivity(), MainController.view,
                 )
             )
 
-            val routePoints =  ArrayList<RouteItem>()
+            val routePoints = ArrayList<RouteItem>()
             routePoints.addAll(ROUTE_DATA)
             routePoints.add(0, RouteItem(false, START_POINT_NAME, START_POINT_LAT, START_POINT_LON))
 
-            for ((counter, rot) in routePoints.withIndex()){
-                if (counter!=0&&counter!=routePoints.size-1){
+            for ((counter, rot) in routePoints.withIndex()) {
+                if (counter != 0 && counter != routePoints.size - 1) {
                     mapBoxStyle.addSource(
                         GeoJsonSource(
                             "start-source-${counter}", Feature.fromGeometry(
@@ -1479,8 +1510,57 @@ class MainActivity : BaseActivity(), MainController.view,
                 )
             )
 
+
+            animate()
         }
     }
+
+    private class PointEvaluator : TypeEvaluator<Point> {
+        override fun evaluate(fraction: Float, startValue: Point, endValue: Point): Point {
+            return Point.fromLngLat(
+                startValue.longitude() + (endValue.longitude() - startValue.longitude()) * fraction,
+                startValue.latitude() + (endValue.latitude() - startValue.latitude()) * fraction
+            )
+        }
+    }
+
+    var routeIndex = 0
+
+    private var currentAnimator: Animator? = null
+    private fun animate() {
+// Check if we are at the end of the points list
+        if (routeCoordinateList.size - 1 > routeIndex) {
+            val indexPoint: Point = routeCoordinateList.get(routeIndex)
+            val newPoint = Point.fromLngLat(indexPoint.longitude(), indexPoint.latitude())
+            currentAnimator = createLatLngAnimator(indexPoint, newPoint)
+            currentAnimator?.start()
+            routeIndex++
+        }
+    }
+
+    private fun createLatLngAnimator(currentPosition: Point, targetPosition: Point): Animator? {
+        val latLngAnimator =
+            ValueAnimator.ofObject(PointEvaluator(), currentPosition, targetPosition)
+        latLngAnimator.duration = TurfMeasurement.distance(
+            currentPosition,
+            targetPosition,
+            "meters"
+        ).toLong() / 20
+        latLngAnimator.interpolator = AccelerateInterpolator()
+        latLngAnimator.addListener(object : AnimatorListenerAdapter() {
+            override fun onAnimationEnd(animation: Animator) {
+                super.onAnimationEnd(animation)
+                animate()
+            }
+        })
+        latLngAnimator.addUpdateListener { animation ->
+            val point = animation.animatedValue as Point
+            routeLineData.add(point)
+            routeLineSource.setGeoJson(Feature.fromGeometry(LineString.fromLngLats(routeLineData)))
+        }
+        return latLngAnimator
+    }
+
 
     val paymentMethods = ArrayList<PaymentMethod>()
 
@@ -1496,15 +1576,15 @@ class MainActivity : BaseActivity(), MainController.view,
     }
 
     override fun onServiceNotAvailable() {
-        bottomSheetBehaviour.peekHeight = 0
-        bottomSheetBehaviour.state = BottomSheetBehavior.STATE_COLLAPSED
+        bottomSheetBehaviour.isHideable = true
+        bottomSheetBehaviour.state = BottomSheetBehavior.STATE_HIDDEN
         cardNext.visibility = View.GONE
         rvNoService.visibility = View.VISIBLE
 
     }
 
     override fun onTariffsReady(tariffs: ArrayList<ServiceTariff>) {
-        if (rvNoService.visibility == View.VISIBLE){
+        if (rvNoService.visibility == View.VISIBLE) {
             bottomSheetBehaviour.peekHeight = PEEK_HEIGHT
             bottomSheetBehaviour.state = BottomSheetBehavior.STATE_COLLAPSED
             cardNext.visibility = View.VISIBLE
@@ -1537,10 +1617,26 @@ class MainActivity : BaseActivity(), MainController.view,
                         COMMENT = ""
                         TARIF_OPTIONS.clear()
 
-                        val routePoints = ArrayList<RouteCoordinates>()
-                        routePoints.add(RouteCoordinates(START_POINT_LAT, START_POINT_LON, null))
-                        if (END_POINT_LAT != 0.0)
-                            routePoints.add(RouteCoordinates(END_POINT_LAT, END_POINT_LON, null))
+//                        val routePoints = ArrayList<RouteCoordinates>()
+//                        routePoints.add(RouteCoordinates(START_POINT_LAT, START_POINT_LON, null))
+//                        if (END_POINT_LAT != 0.0)
+//                            routePoints.add(RouteCoordinates(END_POINT_LAT, END_POINT_LON, null))
+
+                        val routeToDraw = ArrayList<RouteCoordinates>()
+
+                        val routePoints = ArrayList<RouteItem>()
+                        routePoints.addAll(ROUTE_DATA)
+                        routePoints.add(
+                            0, RouteItem(
+                                false,
+                                START_POINT_NAME,
+                                START_POINT_LAT,
+                                START_POINT_LON
+                            )
+                        )
+                        for (rot in routePoints) {
+                            routeToDraw.add(RouteCoordinates(rot.lat, rot.lon, "through"))
+                        }
 
                         var price = 0.0
 
@@ -1553,7 +1649,8 @@ class MainActivity : BaseActivity(), MainController.view,
                                         PaymentMethod("cash", null, null, null),
                                         tariffID,
                                         null,
-                                        routePoints
+//                                        routePoints
+                                        routeToDraw
                                     )
                                 )
                                 .observeOn(AndroidSchedulers.mainThread())
@@ -1637,7 +1734,7 @@ class MainActivity : BaseActivity(), MainController.view,
                     }
 
                     override fun onTarifReclicked(tariff: ServiceTariff) {
-                        TariffInfoSheet(tariff).show(supportFragmentManager, "tariffInfo")
+//                        TariffInfoSheet(tariff).show(supportFragmentManager, "tariffInfo")
                     }
                 })
 
@@ -1702,6 +1799,11 @@ class MainActivity : BaseActivity(), MainController.view,
     var PEEK_HEIGHT = 0
 
     fun showSearchWherePage() {
+
+        cardBack.visibility = View.GONE
+
+
+        ROUTE_DATA.clear()
 
         END_POINT_LAT = 0.0
         END_POINT_LON = 0.0
@@ -1810,8 +1912,8 @@ class MainActivity : BaseActivity(), MainController.view,
         mapboxMap.easeCamera(CameraUpdateFactory.newCameraPosition(position), 500)
 
 
-        bottomSheetBehaviour.peekHeight = 0
-        bottomSheetBehaviour.state = BottomSheetBehavior.STATE_COLLAPSED
+        bottomSheetBehaviour.isHideable = true
+        bottomSheetBehaviour.state = BottomSheetBehavior.STATE_HIDDEN
         cardNext.visibility = View.GONE
         rvReady.visibility = View.VISIBLE
         rvReady.animate().translationY(0f).setDuration(200)
@@ -1952,6 +2054,8 @@ class MainActivity : BaseActivity(), MainController.view,
 
 
         modeCreateOrder.visibility = View.GONE
+//        cardBack.visibility = View.GONE
+
         cardGPS.visibility = View.VISIBLE
         cardNext.visibility = View.GONE
         imageViewPointerShadow.visibility = View.VISIBLE
@@ -2020,6 +2124,8 @@ class MainActivity : BaseActivity(), MainController.view,
         CURRENT_MODE = Constants.MODE_CAR_SEARCH
 
         modeCreateOrder.visibility = View.GONE
+        cardBack.visibility = View.GONE
+
         modeSearchCar.visibility = View.VISIBLE
         pointerLayout.visibility = View.VISIBLE
         imageViewPointerFoot.visibility = View.GONE
@@ -2055,61 +2161,61 @@ class MainActivity : BaseActivity(), MainController.view,
 
     }
 
-    private fun createOrderPositionDisposable(orderID: Long){
-        if(!::carPositionDisposable.isInitialized)
-        carPositionDisposable = Observable.interval(
-            0, 1500,
-            TimeUnit.MILLISECONDS
-        )
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeOn(Schedulers.io())
-            .subscribe({
-                RetrofitHelper.apiService(Constants.BASE_URL)
-                    .getOrderDetails(
-                        getCurrentLanguage().toLanguageTag(),
-                        Constants.HIVE_PROFILE,
-                        NaiveHmacSigner.DateSignature(),
-                        NaiveHmacSigner.AuthSignature(
-                            HIVE_USER_ID,
-                            HIVE_TOKEN,
-                            "GET",
-                            "/api/client/mobile/2.2/orders/$orderID"
-                        ),
-                        orderID
-                    )
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribeOn(Schedulers.io())
-                    .subscribe({
+    private fun createOrderPositionDisposable(orderID: Long) {
+        if (!::carPositionDisposable.isInitialized)
+            carPositionDisposable = Observable.interval(
+                0, 1500,
+                TimeUnit.MILLISECONDS
+            )
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe({
+                    RetrofitHelper.apiService(Constants.BASE_URL)
+                        .getOrderDetails(
+                            getCurrentLanguage().toLanguageTag(),
+                            Constants.HIVE_PROFILE,
+                            NaiveHmacSigner.DateSignature(),
+                            NaiveHmacSigner.AuthSignature(
+                                HIVE_USER_ID,
+                                HIVE_TOKEN,
+                                "GET",
+                                "/api/client/mobile/2.2/orders/$orderID"
+                            ),
+                            orderID
+                        )
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribeOn(Schedulers.io())
+                        .subscribe({
 
-                        if (it.isSuccessful && it.body() != null) {
+                            if (it.isSuccessful && it.body() != null) {
 
-                            onOnGoingOrderChange(orderID, it.body()!!)
-                            ORDER_COST = it.body()!!.cost.amount
+                                onOnGoingOrderChange(orderID, it.body()!!)
+                                ORDER_COST = it.body()!!.cost.amount
 
-                            if (it.body()!!.route[0].address.position != null) {
-                                START_POINT_LAT = it.body()!!.route[0].address.position!!.lat
-                                START_POINT_LON = it.body()!!.route[0].address.position!!.lon
+                                if (it.body()!!.route[0].address.position != null) {
+                                    START_POINT_LAT = it.body()!!.route[0].address.position!!.lat
+                                    START_POINT_LON = it.body()!!.route[0].address.position!!.lon
 
-                                if (it.body()!!.assignee?.location != null) {
-                                    addCar(
-                                        it.body()!!.assignee?.location!!.lat,
-                                        it.body()!!.assignee?.location!!.lon
-                                    )
+                                    if (it.body()!!.assignee?.location != null) {
+                                        addCar(
+                                            it.body()!!.assignee?.location!!.lat,
+                                            it.body()!!.assignee?.location!!.lon
+                                        )
+                                    }
                                 }
+
+
                             }
 
+                        }, {
 
-                        }
+                        })
 
-                    }, {
+                },
+                    {
 
-                    })
-
-            },
-                {
-
-                }
-            )
+                    }
+                )
     }
 
     override fun onOrderCancelled() {
@@ -2127,7 +2233,7 @@ class MainActivity : BaseActivity(), MainController.view,
             CURRENT_MODE = Constants.MODE_CREATE_ORDER
 
             modeCreateOrder.visibility = View.VISIBLE
-
+            cardBack.visibility = View.VISIBLE
             pointerLayout.visibility = View.GONE
             imageViewPointerFoot.visibility = View.GONE
             imageViewPointerShadow.visibility = View.GONE
@@ -2158,7 +2264,7 @@ class MainActivity : BaseActivity(), MainController.view,
 
 
     var movingCarPositions = HashMap<Long, LatLng>()
-    var movingCarGeoJsonSources  = HashMap<Long, GeoJsonSource>()
+    var movingCarGeoJsonSources = HashMap<Long, GeoJsonSource>()
     var movingCarAnimations = HashMap<Long, ValueAnimator>()
     var movingCarAnimationListeners = HashMap<Long, AnimatorUpdateListener>()
 
@@ -2289,7 +2395,7 @@ class MainActivity : BaseActivity(), MainController.view,
                             animatedPosition.latitude
                         )
                     )
-                }catch (ex: Exception){
+                } catch (ex: Exception) {
                     valueAnimator.cancel()
                 }
 
@@ -2348,7 +2454,7 @@ class MainActivity : BaseActivity(), MainController.view,
         val distance = carPointOLD.distanceTo(carPointNEW)
 
 
-        val time = ((distance.toInt() * 3600) / 10000)/60 + 1
+        val time = ((distance.toInt() * 3600) / 10000) / 60 + 1
 
         if (!MAP_MOVING) {
             pointerRectangle.animate().scaleY(3f).scaleX(3f)
@@ -2377,15 +2483,15 @@ class MainActivity : BaseActivity(), MainController.view,
                 textViewDurationDriver.text = "${time}"
                 textViewDurationMin.visibility = View.VISIBLE
             }, 500)
-        }else{
+        } else {
             textViewDurationDriver.text = ""
             textViewDurationMin.visibility = View.INVISIBLE
         }
 
         val iterator = movingCarGeoJsonSources.iterator()
-        while(iterator.hasNext()){
+        while (iterator.hasNext()) {
             val item = iterator.next()
-            if(!ids.contains(item.key)){
+            if (!ids.contains(item.key)) {
                 iterator.remove()
                 mapBoxStyle.removeLayer("moving-layer-${item.key}")
                 mapBoxStyle.removeSource("moving-source-${item.key}")
@@ -2416,7 +2522,7 @@ class MainActivity : BaseActivity(), MainController.view,
             .withPixelRatio(2f)
         MapSnapshotter(this, options).start(
             { snapshot ->
-                if (snapshot!=null)
+                if (snapshot != null)
                     AddAddressSheet(snapshot.bitmap, object : AddAddressSheet.OnAddressAddListener {
                         override fun onAddClicked(
                             addressName: String,
@@ -2467,6 +2573,7 @@ class MainActivity : BaseActivity(), MainController.view,
         longitude: Double,
         title: String
     ) {
+
         END_POINT_NAME = title
         END_POINT_LAT = latitude
         END_POINT_LON = longitude
@@ -2475,10 +2582,10 @@ class MainActivity : BaseActivity(), MainController.view,
 
         val routeToDraw = ArrayList<RouteCoordinates>()
 
-        val routePoints =  ArrayList<RouteItem>()
+        val routePoints = ArrayList<RouteItem>()
         routePoints.addAll(ROUTE_DATA)
         routePoints.add(0, RouteItem(false, START_POINT_NAME, START_POINT_LAT, START_POINT_LON))
-        for (rot in routePoints){
+        for (rot in routePoints) {
             routeToDraw.add(RouteCoordinates(rot.lat, rot.lon, "through"))
         }
 
@@ -2491,6 +2598,8 @@ class MainActivity : BaseActivity(), MainController.view,
 
     }
 
+    lateinit var searchFragment : SearchFragment
+
     fun setUpBottomSheet() {
         bottomSheetBehaviour = BottomSheetBehavior.from(bottomSheet)
         bottomSheetBehaviour.isFitToContents = false
@@ -2498,10 +2607,13 @@ class MainActivity : BaseActivity(), MainController.view,
 
         PEEK_HEIGHT = bottomSheetBehaviour.peekHeight
 
-        val searchFragment = SearchFragment()
+        searchFragment = SearchFragment()
         searchCancelListener = searchFragment
         changeBottomSheet(searchFragment, false)
 
+        cardBack.setOnClickListener {
+            onBackPressed()
+        }
 
 
         bottomSheetBehaviour.addBottomSheetCallback(object :
@@ -2535,6 +2647,8 @@ class MainActivity : BaseActivity(), MainController.view,
     }
 
     override fun onAddressFound(name: String, details: String) {
+        if(::searchFragment.isInitialized)
+        searchFragment.loadSavedAdresses()
         try {
             textViewCurrentAddress.text = "${name.toInt()}${getString(R.string.house)}"
         } catch (e: java.lang.Exception) {
@@ -2587,7 +2701,7 @@ class MainActivity : BaseActivity(), MainController.view,
                 rvReady.isClickable = true
                 rvReady.setBackgroundResource(R.drawable.bc_button_purple)
             }
-            else->{
+            else -> {
                 END_POINT_NAME = if (details != "") details else name
 //                ROUTE_DATA.add(RouteItem(false,END_POINT_NAME,END_POINT_LAT,END_POINT_LON))
                 rvReady.isClickable = true
@@ -2765,7 +2879,7 @@ class MainActivity : BaseActivity(), MainController.view,
     override fun onResume() {
         super.onResume()
         mapView?.onResume()
-        if(searchCancelListener!=null&&searchCancelListener is SearchFragment)
+        if (searchCancelListener != null && searchCancelListener is SearchFragment)
             (searchCancelListener as SearchFragment).loadSavedAdresses()
 //        mainDisposables.add(presenter.getOngoingOrder())
     }
@@ -2798,6 +2912,10 @@ class MainActivity : BaseActivity(), MainController.view,
             unregisterReceiver(receiver)
         }
 
+        if (currentAnimator != null) {
+            currentAnimator?.cancel();
+        }
+
         if (::shimmer.isInitialized) {
             shimmer.cancel()
         }
@@ -2816,8 +2934,8 @@ class MainActivity : BaseActivity(), MainController.view,
             carPositionDisposable.dispose()
 
 
-        mSocket?.disconnect();
-        mSocket?.off("drivers", onNewMessage);
+        mSocket?.disconnect()
+        mSocket?.off("drivers", onNewMessage)
     }
 
     override fun onLocationChanged(location: Location) {
@@ -2880,7 +2998,6 @@ class MainActivity : BaseActivity(), MainController.view,
 
         if (::geoJsonSource.isInitialized) {
 
-//
             if (animator != null) {
 
                 animator!!.removeAllUpdateListeners()
@@ -2892,7 +3009,11 @@ class MainActivity : BaseActivity(), MainController.view,
             }
 
         } else {
-
+//            val list = ArrayList<RouteCoordinates>()
+//            list.add(RouteCoordinates(latitude, longitude, "through"))
+//            list.add(RouteCoordinates(41.382449918051115, 69.30347510578719, "through"))
+//            mainDisposables.add(presenter.getRoute(list, false))
+//
             if (CURRENT_MODE == Constants.MODE_CAR_FOUND)
                 showDriverRoute(latitude, longitude)
             if (END_POINT_LAT != 0.0)
@@ -2959,8 +3080,9 @@ class MainActivity : BaseActivity(), MainController.view,
 
                 iconSpinningAnimator!!.addUpdateListener { valueAnimator -> // Retrieve the new animation number to use as the map camera bearing value
                     var newIconRotateValue = valueAnimator.animatedValue as Float
-                    if (newIconRotateValue.toString().contains(",")){
-                        newIconRotateValue = newIconRotateValue.toString().replace(",", ".").toFloat()
+                    if (newIconRotateValue.toString().contains(",")) {
+                        newIconRotateValue =
+                            newIconRotateValue.toString().replace(",", ".").toFloat()
                     }
                     OLD_ROTATION = newIconRotateValue
 
@@ -3319,7 +3441,7 @@ class MainActivity : BaseActivity(), MainController.view,
 
                     val routeToDraw = ArrayList<RouteCoordinates>()
 
-                    val routePoints =  ArrayList<RouteItem>()
+                    val routePoints = ArrayList<RouteItem>()
                     routePoints.addAll(ROUTE_DATA)
                     routePoints.add(
                         0, RouteItem(
@@ -3329,7 +3451,7 @@ class MainActivity : BaseActivity(), MainController.view,
                             START_POINT_LON
                         )
                     )
-                    for (rot in routePoints){
+                    for (rot in routePoints) {
                         routeToDraw.add(RouteCoordinates(rot.lat, rot.lon, "through"))
                     }
 
@@ -3352,6 +3474,7 @@ class MainActivity : BaseActivity(), MainController.view,
 
                     return true
                 }
+
                 override fun onSwiped(
                     viewHolder: RecyclerView.ViewHolder,
                     direction: Int

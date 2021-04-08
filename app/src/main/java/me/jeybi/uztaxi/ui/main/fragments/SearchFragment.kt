@@ -51,7 +51,7 @@ class SearchFragment : BaseFragment(), SearchAdapter.SearchItemClickListener,
 
         }
 
-        loadSavedAdresses()
+//        loadSavedAdresses()
 
         rvDelivery.setOnClickListener {
 
