@@ -11,24 +11,22 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:orientation="vertical"
-        android:layout_weight="0.7"
+        android:layout_weight="0.8"
         android:gravity="center"
         android:layout_marginTop="52dp"
         >
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
+            android:layout_height="wrap_content"
             >
 
-            <com.airbnb.lottie.LottieAnimationView
+            <ImageView
                 android:id="@+id/lottieProfile"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 android:layout_width="64dp"
                 android:layout_height="64dp"
-                app:lottie_fileName="profile_male.json"
                 android:scaleType="centerCrop"
                 android:layout_marginStart="12dp"
                 />
@@ -66,6 +64,43 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <LinearLayout
+        android:id="@+id/linearPayment"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:gravity="center_horizontal|bottom"
+        android:background="?attr/selectableItemBackground"
+        android:orientation="vertical"
+        >
+
+        <TextView
+            android:layout_width="match_parent"
+            android:paddingStart="18dp"
+            android:gravity="center"
+            android:maxLines="1"
+            android:layout_height="wrap_content"
+            android:text="@string/payment_type"
+            android:textSize="18sp"
+            android:fontFamily="@font/g_bold"
+            android:textColor="@color/black"
+            />
+
+        <TextView
+            android:id="@+id/textNavigationPayment"
+            android:layout_width="match_parent"
+            android:paddingStart="18dp"
+            android:gravity="center"
+            android:maxLines="1"
+            android:layout_height="wrap_content"
+            android:text="@string/cash"
+            android:textSize="14sp"
+            android:fontFamily="@font/g_regular"
+            android:textColor="@color/black"
+            />
+
+
+
+    </LinearLayout>
         <TextView
             android:id="@+id/textNavigation0"
             android:background="?attr/selectableItemBackground"

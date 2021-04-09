@@ -75,6 +75,9 @@ class AddressAdapter(var data : ArrayList<AddressEntity>, val activity : Activit
             Constants.ALIES_TYPE_GYM->{
                 holder.imageAddressAlias.setImageResource(R.drawable.ic_address_gym)
             }
+            Constants.ALIES_TYPE_MOSQUE->{
+                holder.imageAddressAlias.setImageResource(R.drawable.ic_mosque)
+            }
             else->{
                 holder.imageAddressAlias.setImageResource(R.drawable.ic_address_point)
             }

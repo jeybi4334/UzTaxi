@@ -197,6 +197,34 @@
                 app:lottie_loop="true"
                 app:lottie_speed="0.7" />
 
+            <RelativeLayout
+                android:id="@+id/rvHint"
+                android:scaleY="0"
+                android:scaleX="0"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/pointerLayout"
+                android:layout_marginBottom="26dp"
+                android:background="@drawable/bc_pointer_hint"
+                >
+
+                <TextView
+                    android:id="@+id/textViewHint"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/gilroy_meidum"
+                    android:paddingStart="18dp"
+                    android:paddingEnd="18dp"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp"
+                    android:textColor="@color/white"
+                    />
+
+            </RelativeLayout>
+
+
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/pointerLayout"
                 android:layout_width="48dp"
@@ -327,17 +355,17 @@
                 android:fontFamily="@font/g_bold"
                 />
 
-            <androidx.cardview.widget.CardView
-                android:visibility="gone"
+            <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardViewShowRoute"
+                android:visibility="gone"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintBottom_toTopOf="@id/frameReady"
-                android:layout_marginBottom="4dp"
+                android:layout_margin="8dp"
                 app:cardBackgroundColor="@color/white"
                 app:cardCornerRadius="24dp"
-                android:layout_marginEnd="18dp"
+                app:cardElevation="4dp"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/frameReady"
                 >
 
                 <ImageView
@@ -347,7 +375,7 @@
                     android:layout_gravity="center"
                     />
 
-            </androidx.cardview.widget.CardView>
+            </com.google.android.material.card.MaterialCardView>
 
 
 
@@ -540,30 +568,30 @@
 
             </com.google.android.material.card.MaterialCardView>
 
-            <com.google.android.material.card.MaterialCardView
+<!--            <com.google.android.material.card.MaterialCardView-->
 
-                android:id="@+id/cardNext"
-                android:layout_width="wrap_content"
-                android:layout_height="48dp"
-                android:layout_alignParentEnd="true"
-                android:layout_margin="8dp"
-                app:cardBackgroundColor="@color/purple_200"
-                app:cardCornerRadius="24dp"
-                app:cardElevation="4dp">
+<!--                android:id="@+id/cardNext"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="48dp"-->
+<!--                android:layout_alignParentEnd="true"-->
+<!--                android:layout_margin="8dp"-->
+<!--                app:cardBackgroundColor="@color/purple_200"-->
+<!--                app:cardCornerRadius="24dp"-->
+<!--                app:cardElevation="4dp">-->
 
-                <TextView
-                    android:layout_marginEnd="16dp"
-                    android:layout_marginStart="16dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:layout_gravity="center"
-                    android:fontFamily="@font/g_bold"
-                    android:text="@string/next"
-                    android:textColor="@color/white"
-                    android:textSize="16sp" />
+<!--                <TextView-->
+<!--                    android:layout_marginEnd="16dp"-->
+<!--                    android:layout_marginStart="16dp"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:gravity="center"-->
+<!--                    android:layout_gravity="center"-->
+<!--                    android:fontFamily="@font/g_bold"-->
+<!--                    android:text="@string/next"-->
+<!--                    android:textColor="@color/white"-->
+<!--                    android:textSize="16sp" />-->
 
-            </com.google.android.material.card.MaterialCardView>
+<!--            </com.google.android.material.card.MaterialCardView>-->
 
 
         </RelativeLayout>
@@ -571,11 +599,12 @@
 
         <FrameLayout
             android:visibility="gone"
+            android:paddingTop="36dp"
             android:id="@+id/bottomSheet"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:behavior_hideable="false"
-            app:behavior_peekHeight="176dp"
+            app:behavior_peekHeight="206dp"
             app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
 

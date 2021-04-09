@@ -52,7 +52,9 @@
 
 <!--    </RelativeLayout>-->
 
-    <RelativeLayout
+    <LinearLayout
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
         android:id="@+id/rvWhereTo"
         android:layout_width="match_parent"
         android:layout_height="50dp"
@@ -73,7 +75,8 @@
 
         <EditText
             android:id="@+id/editTextSearch"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_marginRight="4dp"
             android:inputType="textLongMessage"
             android:maxLines="1"
@@ -81,7 +84,7 @@
             android:layout_height="match_parent"
             android:background="@android:color/transparent"
             android:hint="@string/to_where"
-            android:layout_toLeftOf="@id/imageMap"
+            android:layout_toLeftOf="@id/imageNext"
             android:fontFamily="@font/g_bold"
             android:focusableInTouchMode="false"
             android:focusable="false"
@@ -96,20 +99,62 @@
             />
 
 
-        <ImageView
-            android:id="@+id/imageMap"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:padding="15dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/ic_map_small"
+        <View
+            android:id="@+id/viewDiv"
+            android:layout_width="2dp"
+            android:layout_height="28dp"
+            android:background="@drawable/bc_handler_bottomsheet"
+            android:layout_toLeftOf="@id/imageNext"
             android:layout_centerVertical="true"
-            android:layout_alignParentEnd="true"
-            android:layout_marginEnd="5dp"
+            android:alpha="0.14"
             />
 
 
-    </RelativeLayout>
+                <ImageView
+                    android:id="@+id/imageNext"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:padding="15dp"
+                    android:rotation="270"
+                    app:tint="#39034e"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:src="@drawable/ic_arrow_bottom"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginEnd="5dp"
+                    />
+
+        <TextView
+            android:id="@+id/textMap"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:padding="15dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:text="@string/map"
+            android:fontFamily="@font/gilroy_meidum"
+            android:textColor="#39034e"
+            android:layout_centerVertical="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="5dp"
+            android:visibility="gone"
+            />
+
+
+
+        <!--        <ImageView-->
+<!--            android:id="@+id/imageMap"-->
+<!--            android:layout_width="48dp"-->
+<!--            android:layout_height="48dp"-->
+<!--            android:padding="15dp"-->
+<!--            android:background="?attr/selectableItemBackgroundBorderless"-->
+<!--            android:src="@drawable/ic_map_small"-->
+<!--            android:layout_centerVertical="true"-->
+<!--            android:layout_alignParentEnd="true"-->
+<!--            android:layout_marginEnd="5dp"-->
+<!--            />-->
+
+
+    </LinearLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -124,14 +169,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            app:layout_constraintGuide_percent="0.45" />
+            app:layout_constraintGuide_percent="0.5" />
 
 
         <androidx.cardview.widget.CardView
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="60dp"
-
             android:layout_marginStart="18dp"
             android:layout_marginEnd="6dp"
             app:layout_constraintLeft_toLeftOf="parent"
@@ -143,14 +187,17 @@
             app:cardCornerRadius="18dp"
             >
 
-            <RelativeLayout
+            <LinearLayout
                 android:id="@+id/rvDelivery"
+                android:orientation="horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:gravity="center_vertical"
                 >
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
                     android:layout_height="wrap_content"
                     android:text="@string/delivery"
                     android:fontFamily="@font/g_bold"
@@ -172,7 +219,7 @@
                     android:layout_marginBottom="-12dp"
                     />
 
-            </RelativeLayout>
+            </LinearLayout>
 
 
         </androidx.cardview.widget.CardView>
@@ -193,16 +240,18 @@
             app:cardCornerRadius="18dp"
             >
 
-            <RelativeLayout
+            <LinearLayout
                 android:id="@+id/rvAddAddress"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@drawable/bc_search"
+                android:gravity="center_vertical"
                 >
 
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
                     android:layout_height="wrap_content"
                     android:text="@string/add_address"
                     android:fontFamily="@font/g_bold"
@@ -224,7 +273,7 @@
                     android:layout_marginBottom="-12dp"
                     />
 
-            </RelativeLayout>
+            </LinearLayout>
 
 
         </androidx.cardview.widget.CardView>

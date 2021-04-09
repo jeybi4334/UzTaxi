@@ -359,12 +359,13 @@ class MainPresenter(val view: MainActivity) : MainController.presenter {
             })
     }
 
-    override fun getAvailableService(latitude: Double, longitude: Double): Disposable {
+    override fun getAvailableService(latitude: Double, longitude: Double,paymentMethod: PaymentMethod): Disposable {
 
         return RetrofitHelper.apiService(Constants.BASE_URL)
             .getAvailableService(
                 view.getCurrentLanguage().toLanguageTag(),
-                Constants.HIVE_PROFILE, "$latitude $longitude"
+                Constants.HIVE_PROFILE, "$latitude $longitude",
+                paymentMethod
             )
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
@@ -387,7 +388,14 @@ class MainPresenter(val view: MainActivity) : MainController.presenter {
         return RetrofitHelper.apiService(Constants.BASE_URL)
             .getPaymentOptions(
                 view.getCurrentLanguage().toLanguageTag(),
-                Constants.HIVE_PROFILE, "$latitude $longitude"
+                Constants.HIVE_PROFILE, "$latitude $longitude",
+                NaiveHmacSigner.DateSignature(),
+                NaiveHmacSigner.AuthSignature(
+                    view.HIVE_USER_ID,
+                    view.HIVE_TOKEN,
+                    "GET",
+                    "/api/client/mobile/1.0/payment-methods"
+                )
             )
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())

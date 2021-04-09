@@ -8,11 +8,11 @@ data class RegisterUserRequest(
 )
 
 data class ClientInfo(
-    val lastName : String?,
+//    val lastName : String?,
     val firstName : String?,
-    val middleName: String?,
-    val gender : Int?,
-    val birthDate : String?
+//    val middleName: String?,
+//    val gender : Int?,
+//    val birthDate : String?
 )
 
 data class RegisterUserResponse(

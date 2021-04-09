@@ -7,7 +7,9 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.KeyEvent
 import android.view.View
+import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
+import android.widget.TextView.OnEditorActionListener
 import kotlinx.android.synthetic.main.fragment_verify_code.*
 import me.jeybi.uztaxi.R
 import me.jeybi.uztaxi.ui.BaseFragment
@@ -34,7 +36,10 @@ class VerificationFragment() : BaseFragment(), AuthenticationController.OnErrorL
             if (!smsCode1.text.isNullOrEmpty() && !smsCode2.text.isNullOrEmpty() && !smsCode3.text.isNullOrEmpty() && !smsCode4.text.isNullOrEmpty()) {
                 if (progressBarCode.visibility == View.GONE) {
                     progressBarCode.visibility = View.VISIBLE
-                    (activity as AuthenticationActivity).onVerifyClicked("${smsCode1.text}${smsCode2.text}${smsCode3.text}${smsCode4.text}",this)
+                    (activity as AuthenticationActivity).onVerifyClicked(
+                        "${smsCode1.text}${smsCode2.text}${smsCode3.text}${smsCode4.text}",
+                        this
+                    )
                 }
             } else {
                 textViewError.text = getString(R.string.verification_code_wrong)
@@ -119,7 +124,9 @@ class VerificationFragment() : BaseFragment(), AuthenticationController.OnErrorL
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 if (count > 0) {
-                    smsCode1.requestFocus()
+//                    smsCode1.requestFocus()
+                    hideKeyboard(activity as AuthenticationActivity)
+
                 } else {
 
                 }
@@ -138,6 +145,26 @@ class VerificationFragment() : BaseFragment(), AuthenticationController.OnErrorL
             }
             false
         }
+
+        smsCode4.setOnEditorActionListener(OnEditorActionListener { v, actionId, event ->
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                hideKeyboard(activity as AuthenticationActivity)
+                return@OnEditorActionListener true
+            }
+            false
+        })
+    }
+
+    fun hideKeyboard(activity: Activity) {
+        val imm: InputMethodManager =
+            activity.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+        //Find the currently focused view, so we can grab the correct window token from it.
+        var view = activity.currentFocus
+        //If no view currently has focus, create a new one, just so we can grab a window token from it
+        if (view == null) {
+            view = View(activity)
+        }
+        imm.hideSoftInputFromWindow(view.windowToken, 0)
     }
 
     override fun onErrorOccured(message: String) {

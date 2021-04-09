@@ -3,6 +3,7 @@ package me.jeybi.uztaxi.ui.auth.pages
 import android.app.Activity
 import android.os.Bundle
 import android.text.method.LinkMovementMethod
+import android.util.Log
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
@@ -12,6 +13,7 @@ import me.jeybi.uztaxi.R
 import me.jeybi.uztaxi.ui.BaseFragment
 import me.jeybi.uztaxi.ui.auth.AuthenticationActivity
 import me.jeybi.uztaxi.ui.auth.AuthenticationController
+import me.jeybi.uztaxi.utils.NaiveHmacSigner
 
 
 class PhoneNumberFragment : BaseFragment(), AuthenticationController.OnErrorListener {
@@ -40,10 +42,11 @@ class PhoneNumberFragment : BaseFragment(), AuthenticationController.OnErrorList
         rvLogin.setOnClickListener {
             if (progressBarPhone.visibility == View.GONE){
                 (activity as AuthenticationActivity).onPhoneNumberEntered("+998${phone_input.rawText}",this)
-                textViewError.text = ""
                 progressBarPhone.visibility = View.VISIBLE
             }
         }
+
+
 
 
     }

@@ -71,6 +71,8 @@
         android:layout_marginTop="16dp"
         />
 
+
+
    <LinearLayout
        android:id="@+id/linearPaymentType"
        android:background="?attr/selectableItemBackground"
@@ -133,6 +135,7 @@
         android:id="@+id/rvOrder"
         android:layout_width="wrap_content"
         android:minWidth="46dp"
+        android:maxWidth="96dp"
         android:layout_height="46dp"
         app:layout_constraintRight_toRightOf="parent"
         android:layout_marginEnd="16dp"

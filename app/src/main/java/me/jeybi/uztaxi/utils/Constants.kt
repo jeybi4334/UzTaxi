@@ -29,6 +29,13 @@ class Constants {
         const val TABLE_ADDRESS = "table_address"
         const val TABLE_CARDS = "table_cards"
 
+        const val PAYMENT_TYPE = "payment_type"
+
+        const val PAYMENT_TYPE_CASH = "cash"
+        const val PAYMENT_TYPE_CONTRACTOR = "contractor"
+        const val PAYMENT_TYPE_NAME = "payment_type_name"
+        const val PAYMENT_TYPE_ID = "payment_type_id"
+
 
         const val CALL_CENTER_NUMBER = "1191"
 
@@ -188,6 +195,7 @@ class Constants {
         val ALIES_TYPE_HOME = 101
         val ALIES_TYPE_WORK = 102
         val ALIES_TYPE_GYM = 103
+        val ALIES_TYPE_MOSQUE = 104
 
         val CARD_TYPE_PLASTIC = 110010020
         val CARD_TYPE_WALLET = 110010021

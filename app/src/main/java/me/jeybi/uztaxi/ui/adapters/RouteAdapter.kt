@@ -58,7 +58,7 @@ class RouteAdapter(val data : ArrayList<RouteItem>,val listener : onRouteAddClic
 
         }
 
-        holder.imageViewSelectFromMap.setOnClickListener{
+        holder.textMap.setOnClickListener{
             listener.onChangeRouteLocationClicked(item.lat,item.lon)
         }
 
@@ -103,8 +103,9 @@ class RouteAdapter(val data : ArrayList<RouteItem>,val listener : onRouteAddClic
 
     class RouteHolder(view : View) : RecyclerView.ViewHolder(view){
         val textViewDestination = view.findViewById<TextView>(R.id.textViewDestination)
+        val textMap = view.findViewById<TextView>(R.id.textMap)
         val imageViewAdd = view.findViewById<ImageView>(R.id.imageViewAdd)
-        val imageViewSelectFromMap = view.findViewById<ImageView>(R.id.imageViewSelectFromMap)
+//        val imageViewSelectFromMap = view.findViewById<ImageView>(R.id.imageViewSelectFromMap)
         val iconEnd = view.findViewById<ImageView>(R.id.iconEnd)
     }
 

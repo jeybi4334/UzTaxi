@@ -10,6 +10,7 @@
     android:id="@+id/parentPaymentMethod"
     >
 
+
     <ImageView
         android:id="@+id/imageViewPaymentMethod"
         android:layout_width="48dp"
@@ -20,8 +21,6 @@
         android:layout_marginStart="12dp"
         android:paddingRight="8dp"
         android:src="@drawable/ic_money"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:clickable="true"
         />
 
     <TextView
@@ -40,14 +39,13 @@
         />
 
     <ImageView
+        android:visibility="gone"
         android:id="@+id/imageViewDone"
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:layout_marginEnd="8dp"
         android:src="@drawable/ic_done"
         android:padding="12dp"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:clickable="true"
         />
 
 </LinearLayout>

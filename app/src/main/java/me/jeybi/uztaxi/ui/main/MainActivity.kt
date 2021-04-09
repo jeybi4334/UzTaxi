@@ -384,6 +384,19 @@ class MainActivity : BaseActivity(), MainController.view,
                     rvReady.isClickable = false
                     rvReady.setBackgroundResource(R.drawable.bc_button_purple_disabled)
 
+                    cardGPS.animate().translationX(-500f).setDuration(400).setInterpolator(AccelerateInterpolator()).start()
+//                    cardNext.animate().translationX(500f).setDuration(400).setInterpolator(AccelerateInterpolator()).start()
+
+
+                    if(CURRENT_MODE == Constants.MODE_SEARCH_WHERE){
+                        textViewHint.text = getString(R.string.start_point)
+                        rvHint.animate().scaleY(1f).scaleX(1f).setDuration(200).setInterpolator(AnticipateOvershootInterpolator()).start()
+                    }else if (CURRENT_MODE == Constants.MODE_DESTINATION_PICK){
+                        textViewHint.text = getString(R.string.end_point)
+                        rvHint.animate().scaleY(1f).scaleX(1f).setDuration(200).setInterpolator(AnticipateOvershootInterpolator()).start()
+                    }
+
+
                     if (CURRENT_MODE == Constants.MODE_SEARCH_WHERE || CURRENT_MODE == Constants.MODE_DESTINATION_PICK || CURRENT_MODE == Constants.MODE_DESTINATION_PICK_STOP || CURRENT_MODE == Constants.MODE_DESTINATION_PICK_EDIT) {
                         rotatePointerRectangleAnimation()
                         imageViewCloudTop.animate().translationY(-200f).alpha(0.6f)
@@ -402,7 +415,7 @@ class MainActivity : BaseActivity(), MainController.view,
 
                     if (CURRENT_MODE == Constants.MODE_SEARCH_WHERE && rvNoService.visibility == View.GONE) {
                         PEEK_HEIGHT = bottomSheetBehaviour.peekHeight
-                        bottomSheetBehaviour.setPeekHeight(PEEK_HEIGHT / 4, true)
+                        bottomSheetBehaviour.setPeekHeight((PEEK_HEIGHT / 2.5f).toInt(), true)
                         bottomSheetBehaviour.state = BottomSheetBehavior.STATE_COLLAPSED
                     }
 
@@ -474,9 +487,16 @@ class MainActivity : BaseActivity(), MainController.view,
 
                 override fun onMoveEnd(detector: MoveGestureDetector) {
 
+                    cardGPS.animate().translationX(0f).setDuration(200).setInterpolator(DecelerateInterpolator()).start()
+//                    cardNext.animate().translationX(0f).setDuration(200).setInterpolator(DecelerateInterpolator()).start()
+
+
+                    rvHint.animate().scaleY(0f).scaleX(0f).setDuration(300).setInterpolator(DecelerateInterpolator()).start()
+
                     MAP_MOVING = false
                     if (CURRENT_MODE == Constants.MODE_SEARCH_WHERE) {
                         bottomSheetBehaviour.setPeekHeight(PEEK_HEIGHT, true)
+                        bottomSheetBehaviour.isHideable = false
                         bottomSheetBehaviour.state = BottomSheetBehavior.STATE_COLLAPSED
                     }
 
@@ -531,7 +551,8 @@ class MainActivity : BaseActivity(), MainController.view,
                                 mainDisposables.add(
                                     presenter.getAvailableService(
                                         mapLat,
-                                        mapLong
+                                        mapLong,
+                                        PaymentMethod("cash",null,null,null)
                                     )
                                 )
                             }
@@ -1108,7 +1129,7 @@ class MainActivity : BaseActivity(), MainController.view,
 
         modeSearchCar.visibility = View.GONE
         cardGPS.visibility = View.GONE
-        cardNext.visibility = View.GONE
+//        cardNext.visibility = View.GONE
 
         rvCancelRide.setOnClickListener {
             mainDisposables.add(presenter.cancelOrder(orderID))
@@ -1333,9 +1354,10 @@ class MainActivity : BaseActivity(), MainController.view,
 
             modeCreateOrder.visibility = View.VISIBLE
             cardBack.visibility = View.VISIBLE
+            cardViewShowRoute.visibility = View.VISIBLE
 
             cardGPS.visibility = View.GONE
-            cardNext.visibility = View.GONE
+//            cardNext.visibility = View.GONE
             imageViewPointerShadow.visibility = View.GONE
             pointerLayout.visibility = View.GONE
             textViewCurrentAddress.visibility = View.GONE
@@ -1368,8 +1390,8 @@ class MainActivity : BaseActivity(), MainController.view,
                 val latLngBounds = LatLngBounds.Builder()
                     .includes(routeLines)
                     .build()
-                if (END_POINT_LAT != 0.0) {
-                    cardViewShowRoute.visibility = View.VISIBLE
+//                if (END_POINT_LAT != 0.0) {
+//                    cardViewShowRoute.visibility = View.VISIBLE
                     cardViewShowRoute.setOnClickListener {
 
                         mapboxMap.animateCamera(
@@ -1392,7 +1414,7 @@ class MainActivity : BaseActivity(), MainController.view,
                         )
                     }
                     cardViewShowRoute.performClick()
-                }
+//                }
 
 
             }
@@ -1578,7 +1600,7 @@ class MainActivity : BaseActivity(), MainController.view,
     override fun onServiceNotAvailable() {
         bottomSheetBehaviour.isHideable = true
         bottomSheetBehaviour.state = BottomSheetBehavior.STATE_HIDDEN
-        cardNext.visibility = View.GONE
+//        cardNext.visibility = View.GONE
         rvNoService.visibility = View.VISIBLE
 
     }
@@ -1586,8 +1608,9 @@ class MainActivity : BaseActivity(), MainController.view,
     override fun onTariffsReady(tariffs: ArrayList<ServiceTariff>) {
         if (rvNoService.visibility == View.VISIBLE) {
             bottomSheetBehaviour.peekHeight = PEEK_HEIGHT
+            bottomSheetBehaviour.isHideable = false
             bottomSheetBehaviour.state = BottomSheetBehavior.STATE_COLLAPSED
-            cardNext.visibility = View.VISIBLE
+//            cardNext.visibility = View.VISIBLE
             rvNoService.visibility = View.GONE
         }
         if (TARIFF_ID != tariffs[0].id) {
@@ -1840,11 +1863,12 @@ class MainActivity : BaseActivity(), MainController.view,
         textViewCurrentAddress.visibility = View.VISIBLE
         textViewCurrentAddressDetails.visibility = View.VISIBLE
 
+        bottomSheetBehaviour.isHideable = false
         bottomSheetBehaviour.peekHeight = PEEK_HEIGHT
 
         bottomSheetBehaviour.state = BottomSheetBehavior.STATE_COLLAPSED
         cardGPS.visibility = View.VISIBLE
-        cardNext.visibility = View.VISIBLE
+//        cardNext.visibility = View.VISIBLE
 
         rvReady.visibility = View.GONE
         rvReady.animate().translationY(100f).setDuration(200)
@@ -1857,6 +1881,7 @@ class MainActivity : BaseActivity(), MainController.view,
     }
 
     fun showDestinationPickPage(action: Int, lat: Double, lon: Double) {
+        cardViewShowRoute.visibility = View.GONE
         END_POINT_NAME = ""
         rvReady.isClickable = false
         rvReady.setBackgroundResource(R.drawable.bc_button_purple_disabled)
@@ -1914,7 +1939,7 @@ class MainActivity : BaseActivity(), MainController.view,
 
         bottomSheetBehaviour.isHideable = true
         bottomSheetBehaviour.state = BottomSheetBehavior.STATE_HIDDEN
-        cardNext.visibility = View.GONE
+//        cardNext.visibility = View.GONE
         rvReady.visibility = View.VISIBLE
         rvReady.animate().translationY(0f).setDuration(200)
             .setInterpolator(DecelerateInterpolator()).start()
@@ -2057,7 +2082,7 @@ class MainActivity : BaseActivity(), MainController.view,
 //        cardBack.visibility = View.GONE
 
         cardGPS.visibility = View.VISIBLE
-        cardNext.visibility = View.GONE
+//        cardNext.visibility = View.GONE
         imageViewPointerShadow.visibility = View.VISIBLE
         pointerLayout.visibility = View.VISIBLE
         textViewCurrentAddress.visibility = View.VISIBLE
@@ -2072,7 +2097,7 @@ class MainActivity : BaseActivity(), MainController.view,
     }
 
     private fun removeRoute() {
-        cardViewShowRoute.visibility = View.GONE
+//        cardViewShowRoute.visibility = View.GONE
         for (layer in mapBoxStyle.layers) {
             if (layer.id.startsWith("line-") || layer.id.startsWith("start-") || layer.id.startsWith(
                     "finish-"
@@ -2118,13 +2143,13 @@ class MainActivity : BaseActivity(), MainController.view,
 
 
     fun showCarSearchPage(orderID: Long) {
-
         cardViewShowRoute.visibility = View.GONE
 
         CURRENT_MODE = Constants.MODE_CAR_SEARCH
 
         modeCreateOrder.visibility = View.GONE
         cardBack.visibility = View.GONE
+        cardViewShowRoute.visibility = View.GONE
 
         modeSearchCar.visibility = View.VISIBLE
         pointerLayout.visibility = View.VISIBLE
@@ -2189,6 +2214,37 @@ class MainActivity : BaseActivity(), MainController.view,
 
                             if (it.isSuccessful && it.body() != null) {
 
+                                if (it.body()!!.needsProlongation!=null&&it.body()!!.needsProlongation!!){
+                                    mainDisposables.add(
+                                        RetrofitHelper.apiService(Constants.BASE_URL)
+                                            .fixOrderCost(
+                                                getCurrentLanguage().toLanguageTag(),
+                                                Constants.HIVE_PROFILE,
+                                                NaiveHmacSigner.DateSignature(),
+                                                NaiveHmacSigner.AuthSignature(
+                                                    HIVE_USER_ID,
+                                                    HIVE_TOKEN,
+                                                    "GET",
+                                                    "/api/client/mobile/1.0/orders/$orderID/fix-cost"
+                                                ),
+                                                orderID,
+                                                12500.0
+                                            )
+                                            .observeOn(AndroidSchedulers.mainThread())
+                                            .subscribeOn(Schedulers.io())
+                                            .subscribe({
+
+                                            },{
+
+                                            })
+                                    )
+
+
+//                                    /api/client/mobile/1.0/orders/{id}/fix-cost
+
+
+                                }
+
                                 onOnGoingOrderChange(orderID, it.body()!!)
                                 ORDER_COST = it.body()!!.cost.amount
 
@@ -2234,6 +2290,7 @@ class MainActivity : BaseActivity(), MainController.view,
 
             modeCreateOrder.visibility = View.VISIBLE
             cardBack.visibility = View.VISIBLE
+            cardViewShowRoute.visibility = View.VISIBLE
             pointerLayout.visibility = View.GONE
             imageViewPointerFoot.visibility = View.GONE
             imageViewPointerShadow.visibility = View.GONE
@@ -2601,6 +2658,8 @@ class MainActivity : BaseActivity(), MainController.view,
     lateinit var searchFragment : SearchFragment
 
     fun setUpBottomSheet() {
+
+
         bottomSheetBehaviour = BottomSheetBehavior.from(bottomSheet)
         bottomSheetBehaviour.isFitToContents = false
         bottomSheetBehaviour.halfExpandedRatio = 0.45f
@@ -2616,11 +2675,13 @@ class MainActivity : BaseActivity(), MainController.view,
         }
 
 
+
         bottomSheetBehaviour.addBottomSheetCallback(object :
             BottomSheetBehavior.BottomSheetCallback() {
             override fun onStateChanged(bottomSheet: View, newState: Int) {
                 if (searchCancelListener != null) {
                     if (newState == BottomSheetBehavior.STATE_HALF_EXPANDED || newState == BottomSheetBehavior.STATE_COLLAPSED) {
+                        hideKeyboard()
                         searchCancelListener!!.onSearchCancel()
                     } else if (newState == BottomSheetBehavior.STATE_EXPANDED) {
                         searchCancelListener!!.onSearchStart()
@@ -2633,12 +2694,12 @@ class MainActivity : BaseActivity(), MainController.view,
 
                 if (slideOffset > 0.3) {
                     cardGPS.alpha = 0.6f - slideOffset
-                    cardNext.alpha = 0.6f - slideOffset
+//                    cardNext.alpha = 0.6f - slideOffset
 
 
                 } else {
                     cardGPS.alpha = 1f
-                    cardNext.alpha = 1f
+//                    cardNext.alpha = 1f
 
                 }
             }
@@ -2646,9 +2707,15 @@ class MainActivity : BaseActivity(), MainController.view,
 
     }
 
+    fun onNextClicked(){
+
+        drawRoute(arrayListOf())
+
+    }
+
     override fun onAddressFound(name: String, details: String) {
-        if(::searchFragment.isInitialized)
-        searchFragment.loadSavedAdresses()
+//        if(::searchFragment.isInitialized)
+//        searchFragment.loadSavedAdresses()
         try {
             textViewCurrentAddress.text = "${name.toInt()}${getString(R.string.house)}"
         } catch (e: java.lang.Exception) {
@@ -2733,11 +2800,11 @@ class MainActivity : BaseActivity(), MainController.view,
             }
         }
 
-        cardNext.setOnClickListener {
-//            textViewDestination.text = getString(R.string.around_city)
-            drawRoute(arrayListOf())
-
-        }
+//        cardNext.setOnClickListener {
+////            textViewDestination.text = getString(R.string.around_city)
+//            drawRoute(arrayListOf())
+//
+//        }
     }
 
     private fun requestCurrentLocation() {
@@ -2879,8 +2946,10 @@ class MainActivity : BaseActivity(), MainController.view,
     override fun onResume() {
         super.onResume()
         mapView?.onResume()
+        hideKeyboard()
         if (searchCancelListener != null && searchCancelListener is SearchFragment)
             (searchCancelListener as SearchFragment).loadSavedAdresses()
+
 //        mainDisposables.add(presenter.getOngoingOrder())
     }
 
@@ -2950,7 +3019,7 @@ class MainActivity : BaseActivity(), MainController.view,
         progressGPS.visibility = View.GONE
         imageGPS.visibility = View.VISIBLE
 
-        mainDisposables.add(presenter.getAvailableService(location.latitude, location.longitude))
+        mainDisposables.add(presenter.getAvailableService(location.latitude, location.longitude,   PaymentMethod("cash",null,null,null)))
 
         mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(position), 1000)
 
@@ -3016,8 +3085,8 @@ class MainActivity : BaseActivity(), MainController.view,
 //
             if (CURRENT_MODE == Constants.MODE_CAR_FOUND)
                 showDriverRoute(latitude, longitude)
-            if (END_POINT_LAT != 0.0)
-                cardViewShowRoute.visibility = View.GONE
+//            if (END_POINT_LAT != 0.0)
+//                cardViewShowRoute.visibility = View.GONE
 
             carPosition = LatLng(latitude, longitude)
 

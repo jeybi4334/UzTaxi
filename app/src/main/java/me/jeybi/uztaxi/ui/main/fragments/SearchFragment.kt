@@ -13,6 +13,7 @@ import com.google.android.flexbox.*
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.bottom_sheet_search.*
 import me.jeybi.uztaxi.R
 import me.jeybi.uztaxi.UzTaxiApplication
@@ -48,6 +49,13 @@ class SearchFragment : BaseFragment(), SearchAdapter.SearchItemClickListener,
 //            editTextFromWhere.setText((activity as MainActivity).CURRENT_ADDRESS)
 //            editTextFromWhere.isFocusable = true
 //            editTextFromWhere.isFocusableInTouchMode = true
+            textMap.visibility = View.VISIBLE
+            imageNext.visibility = View.GONE
+
+            textMap.setOnClickListener {
+                (activity as MainActivity).hideKeyboard()
+                (activity as MainActivity).onDestinationPickClicked(Constants.DESTINATION_PICK_ORDEDR)
+            }
 
         }
 
@@ -96,11 +104,17 @@ class SearchFragment : BaseFragment(), SearchAdapter.SearchItemClickListener,
             rvWhereTo.performClick()
         }
 
-        imageMap.setOnClickListener {
-            (activity as MainActivity).onDestinationPickClicked(Constants.DESTINATION_PICK_ORDEDR)
-//            imageMap.setImageResource(R.drawable.ic_done)
+//        imageMap.setOnClickListener {
+//            (activity as MainActivity).onDestinationPickClicked(Constants.DESTINATION_PICK_ORDEDR)
+////            imageMap.setImageResource(R.drawable.ic_done)
+//
+//
+//        }
 
-
+        imageNext.setOnClickListener {
+            (activity as MainActivity).cardViewShowRoute.visibility = View.GONE
+            (activity as MainActivity).hideKeyboard()
+            (activity as MainActivity).onNextClicked()
         }
 
     }
@@ -209,10 +223,15 @@ class SearchFragment : BaseFragment(), SearchAdapter.SearchItemClickListener,
     override fun onSearchClicked(latitude: Double, longitude: Double, title: String) {
         (activity as MainActivity).hideKeyboard()
         (activity as MainActivity).onBottomSheetSearchItemClicked(latitude, longitude, title)
+
+
     }
 
     override fun onSearchCancel() {
-//        rvFromWhere.visibility = View.GONE
+        textMap.visibility = View.GONE
+        imageNext.visibility = View.VISIBLE
+
+    //        rvFromWhere.visibility = View.GONE
 //        editTextFromWhere.setText("")
 //        (activity as MainActivity).hideKeyboard()
 //        editTextFromWhere.isFocusable = false

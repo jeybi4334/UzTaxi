@@ -127,5 +127,10 @@
 
     <string name="house">-дом</string>
 
-
+    <string name="creating_route">Составление маршрута...</string>
+    <string name="first_name">Ваше имя</string>
+    <string name="start_point">Место отрправления</string>
+    <string name="end_point">Место назначения</string>
+    <string name="map">Карта</string>
+    <string name="payment_type">To\'lov turi</string>
 </resources>

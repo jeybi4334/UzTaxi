@@ -53,14 +53,28 @@
         android:alpha="0.14"
         />
 
-    <ImageView
-        android:id="@+id/imageViewSelectFromMap"
-        android:layout_width="48dp"
+<!--    <ImageView-->
+<!--        android:id="@+id/imageViewSelectFromMap"-->
+<!--        android:layout_width="48dp"-->
+<!--        android:layout_height="48dp"-->
+<!--        android:layout_marginEnd="8dp"-->
+<!--        android:src="@drawable/ic_map_small"-->
+<!--        android:padding="12dp"-->
+<!--        android:background="?attr/selectableItemBackgroundBorderless"-->
+<!--        />-->
+
+
+    <TextView
+        android:id="@+id/textMap"
+        android:layout_width="wrap_content"
         android:layout_height="48dp"
-        android:layout_marginEnd="8dp"
-        android:src="@drawable/ic_map_small"
-        android:padding="12dp"
+        android:padding="15dp"
         android:background="?attr/selectableItemBackgroundBorderless"
+        android:text="@string/map"
+        android:fontFamily="@font/gilroy_meidum"
+        android:textColor="#39034e"
+        android:layout_marginEnd="5dp"
         />
+
 
 </LinearLayout>

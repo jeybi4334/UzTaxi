@@ -4,7 +4,7 @@
     package="me.jeybi.uztaxi">
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -17,16 +17,13 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
+        android:testOnly="false"
         android:theme="@style/Theme.UzTaxi"
         android:usesCleartextTraffic="true"
-        android:testOnly="false"
         tools:targetApi="m">
-        <activity android:name=".ui.address.AddressesActivity">
-
-        </activity>
-        <activity android:name=".ui.payment.CreditCardsActivity">
-
-        </activity>
+        <activity android:name=".ui.payment.PaymentTypeActivity"></activity>
+        <activity android:name=".ui.address.AddressesActivity"></activity>
+        <activity android:name=".ui.payment.CreditCardsActivity"></activity>
         <activity
             android:name=".ui.payment.AddCardActivity"
             android:windowSoftInputMode="adjustPan" />
@@ -41,9 +38,7 @@
             android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".ui.auth.AuthenticationActivity"
-            android:windowSoftInputMode="stateVisible|adjustResize"
-            />
-
+            android:windowSoftInputMode="stateVisible|adjustPan" />
         <activity android:name=".ui.intro.IntroActivity">
 
             <!-- <intent-filter> -->

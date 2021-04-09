@@ -3,9 +3,16 @@ package me.jeybi.uztaxi.ui.main.fragments
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
+import com.bumptech.glide.Glide
+import com.bumptech.glide.Priority
+import com.google.gson.JsonObject
+import com.google.gson.JsonParser
 import kotlinx.android.synthetic.main.navigation_menu.*
 import me.jeybi.uztaxi.R
 import me.jeybi.uztaxi.ui.BaseFragment
@@ -16,6 +23,7 @@ import me.jeybi.uztaxi.ui.info.InfoActivity
 import me.jeybi.uztaxi.ui.main.MainActivity
 import me.jeybi.uztaxi.ui.payment.AddCardActivity
 import me.jeybi.uztaxi.ui.payment.CreditCardsActivity
+import me.jeybi.uztaxi.ui.payment.PaymentTypeActivity
 import me.jeybi.uztaxi.ui.settings.SettingsActivity
 import me.jeybi.uztaxi.utils.Constants
 
@@ -26,6 +34,45 @@ class NavigationFragment : BaseFragment() {
     }
     var BONUS = 0.0
 
+    override fun onResume() {
+        super.onResume()
+        checkPaymentType()
+    }
+
+    fun checkPaymentType(){
+        val payment_type = sharedPreferences.getString(Constants.PAYMENT_TYPE,Constants.PAYMENT_TYPE_CASH)
+        val payment_type_name = sharedPreferences.getString(Constants.PAYMENT_TYPE_NAME,"")
+
+        when (payment_type) {
+            "" -> {
+                textNavigationPayment.text = getString(R.string.cash)
+            }
+            Constants.PAYMENT_TYPE_CASH -> {
+                textNavigationPayment.text = getString(R.string.cash)
+            }
+            Constants.PAYMENT_TYPE_CONTRACTOR -> {
+                try {
+                    val jsonObject: JsonObject = JsonParser.parseString(payment_type_name).asJsonObject
+
+                    if (jsonObject.isJsonObject){
+                        textNavigationPayment.text = jsonObject.get("name").asString
+//                        val imageLogo = itemView.findViewById<ImageView>(R.id.imageViewPaymentMethod)
+//                        imageLogo.visibility = View.VISIBLE
+//                        Glide.with(this).load(jsonObject.get("logo").asString)
+//                            .priority(Priority.IMMEDIATE)
+//                            .placeholder(R.drawable.ic_suitcase)
+//                            .into(imageLogo)
+
+                    }
+                }catch (exception : IllegalStateException){
+                    textNavigationPayment.text = payment_type_name
+                }
+
+
+            }
+        }
+    }
+
     override fun onViewDidCreate(savedInstanceState: Bundle?) {
 
         lottieProfile.setOnClickListener{
@@ -33,6 +80,13 @@ class NavigationFragment : BaseFragment() {
             intent.putExtra("lat",(activity as MainActivity).START_POINT_LAT)
             intent.putExtra("lon",(activity as MainActivity).START_POINT_LON)
             startActivity(intent)
+        }
+
+        linearPayment.setOnClickListener {
+            val intent = Intent(activity, PaymentTypeActivity::class.java)
+            intent.putExtra("lat",(activity as MainActivity).START_POINT_LAT)
+            intent.putExtra("lon",(activity as MainActivity).START_POINT_LON)
+            activity?.startActivity(intent)
         }
 
         textNavigation0.setOnClickListener{
@@ -103,7 +157,6 @@ class NavigationFragment : BaseFragment() {
 
     public fun onOpen(){
         lottieCoin.playAnimation()
-        lottieProfile.playAnimation()
 
     }
 

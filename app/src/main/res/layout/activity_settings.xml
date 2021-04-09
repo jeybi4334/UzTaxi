@@ -131,7 +131,11 @@
 
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_toStartOf="@id/switchSendLocation"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:layout_marginEnd="8dp"
                 android:layout_height="wrap_content"
                 android:layout_above="@id/spaceView2"
                 android:text="@string/show_driver_where_am_i"

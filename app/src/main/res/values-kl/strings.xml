@@ -234,5 +234,11 @@
 
     <string name="house">-úy</string>
 
+    <string name="creating_route">Составление маршрута...</string>
+    <string name="first_name">Ismin\'iz</string>
+    <string name="start_point">Jo\'nash manzili</string>
+    <string name="end_point">Borish manzili</string>
+    <string name="map">Xarita</string>
+    <string name="payment_type">To\'lov turi</string>
 
 </resources>

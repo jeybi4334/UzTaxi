@@ -74,7 +74,7 @@ interface MainController {
 
         fun getAvailableCars(latitude: Double,longitude: Double,tariff : Long) : Disposable
 
-        fun getAvailableService(latitude: Double,longitude: Double) : Disposable
+        fun getAvailableService(latitude: Double,longitude: Double,paymentMethod: PaymentMethod) : Disposable
 
         fun getPaymentMethods(latitude: Double,longitude: Double) : Disposable
 

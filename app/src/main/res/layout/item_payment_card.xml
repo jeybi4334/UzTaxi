@@ -10,6 +10,8 @@
     android:id="@+id/parentPaymentMethod"
     >
 
+
+
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/cardPaymentMethod"
         android:visibility="visible"
@@ -75,8 +77,7 @@
         android:layout_marginEnd="8dp"
         android:src="@drawable/ic_done"
         android:padding="12dp"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:clickable="true"
+        android:visibility="gone"
         />
 
 </LinearLayout>

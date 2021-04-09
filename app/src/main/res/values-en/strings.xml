@@ -129,5 +129,11 @@
 
     <string name="house">-house</string>
 
+    <string name="creating_route">Составление маршрута…</string>
+    <string name="first_name">First Name</string>
+    <string name="start_point">Pick up point</string>
+    <string name="end_point">Destination point</string>
+    <string name="map">Map</string>
+    <string name="payment_type">To\'lov turi</string>
 
 </resources>

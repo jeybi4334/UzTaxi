@@ -7,8 +7,13 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.cardview.widget.CardView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.Priority
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.card.MaterialCardView
+import com.google.gson.JsonObject
+import com.google.gson.JsonParser
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
@@ -18,6 +23,7 @@ import me.jeybi.uztaxi.R
 import me.jeybi.uztaxi.UzTaxiApplication
 import me.jeybi.uztaxi.database.CreditCardEntity
 import me.jeybi.uztaxi.model.PaymentMethod
+import me.jeybi.uztaxi.ui.main.MainActivity
 import me.jeybi.uztaxi.utils.Constants
 import me.jeybi.uztaxi.utils.CustomPagerAdapter
 
@@ -46,13 +52,38 @@ class PaymentMethodsSheet(val paymentMethods : ArrayList<PaymentMethod>) : Botto
         for (paymentMethod in paymentMethods){
             val itemView = LayoutInflater.from(view.context).inflate(R.layout.item_payment_method,linearParent,false)
 
-            if (paymentMethod.kind=="cash") {
-//                itemView.findViewById<TextView>(R.id.textViewPaymentType).text = getString(R.string.pay_cash)
+            when (paymentMethod.kind) {
+                "cash" -> {
+                    itemView.findViewById<TextView>(R.id.textViewPaymentType).text = getString(R.string.pay_cash)
+                }
+                "contractor" -> {
+                    try {
+                        val jsonObject: JsonObject = JsonParser.parseString(paymentMethod.name).asJsonObject
+
+                        if (jsonObject.isJsonObject){
+                            itemView.findViewById<TextView>(R.id.textViewPaymentType).text = jsonObject.get("name").asString
+                            val imageLogo = itemView.findViewById<ImageView>(R.id.imageViewPaymentMethod)
+                                imageLogo.visibility = View.VISIBLE
+                            Glide.with(context!!).load(jsonObject.get("logo").asString)
+                                .priority(Priority.IMMEDIATE)
+                                .placeholder(R.drawable.ic_suitcase)
+                                .into(imageLogo)
+
+                        }
+                    }catch (exception : IllegalStateException){
+                        itemView.findViewById<ImageView>(R.id.imageViewPaymentMethod).setImageResource(R.drawable.ic_suitcase)
+                        itemView.findViewById<TextView>(R.id.textViewPaymentType).text = paymentMethod.name
+                    }
+
+
+                }
             }
 
             itemView.findViewById<LinearLayout>(R.id.parentPaymentMethod).setOnClickListener {
                 dismiss()
             }
+
+
             linearParent.addView(itemView)
         }
 

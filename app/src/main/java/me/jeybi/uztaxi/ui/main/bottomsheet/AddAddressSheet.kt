@@ -146,6 +146,23 @@ class AddAddressSheet(val bitmap: Bitmap, val onAddressAddListener: OnAddressAdd
             )
         )
 
+        addresTypes.add(
+            AddressType(
+                Constants.ALIES_TYPE_MOSQUE,
+                R.drawable.ic_mosque,
+                "Мечеть"
+            )
+        )
+
+
+        addresTypes.add(
+            AddressType(
+                Constants.ALIES_TYPE_KAFE_RESTAURANT,
+                R.drawable.ic_restaurant,
+                "Ресторан"
+            )
+        )
+
         recyclerViewAddressTypes.layoutManager = StaggeredGridLayoutManager(
             2,
             StaggeredGridLayoutManager.HORIZONTAL

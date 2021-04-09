@@ -46,14 +46,17 @@ interface ApiClient {
     fun getAvailableService(
         @Header("Accept-Language") language : String,
         @Header("Hive-Profile") hive_profile: String,
-        @Header("X-Hive-GPS-Position") hive_gps: String?
+        @Header("X-Hive-GPS-Position") hive_gps: String?,
+        @Body paymentMethod: PaymentMethod
     ): Single<Response<ServiceResponse>>
 
     @GET("client/mobile/1.0/payment-methods")
     fun getPaymentOptions(
         @Header("Accept-Language") language : String,
         @Header("Hive-Profile") hive_profile: String,
-        @Header("X-Hive-GPS-Position") hive_gps: String?
+        @Header("X-Hive-GPS-Position") hive_gps: String?,
+        @Header("Date") date: String,
+        @Header("Authentication") hmac: String
     ): Single<Response<ArrayList<PaymentMethod>>>
 
     @GET("client/mobile/1.0/account")
@@ -193,6 +196,20 @@ interface ApiClient {
         @Header("Authentication") hmac: String,
         @Path("id") id: Long
     ): Single<Response<OrderInfo>>
+
+
+    @GET("client/mobile/1.0/orders/{id}/fix-cost")
+    @Headers( "Content-Type: application/json; charset=utf-8")
+    fun fixOrderCost(
+        @Header("Accept-Language") language : String,
+        @Header("Hive-Profile") hive_profile: String,
+        @Header("Date") date: String,
+        @Header("Authentication") hmac: String,
+        @Path("id") id: Long,
+        @Query("amount") amount : Double
+    ): Single<Response<EmptyModel>>
+
+
 
     @GET("client/mobile/1.0/orders/{id}/coming")
     @Headers( "Content-Type: application/json; charset=utf-8")

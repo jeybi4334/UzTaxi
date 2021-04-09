@@ -73,7 +73,7 @@
     <string name="confirm">Tasdiqlash</string>
     <string name="from_where">Qayerdan borasiz?</string>
     <string name="to_where">Qayerga boramiz?</string>
-    <string name="delivery">Yetkazma</string>
+    <string name="delivery">Yetkazib berish</string>
     <string name="add_address">Manzilni qo\'shish</string>
     <string name="address_history_not_found">Manzillar tarixi topilmadi</string>
     <string name="order">Buyurtma berish</string>
@@ -127,6 +127,11 @@
     <string name="english">Inglizcha</string>
 
     <string name="house">-uy</string>
-
+    <string name="creating_route">Составление маршрута...</string>
+    <string name="first_name">Ismingiz</string>
+    <string name="start_point">Jo\'nash manzili</string>
+    <string name="end_point">Borish manzili</string>
+    <string name="map">Xarita</string>
+    <string name="payment_type">To\'lov turi</string>
 
 </resources>
