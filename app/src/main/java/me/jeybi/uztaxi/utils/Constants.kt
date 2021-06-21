@@ -54,6 +54,9 @@ class Constants {
 
         val BASE_URL_OPENWEATHER = "https://api.openweathermap.org/data/2.5/"
 
+        //// WEATHER IDs based on openweathermap.com
+        val OPENWEATHERMAP_API = "e133d7db9b14e753bf10f14791e4c270"
+
 //        val BASE_URL_MAPZEN = "https://api.stadiamaps.com/"
         val BASE_URL_UZ_TAXI_NAVIGATION = "http://map.uz.taxi:8989/"
 
@@ -262,9 +265,6 @@ class Constants {
         val DEFAULT_TILT_MAP = 30.0
 
 
-
-        //// WEATHER IDs based on openweathermap.com
-        val OPENWEATHERMAP_API = "e133d7db9b14e753bf10f14791e4c270"
 
         val WEATHER_RAIN = arrayListOf<Int>(500, 501, 520)
         /*

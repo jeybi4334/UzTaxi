@@ -19,6 +19,6 @@ data class WeatherType(
 )
 
 data class WeatherMain(
-    val temp : Int,
+    val temp : Double,
 
 )

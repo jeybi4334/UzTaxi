@@ -18,7 +18,7 @@ interface MainController {
 
         fun onSearchClicked(searchCancelListener: SearchCancelListener)
 
-        fun onWeatherReady(weather : ArrayList<WeatherType>, temperature : Int)
+        fun onWeatherReady(weather : ArrayList<WeatherType>, temperature : Double)
 
 
         fun onDestinationPickClicked(action : Int,delivery: Boolean)

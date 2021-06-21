@@ -278,7 +278,8 @@ class MainPresenter(val view: MainActivity) : MainController.presenter {
             .subscribe({
                 if (it.isSuccessful && it.body() != null) {
                     view.onWeatherReady(it.body()!!.weather, it.body()!!.main.temp)
-                }
+                 }
+
             }, {
 
             })

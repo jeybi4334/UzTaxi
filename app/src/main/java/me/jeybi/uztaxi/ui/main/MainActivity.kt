@@ -1381,7 +1381,7 @@ class MainActivity : BaseActivity(), MainController.view,
 
     var WEATHER_READY = false
 
-    override fun onWeatherReady(weather: ArrayList<WeatherType>, temperature: Int) {
+    override fun onWeatherReady(weather: ArrayList<WeatherType>, temperature: Double) {
 
         val showSeason = sharedPreferences.getBoolean(Constants.SETTINGS_WEATHER_ANIMATION, true)
 
@@ -1477,7 +1477,7 @@ class MainActivity : BaseActivity(), MainController.view,
         }
 //        presenter.playLottie(lottieSeason, "rain.json", true, REVERSE = false)
 //        presenter.playLottie(lottieTerrain, "cloud.json", true, REVERSE = false)
-        textViewTemperature.text = "$temperature"
+        textViewTemperature.text = "${temperature.toInt()}"
     }
 
     var DELIVERY = false
