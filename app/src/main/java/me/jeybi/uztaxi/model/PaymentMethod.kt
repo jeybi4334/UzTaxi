@@ -6,3 +6,8 @@ data class PaymentMethod(
     val name : String?,
     val enoughMoney: Boolean?
 )
+
+data class PaymentMethodParent(
+    val prevServiceId : String,
+    val paymentMethod : PaymentMethod
+)

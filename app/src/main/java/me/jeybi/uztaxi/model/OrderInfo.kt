@@ -24,7 +24,7 @@ data class Cost(
     val amount: Double,
     val calculation: String,
     val modifier: CostModifier?,
-    val fixed : Double?,
+    val fixed : Double?=null,
     val details: ArrayList<CostItem>?
     )
 

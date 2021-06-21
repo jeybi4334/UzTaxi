@@ -47,7 +47,9 @@ interface ApiClient {
         @Header("Accept-Language") language : String,
         @Header("Hive-Profile") hive_profile: String,
         @Header("X-Hive-GPS-Position") hive_gps: String?,
-        @Body paymentMethod: PaymentMethod
+        @Header("Date") date: String,
+        @Header("Authentication") hmac: String,
+        @Body paymentMethod: PaymentMethodParent
     ): Single<Response<ServiceResponse>>
 
     @GET("client/mobile/1.0/payment-methods")
@@ -72,6 +74,8 @@ interface ApiClient {
     fun getEstimatedRide(
         @Header("Accept-Language") language : String,
         @Header("Hive-Profile") hive_profile: String,
+        @Header("Date") date: String,
+        @Header("Authentication") hmac: String,
         @Body estimateRideRequest: EstimateRideRequest
     ): Single<Response<EstimateResponse>>
 
@@ -153,6 +157,7 @@ interface ApiClient {
     fun createOrder(
         @Header("Accept-Language") language : String,
         @Header("Hive-Profile") hive_profile: String,
+        @Header("X-Hive-GPS-Position") hive_gps: String?,
         @Header("Date") date: String,
         @Header("Authentication") hmac: String,
         @Body createOrderRequest: CreateOrderRequest
@@ -176,6 +181,17 @@ interface ApiClient {
         @Header("Date") date: String,
         @Header("Authentication") hmac: String
     ): Single<Response<ArrayList<ShortOrderInfo>>>
+
+       @GET("client/mobile/1.0/orders/{id}/finished")
+    @Headers("Content-Type: application/json; charset=utf-8")
+    fun getFinishedOrder(
+        @Header("Accept-Language") language : String,
+        @Header("Hive-Profile") hive_profile: String,
+        @Header("Date") date: String,
+        @Header("Authentication") hmac: String,
+        @Path("id") id : Long
+    ): Single<Response<ArrayList<ShortOrderInfo>>>
+
 
 
     @GET("client/mobile/2.0/history?offset=0&length=16")

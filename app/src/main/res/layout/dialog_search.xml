@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    android:id="@+id/bottomSheet"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:behavior_hideable="true"
+    app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:cardCornerRadius="24dp"
+        app:cardBackgroundColor="@color/white"
+        app:cardElevation="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="-24dp"
+        android:paddingBottom="24dp"
+        >
+
+
+<LinearLayout android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:focusable="true"
+    android:paddingBottom="24dp"
+    android:focusableInTouchMode="true"
+    android:orientation="vertical"
+    >
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:id="@+id/rvWhereTo"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="@drawable/bc_search"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="18dp"
+        android:layout_marginEnd="18dp"
+        >
+
+        <ImageView
+            android:id="@+id/imageSearch"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:src="@drawable/ic_search"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="20dp"
+            />
+
+        <EditText
+            android:id="@+id/editTextSearch"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_marginRight="4dp"
+            android:inputType="textLongMessage"
+            android:maxLines="1"
+            android:imeOptions="actionDone"
+            android:layout_height="match_parent"
+            android:background="@android:color/transparent"
+            android:hint="@string/searching_address"
+            android:layout_toLeftOf="@id/imageNext"
+            android:fontFamily="@font/g_bold"
+            android:textColor="@color/purple_200"
+            android:textColorHint="@color/purple_200"
+            android:alpha="0.9"
+            android:textSize="16sp"
+            android:layout_toRightOf="@id/imageSearch"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="16dp"
+            />
+
+
+        <View
+            android:id="@+id/viewDiv"
+            android:layout_width="2dp"
+            android:layout_height="28dp"
+            android:background="@drawable/bc_handler_bottomsheet"
+            android:layout_toLeftOf="@id/imageNext"
+            android:layout_centerVertical="true"
+            android:alpha="0.14"
+            />
+
+
+
+
+        <TextView
+            android:id="@+id/textMap"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:padding="15dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:text="@string/map"
+            android:fontFamily="@font/gilroy_meidum"
+            android:textColor="#39034e"
+            android:layout_centerVertical="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="5dp"
+            />
+
+
+
+        <!--        <ImageView-->
+<!--            android:id="@+id/imageMap"-->
+<!--            android:layout_width="48dp"-->
+<!--            android:layout_height="48dp"-->
+<!--            android:padding="15dp"-->
+<!--            android:background="?attr/selectableItemBackgroundBorderless"-->
+<!--            android:src="@drawable/ic_map_small"-->
+<!--            android:layout_centerVertical="true"-->
+<!--            android:layout_alignParentEnd="true"-->
+<!--            android:layout_marginEnd="5dp"-->
+<!--            />-->
+
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/textViewNoAddress"
+        android:visibility="gone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="32dp"
+        android:text="@string/address_history_not_found"
+        android:fontFamily="@font/g_regular"
+        android:textColor="@color/black"
+        />
+
+    <ProgressBar
+        android:id="@+id/progressBarSearch"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="32dp"
+        android:visibility="gone"
+        />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewSearch"
+        android:layout_width="match_parent"
+        android:nestedScrollingEnabled="true"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp"
+        android:clipToPadding="false"
+        android:overScrollMode="never"
+        android:paddingTop="12dp"
+        android:paddingBottom="56dp"
+         />
+
+
+</LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+</FrameLayout>
+

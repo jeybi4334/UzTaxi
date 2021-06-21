@@ -153,6 +153,10 @@ class MainPresenter(val view: MainActivity) : MainController.presenter {
                             details.append("${it.body()!!.address.road}")
                         if (it.body()!!.address.house_number != null)
                             details.append(", ${it.body()!!.address.house_number}")
+                        else if (it.body()!!.address.neighbourhood!=null)
+                            details.append(", ${it.body()!!.address.neighbourhood}")
+
+
                     } else {
                         address.append(it.body()!!.display_name)
                     }
@@ -280,6 +284,34 @@ class MainPresenter(val view: MainActivity) : MainController.presenter {
             })
     }
 
+    fun getFinishedOrder(orderID: Long) : Disposable{
+//        63000403382396
+
+        return RetrofitHelper.apiService(Constants.BASE_URL)
+            .getFinishedOrder(
+                view.getCurrentLanguage().toLanguageTag(),
+                Constants.HIVE_PROFILE,
+                NaiveHmacSigner.DateSignature(),
+                NaiveHmacSigner.AuthSignature(
+                    view.HIVE_USER_ID,
+                    view.HIVE_TOKEN,
+                    "GET",
+                    "/api/client/mobile/1.0/orders/$orderID/finished"
+                ),
+                orderID
+            )
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io())
+            .subscribe({
+                if (it.isSuccessful && it.body() != null) {
+
+
+                }
+            }, {
+
+            })
+    }
+
     //    override fun getRoute( listCoordinates: ArrayList<RouteCoordinates>, driverRoute: Boolean): Disposable {
 //
 //
@@ -359,23 +391,42 @@ class MainPresenter(val view: MainActivity) : MainController.presenter {
             })
     }
 
+    var SERVICE_ID = ""
+    var PAYMENT_TYPE = "cash"
     override fun getAvailableService(latitude: Double, longitude: Double,paymentMethod: PaymentMethod): Disposable {
-
+        if (PAYMENT_TYPE!=paymentMethod.kind){
+            SERVICE_ID=""
+            PAYMENT_TYPE = paymentMethod.kind
+        }
         return RetrofitHelper.apiService(Constants.BASE_URL)
             .getAvailableService(
                 view.getCurrentLanguage().toLanguageTag(),
                 Constants.HIVE_PROFILE, "$latitude $longitude",
-                paymentMethod
+                NaiveHmacSigner.DateSignature(),
+                NaiveHmacSigner.AuthSignature(
+                    view.HIVE_USER_ID,
+                    view.HIVE_TOKEN,
+                    "POST",
+                    "/api/client/mobile/1.1/service"
+                ),
+                PaymentMethodParent(SERVICE_ID,paymentMethod)
             )
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribe({
                 if (it.isSuccessful) {
                     if (it.body() != null) {
-                        if (it.body()!!.kind == "service") {
-                            view.onTariffsReady(it.body()!!.tariffs)
-                        } else {
-                            view.onServiceNotAvailable()
+                        when (it.body()!!.kind) {
+                            "service" -> {
+                                SERVICE_ID = it.body()!!.serviceId
+                                view.onTariffsReady(it.body()!!.tariffs)
+                            }
+                            Constants.STILL_SAME_SERVICE -> {
+                              view.onTarrifTheSame()
+                            }
+                            else -> {
+                                view.onServiceNotAvailable()
+                            }
                         }
                     }
                 }
@@ -413,6 +464,7 @@ class MainPresenter(val view: MainActivity) : MainController.presenter {
             .createOrder(
                 view.getCurrentLanguage().toLanguageTag(),
                 Constants.HIVE_PROFILE,
+                "${view.START_POINT_LAT} ${view.START_POINT_LON}",
                 NaiveHmacSigner.DateSignature(),
                 NaiveHmacSigner.AuthSignature(
                     view.HIVE_USER_ID,
@@ -570,7 +622,7 @@ class MainPresenter(val view: MainActivity) : MainController.presenter {
             Constants.getBitmap(
                 ResourcesCompat.getDrawable(
                     resources,
-                    R.drawable.ic_marker_finish,
+                    R.drawable.ic_order_end,
                     null
                 )!!
             )!!
@@ -581,7 +633,7 @@ class MainPresenter(val view: MainActivity) : MainController.presenter {
             Constants.getBitmap(
                 ResourcesCompat.getDrawable(
                     resources,
-                    R.drawable.ic_marker_start,
+                    R.drawable.ic_order_start,
                     null
                 )!!
             )!!
@@ -592,7 +644,7 @@ class MainPresenter(val view: MainActivity) : MainController.presenter {
             Constants.getBitmap(
                 ResourcesCompat.getDrawable(
                     resources,
-                    R.drawable.ic_marker_stop,
+                    R.drawable.ic_order_end,
                     null
                 )!!
             )!!

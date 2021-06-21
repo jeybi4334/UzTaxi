@@ -135,5 +135,6 @@
     <string name="end_point">Destination point</string>
     <string name="map">Map</string>
     <string name="payment_type">To\'lov turi</string>
+    <string name="high_demand">High demand</string>
 
 </resources>

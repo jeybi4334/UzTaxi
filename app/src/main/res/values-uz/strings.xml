@@ -64,7 +64,7 @@
     <string name="share">Bo\'lishish</string>
     <string name="driver_comes_within">Xaydovchining yetib kelish vaqti</string>
     <string name="call_driver">Xaydovchi bilan bog\'lanish</string>
-    <string name="cancelling_order">Buyurtmani bekor qilish</string>
+    <string name="cancelling_order">Bekor qilish</string>
     <string name="ride_finished">Safar yakunlandi</string>
     <string name="payment_for_ride">Safar uchun to\'lov miqdori :</string>
     <string name="paid_bonus">Bonus orqali to\'lov miqdori :</string>
@@ -133,5 +133,6 @@
     <string name="end_point">Borish manzili</string>
     <string name="map">Xarita</string>
     <string name="payment_type">To\'lov turi</string>
+    <string name="high_demand">Yuqori talab</string>
 
 </resources>

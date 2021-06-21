@@ -21,12 +21,11 @@ interface MainController {
         fun onWeatherReady(weather : ArrayList<WeatherType>, temperature : Int)
 
 
-        fun onDestinationPickClicked(action : Int)
-
+        fun onDestinationPickClicked(action : Int,delivery: Boolean)
 
         fun drawRoute(route: ArrayList<Point>)
 
-        fun onBottomSheetSearchItemClicked(latitude: Double, longitude: Double,title : String)
+        fun onBottomSheetSearchItemClicked(latitude: Double, longitude: Double,title : String, delivery: Boolean)
 
         fun onTariffsReady(tariffs : ArrayList<ServiceTariff>)
         fun onServiceNotAvailable()
@@ -36,6 +35,8 @@ interface MainController {
         fun onCarsAvailabe(data : ArrayList<GetCarResponse>)
 
         fun onAddAddressClicked()
+
+        fun onTarrifTheSame()
 
         fun onOrderCreated(orderID : Long)
 

@@ -35,7 +35,7 @@ class AddresSearchFragment : BottomSheetDialogFragment(), SearchAdapter.SearchIt
         setStyle(STYLE_NORMAL, R.style.CustomBottomSheetDialogTheme);
     }
 
-    val db = Firebase.firestore
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -97,7 +97,7 @@ class AddresSearchFragment : BottomSheetDialogFragment(), SearchAdapter.SearchIt
 
 
         imageMap.setOnClickListener {
-            (activity as MainActivity).onDestinationPickClicked(Constants.DESTINATION_PICK_STOP)
+            (activity as MainActivity).onDestinationPickClicked(Constants.DESTINATION_PICK_STOP,false)
             dismiss()
         }
     }
@@ -178,7 +178,7 @@ class AddresSearchFragment : BottomSheetDialogFragment(), SearchAdapter.SearchIt
         )
         (activity as MainActivity).hideKeyboard()
         dismiss()
-        (activity as MainActivity).onBottomSheetSearchItemClicked(latitude, longitude, title)
+        (activity as MainActivity).onBottomSheetSearchItemClicked(latitude, longitude, title,false)
     }
 
 }

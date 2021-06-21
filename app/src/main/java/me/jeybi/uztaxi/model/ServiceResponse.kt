@@ -22,9 +22,11 @@ data class ServiceTariff(
     val options: ArrayList<TariffOption>,
     val minCost: Double,
     val costChangeAllowed: Boolean,
+    val costChangeStep : Double,
     val hint: String,
     val showEstimation: Boolean
 )
+
 
 data class TariffOption(
     val id: Long,

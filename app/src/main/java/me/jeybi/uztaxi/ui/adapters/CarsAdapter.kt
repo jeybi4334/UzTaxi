@@ -60,20 +60,44 @@ class CarsAdapter(
         val shimmer = Shimmer()
 
         when(item.icon){
-            Constants.CAR_TYPE_SPARK -> {
-                holder.imageViewCar.setImageResource(R.drawable.spark)
+            Constants.CAR_TYPE_1 -> {
+                holder.imageViewCar.setImageResource(R.drawable.car_white_nexia3)
+            }
+            Constants.CAR_TYPE_2 -> {
+                holder.imageViewCar.setImageResource(R.drawable.car_white_spark)
+            }
+            Constants.CAR_TYPE_3 -> {
+                holder.imageViewCar.setImageResource(R.drawable.car_white_gentra)
             }
             Constants.CAR_TYPE_4 -> {
-                holder.imageViewCar.setImageResource(R.drawable.spark)
+                holder.imageViewCar.setImageResource(R.drawable.car_white_epica)
             }
-            Constants.CAR_TYPE_DELIVERY -> {
-                holder.imageViewCar.setImageResource(R.drawable.scooter)
+            Constants.CAR_TYPE_5 -> {
+                holder.imageViewCar.setImageResource(R.drawable.car_white_isuzu)
             }
-            Constants.CAR_TYPE_PEREGON -> {
-                holder.imageViewCar.setImageResource(R.drawable.spark)
+            Constants.CAR_TYPE_6 -> {
+                holder.imageViewCar.setImageResource(R.drawable.car_black_vito)
+            }
+            Constants.CAR_TYPE_7 -> {
+                holder.imageViewCar.setImageResource(R.drawable.car_white_captiva)
+            }
+            Constants.CAR_TYPE_8 -> {
+                holder.imageViewCar.setImageResource(R.drawable.car_white_malibu1)
+            }
+            Constants.CAR_TYPE_9 -> {
+                holder.imageViewCar.setImageResource(R.drawable.car_white_malibu2)
+            }
+            Constants.CAR_TYPE_10 -> {
+                holder.imageViewCar.setImageResource(R.drawable.car_scooter)
+            }
+            Constants.CAR_TYPE_11 -> {
+                holder.imageViewCar.setImageResource(R.drawable.car_white_cruiser)
+            }
+            Constants.CAR_TYPE_12 -> {
+                holder.imageViewCar.setImageResource(R.drawable.car_keys)
             }
             else->{
-                holder.imageViewCar.setImageResource(R.drawable.scooter)
+                holder.imageViewCar.setImageResource(R.drawable.car_default)
             }
         }
         if ((context as MainActivity).getCurrentLanguage().toLanguageTag()!="uz"&&(context as MainActivity).getCurrentLanguage().toLanguageTag()!="kl")
@@ -85,9 +109,14 @@ class CarsAdapter(
                 R.string.from
             )}"
 
+        holder.rvCar.setOnLongClickListener {
+            listener.onTarifReclicked(item)
+            true
+        }
+
         holder.rvCar.setOnClickListener {
 
-            listener.onTariffChosen(item.id, shimmer, holder.textViewPrice, item.options)
+            listener.onTariffChosen(item.id, shimmer, holder.textViewPrice, item.options,item.costChangeStep)
             shimmer.start(holder.textViewPrice)
 
 
@@ -110,7 +139,7 @@ class CarsAdapter(
                     )
                 )
             }else if (previousItem!=null&&previousItem!!.tag == holder.itemView.tag){
-                listener.onTarifReclicked(item)
+
             }
 
             previousItem = holder.rvCar
@@ -134,7 +163,8 @@ class CarsAdapter(
             tariffID: Long,
             shimmer: Shimmer,
             textViewPrice: ShimmerTextView,
-            options: ArrayList<TariffOption>
+            options: ArrayList<TariffOption>,
+            costChangeStep : Double
         )
         fun onTarifReclicked(tariff: ServiceTariff)
     }

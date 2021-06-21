@@ -53,7 +53,7 @@ class AddressAdapter(var data : ArrayList<AddressEntity>, val activity : Activit
 
         if (activity!=null&&activity is MainActivity)
         holder.constraintAddress.setSafeOnClickListener {
-            activity.onBottomSheetSearchItemClicked(address.latitude,address.longitude,address.title)
+            activity.onBottomSheetSearchItemClicked(address.latitude,address.longitude,address.title,false)
         }
 
         when(address.alies){

@@ -1,5 +1,6 @@
 package me.jeybi.uztaxi.ui.main.fragments
 
+import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
 import android.text.Editable
@@ -7,7 +8,9 @@ import android.text.TextWatcher
 import android.view.KeyEvent
 import android.view.View
 import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.flexbox.*
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -24,6 +27,7 @@ import me.jeybi.uztaxi.ui.adapters.AddressAdapter
 import me.jeybi.uztaxi.ui.adapters.SearchAdapter
 import me.jeybi.uztaxi.ui.main.MainActivity
 import me.jeybi.uztaxi.ui.main.MainController
+import me.jeybi.uztaxi.ui.main.bottomsheet.SearchDialog
 import me.jeybi.uztaxi.utils.Constants
 
 
@@ -43,6 +47,8 @@ class SearchFragment : BaseFragment(), SearchAdapter.SearchItemClickListener,
             editTextSearch.isFocusable = true
             editTextSearch.isFocusableInTouchMode = true
             editTextSearch.requestFocus()
+            val imm: InputMethodManager? = activity!!.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager?
+            imm?.showSoftInput(editTextSearch, InputMethodManager.SHOW_IMPLICIT)
             editTextSearch.setHintTextColor(Color.parseColor("#D6CAD9"))
             (activity as MainActivity).onSearchClicked(this)
 //            rvFromWhere.visibility = View.VISIBLE
@@ -54,7 +60,10 @@ class SearchFragment : BaseFragment(), SearchAdapter.SearchItemClickListener,
 
             textMap.setOnClickListener {
                 (activity as MainActivity).hideKeyboard()
-                (activity as MainActivity).onDestinationPickClicked(Constants.DESTINATION_PICK_ORDEDR)
+                (activity as MainActivity).onDestinationPickClicked(
+                    Constants.DESTINATION_PICK_ORDEDR,
+                    false
+                )
             }
 
         }
@@ -63,11 +72,17 @@ class SearchFragment : BaseFragment(), SearchAdapter.SearchItemClickListener,
 
         rvDelivery.setOnClickListener {
 
+            SearchDialog("Qayerga yetkazib beramiz?", true).show(
+                childFragmentManager,
+                "searchDeliveryAddress"
+            )
+
+
         }
 
         rvAddAddress.setOnClickListener {
             (activity as MainActivity).onAddAddressClicked()
-
+            (activity as MainActivity).presenter.getFinishedOrder(63000403382396)
         }
 
         editTextSearch.addTextChangedListener(object : TextWatcher {
@@ -146,7 +161,11 @@ class SearchFragment : BaseFragment(), SearchAdapter.SearchItemClickListener,
 //                            StaggeredGridLayoutManager.VERTICAL
 //                        )
 
-                        recyclerViewSearchHistory.adapter = AddressAdapter( ArrayList(it),activity,null)
+                        recyclerViewSearchHistory.adapter = AddressAdapter(
+                            ArrayList(it),
+                            activity,
+                            null
+                        )
                     }, {
 
                     })
@@ -213,6 +232,11 @@ class SearchFragment : BaseFragment(), SearchAdapter.SearchItemClickListener,
 
 //
 
+    override fun onResume() {
+        super.onResume()
+        editTextSearch.clearFocus()
+        (activity as MainActivity).hideKeyboard()
+    }
 
     override fun onDestroy() {
         super.onDestroy()
@@ -222,7 +246,7 @@ class SearchFragment : BaseFragment(), SearchAdapter.SearchItemClickListener,
 
     override fun onSearchClicked(latitude: Double, longitude: Double, title: String) {
         (activity as MainActivity).hideKeyboard()
-        (activity as MainActivity).onBottomSheetSearchItemClicked(latitude, longitude, title)
+        (activity as MainActivity).onBottomSheetSearchItemClicked(latitude, longitude, title, false)
 
 
     }

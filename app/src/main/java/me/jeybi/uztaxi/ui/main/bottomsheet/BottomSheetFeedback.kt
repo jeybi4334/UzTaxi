@@ -53,6 +53,10 @@ class BottomSheetFeedback(val orderID: Long, val cost : Double, val usedBonus : 
         textViewCashBackAmount.text = "-$usedBonus ${activity?.getString(R.string.currency)}"
         textViewOrderDate.text = NaiveHmacSigner.DateSignature()
 
+        if (usedBonus==0.0){
+            linearBons.visibility = View.INVISIBLE
+        }
+
         dialog!!.setOnShowListener { dialog -> // In a previous life I used this method to get handles to the positive and negative buttons
             // of a dialog in order to change their Typeface. Good ol' days.
             val d = dialog as BottomSheetDialog

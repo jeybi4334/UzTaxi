@@ -13,7 +13,7 @@ import me.jeybi.uztaxi.R
 import me.jeybi.uztaxi.model.RouteItem
 import me.jeybi.uztaxi.ui.main.MainActivity
 
-class RouteAdapter(val data : ArrayList<RouteItem>,val listener : onRouteAddClickListener,val activity : MainActivity) : RecyclerView.Adapter<RouteAdapter.RouteHolder>(){
+class RouteAdapter(val data : ArrayList<RouteItem>,val listener : onRouteAddClickListener,val activity : MainActivity,val delivery : Boolean) : RecyclerView.Adapter<RouteAdapter.RouteHolder>(){
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RouteHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_route,parent,false)
@@ -32,6 +32,13 @@ class RouteAdapter(val data : ArrayList<RouteItem>,val listener : onRouteAddClic
     }
 
     override fun onBindViewHolder(holder: RouteHolder, position: Int) {
+
+        if (delivery) {
+            holder.imageViewAdd.visibility = View.GONE
+        }else{
+            holder.imageViewAdd.visibility = View.VISIBLE
+        }
+
 
         if (position==0){
             holder.imageViewAdd.setImageResource(R.drawable.ic_add_point)

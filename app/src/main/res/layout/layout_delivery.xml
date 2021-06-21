@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:id="@+id/linearDelivery"
+    android:layout_width="match_parent"
+    android:layout_height="72dp"
+    android:paddingStart="16dp"
+    android:clipToPadding="false"
+    android:orientation="horizontal"
+    app:layout_constraintTop_toBottomOf="@id/recyclerViewRoute"
+    app:layout_constraintLeft_toLeftOf="parent"
+    app:layout_constraintRight_toRightOf="parent"
+    android:layout_marginTop="16dp"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <RelativeLayout
+        android:id="@+id/rvCar"
+        android:layout_width="182dp"
+        android:layout_height="68dp"
+        android:layout_gravity="center"
+        android:background="@drawable/bc_item_car_selected"
+        android:layout_marginRight="16dp"
+        >
+
+        <ImageView
+            android:id="@+id/imageViewCar"
+            android:layout_width="96dp"
+            android:layout_height="64dp"
+            android:src="@drawable/spark"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="-28dp"
+            android:layout_marginTop="0dp"
+            />
+
+        <TextView
+            android:id="@+id/textViewTarrifName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/delivery"
+            android:fontFamily="@font/g_semi_bold"
+            android:layout_marginTop="8dp"
+            android:layout_marginLeft="8dp"
+            android:textSize="14sp"
+            android:textColor="#B1B1B1"
+            />
+
+        <com.romainpiel.shimmer.ShimmerTextView
+            android:id="@+id/textViewPrice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/textViewTarrifName"
+            android:text=""
+            android:fontFamily="@font/g_bold"
+            android:layout_marginTop="4dp"
+            android:layout_marginLeft="8dp"
+            android:textSize="16sp"
+            android:textColor="#B1B1B1"
+            />
+
+    </RelativeLayout>
+
+
+    <RelativeLayout
+        android:layout_width="182dp"
+        android:layout_height="68dp"
+        android:layout_gravity="center"
+        android:background="@drawable/bc_item_car"
+        android:layout_marginRight="16dp"
+        >
+
+        <ImageView
+            android:id="@+id/imageViewCar1"
+            android:layout_width="96dp"
+            android:layout_height="64dp"
+            android:src="@drawable/van"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="-28dp"
+            android:layout_marginTop="0dp"
+            />
+
+        <TextView
+            android:id="@+id/textViewTarrifName1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Cargo"
+            android:fontFamily="@font/g_semi_bold"
+            android:layout_marginTop="8dp"
+            android:layout_marginLeft="8dp"
+            android:textSize="14sp"
+            android:textColor="#B1B1B1"
+            />
+
+        <com.romainpiel.shimmer.ShimmerTextView
+            android:id="@+id/textViewPrice1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/textViewTarrifName1"
+            android:text="mavjud emas"
+            android:fontFamily="@font/g_bold"
+            android:layout_marginTop="4dp"
+            android:layout_marginLeft="8dp"
+            android:textSize="16sp"
+            android:textColor="#B1B1B1"
+            />
+
+    </RelativeLayout>
+
+
+</LinearLayout>

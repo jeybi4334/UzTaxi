@@ -1,5 +1,6 @@
 package me.jeybi.uztaxi.ui.main.bottomsheet
 
+import android.content.DialogInterface
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -9,9 +10,12 @@ import android.widget.TextView
 import androidx.appcompat.widget.SwitchCompat
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.gson.JsonObject
+import com.google.gson.JsonParser
 import kotlinx.android.synthetic.main.bottomsheet_filter.*
 import me.jeybi.uztaxi.R
 import me.jeybi.uztaxi.model.TariffOption
+import me.jeybi.uztaxi.ui.main.MainActivity
 
 class BottomSheetOrderFilter(
     val options: ArrayList<TariffOption>,
@@ -36,6 +40,10 @@ class BottomSheetOrderFilter(
         return view
     }
 
+    override fun onDismiss(dialog: DialogInterface) {
+        (activity as MainActivity).hideKeyboard()
+        super.onDismiss(dialog)
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -44,7 +52,20 @@ class BottomSheetOrderFilter(
         for (option in options) {
             val itemView =
                 LayoutInflater.from(context).inflate(R.layout.item_filter, linearParent, false)
-            itemView.findViewById<TextView>(R.id.textViewOptionName).text = option.name
+
+//            itemView.findViewById<TextView>(R.id.textViewOptionName).text = option.name
+
+            try {
+                val jsonObject: JsonObject = JsonParser.parseString(option.name).asJsonObject
+
+                if (jsonObject.isJsonObject){
+                    itemView.findViewById<TextView>(R.id.textViewOptionName).text = jsonObject.get((context as MainActivity).getCurrentLanguage().toLanguageTag()).asString
+                }
+            }catch (exception : Exception){
+                itemView.findViewById<TextView>(R.id.textViewOptionName).text = option.name
+            }
+
+
             itemView.findViewById<TextView>(R.id.textViewOptionPrice).text = "${option.value.toInt()} ${getString(R.string.currency)}"
             if (CHOSEN_OPTIONS.contains(option.id)){
                 itemView.findViewById<SwitchCompat>(R.id.switchFilter).isChecked = true

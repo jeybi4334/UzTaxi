@@ -36,6 +36,7 @@ class Constants {
         const val PAYMENT_TYPE_NAME = "payment_type_name"
         const val PAYMENT_TYPE_ID = "payment_type_id"
 
+        const val STILL_SAME_SERVICE = "same"
 
         const val CALL_CENTER_NUMBER = "1191"
 
@@ -104,6 +105,7 @@ class Constants {
         val MODE_DESTINATION_PICK_STOP = 10021
         val MODE_DESTINATION_PICK_ADDRESS = 10022
         val MODE_DESTINATION_PICK_EDIT = 10023
+        val MODE_DESTINATION_PICK_START = 10024
         val MODE_CREATE_ORDER = 1003
         val MODE_CAR_SEARCH = 10004
         val MODE_CAR_FOUND = 10005
@@ -121,7 +123,7 @@ class Constants {
         val DESTINATION_PICK_STOP = 2
         val DESTINATION_PICK_ADDRESS = 3
         val DESTINATION_PICK_EDIT = 4
-
+        val DESTINATION_PICK_START = 5
 
         val ORDER_STATUS_CREATED = "order-created"
         val ORDER_STATUS_CHANGED = "order-changed"
@@ -159,12 +161,55 @@ class Constants {
         val CAR_ALIAS_MATIZ = "Matiz"
         val CAR_ALIAS_SPARK = "Spark"
         val CAR_ALIAS_GENTRA = "Gentra"
+        val CAR_ALIAS_COBALT = "Cobalt"
+        val CAR_ALIAS_EPICA = "Epica"
+        val CAR_ALIAS_RAVON = "Ravon"
+        val CAR_ALIAS_GRANTA = "Granta"
+        val CAR_ALIAS_PRIORA = "Priora"
+        val CAR_ALIAS_VESTA = "Vesta"
+        val CAR_ALIAS_XRAY = "X-Ray"
+        val CAR_ALIAS_CAPTIVA = "Captiva"
+        val CAR_ALIAS_TOYOTA = "Toyota"
+        val CAR_ALIAS_ISUZU = "Isuzu"
+        val CAR_ALIAS_MERCEDES = "Mercedes"
+        val CAR_ALIAS_MALIBU = "Malibu"
+        val CAR_ALIAS_CHRYSLER = "Chrysler"
+        val CAR_ALIAS_LINCOLN = "Lincoln"
+        val CAR_ALIAS_LAND_ROVER = "Land Rover"
+        val CAR_ALIAS_CADILLAC = "Cadillac"
+        val CAR_ALIAS_ROLLSROYCE = "Rolls-Royce"
 
+        val CAR_MODEL_MALIBU1 = "Malibu (E)"
+        val CAR_MODEL_MALIBU2 = "Malibu Maxx"
 
-        val CAR_TYPE_SPARK = "carType_1"
+        val CAR_MODEL_NEXIA1_1 = "Nexia (KLETN)"
+        val CAR_MODEL_NEXIA1_2 = "Nexia Combi (KLETN)"
+        val CAR_MODEL_NEXIA2_1 = "Nexia II (DOHC)"
+        val CAR_MODEL_NEXIA2_2 = "Nexia II (SOHC)"
+
+        val CAR_MODEL_NEXIA3 = "NEXIA R3"
+        val CAR_MODEL_GENTRA = "GENTRA"
+        val CAR_MODEL_SPARK = "R2"
+        val CAR_MODEL_COBALT = "R4"
+        val CAR_MODEL_MATIZ = "MATIZ"
+
+        val CAR_MODEL_W221 = "S-klasse (W221)"
+        val CAR_MODEL_W220 = "S-klasse (W220)"
+        val CAR_MODEL_GELIK = "/8 (W114)"
+        val CAR_MODEL_VITO = "Vito"
+
+        val CAR_TYPE_1 = "carType_1"
+        val CAR_TYPE_2 = "carType_2"
+        val CAR_TYPE_3 = "carType_3"
         val CAR_TYPE_4 = "carType_4"
-        val CAR_TYPE_DELIVERY = "carType_12"
-        val CAR_TYPE_PEREGON = "carType_7"
+        val CAR_TYPE_5 = "carType_5"
+        val CAR_TYPE_6 = "carType_6"
+        val CAR_TYPE_7 = "carType_7"
+        val CAR_TYPE_8 = "carType_8"
+        val CAR_TYPE_9 = "carType_9"
+        val CAR_TYPE_10 = "carType_10"
+        val CAR_TYPE_11 = "carType_11"
+        val CAR_TYPE_12 = "carType_12"
 
         val ALIES_TYPE_BANK = 24
         val ALIES_TYPE_METRO = 23
@@ -219,7 +264,7 @@ class Constants {
 
 
         //// WEATHER IDs based on openweathermap.com
-        val OPENWEATHERMAP_API = "ad768b06cd7c862d6506f1b192254369"
+        val OPENWEATHERMAP_API = "e133d7db9b14e753bf10f14791e4c270"
 
         val WEATHER_RAIN = arrayListOf<Int>(500, 501, 520)
         /*
@@ -403,7 +448,7 @@ class Constants {
         }
 
         fun maskCardNumber(cardNumber: String, mask: String): String {
-
+            
             // format the number
             var index = 0
             val maskedNumber = StringBuilder()

@@ -17,7 +17,8 @@
         android:background="#fafafa"
         android:configChanges="locale|orientation|screenSize|keyboard"
         android:windowSoftInputMode="adjustResize"
-        tools:context=".ui.main.MainActivity">
+        tools:context=".ui.main.MainActivity"
+        >
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -108,6 +109,8 @@
                 app:reflectionColor="@color/white"
                 />
 
+
+
             <TextView
                 android:id="@+id/textViewCurrentAddressDetails"
                 android:layout_width="0dp"
@@ -126,6 +129,53 @@
                 android:fontFamily="@font/g_semi_bold"
                 />
 
+
+            <LinearLayout
+                android:id="@+id/linearDemand"
+                android:layout_width="0dp"
+                android:visibility="gone"
+                android:layout_height="56dp"
+                android:layout_marginLeft="12dp"
+                android:layout_marginRight="12dp"
+                android:gravity="center"
+                app:layout_constraintLeft_toRightOf="@id/rvMenu"
+                app:layout_constraintRight_toLeftOf="@id/lottieWeather"
+                app:layout_constraintTop_toTopOf="@id/lottieWeather"
+                android:layout_marginTop="8dp"
+                android:orientation="horizontal"
+                >
+                <com.airbnb.lottie.LottieAnimationView
+                    android:id="@+id/lottieDemand"
+                    android:layout_width="22dp"
+                    android:scaleType="centerCrop"
+                    android:layout_height="22dp"
+                    />
+
+
+
+               <RelativeLayout
+                   android:layout_width="wrap_content"
+                   android:layout_height="match_parent"
+                   android:gravity="center"
+                   >
+
+                   <com.romainpiel.shimmer.ShimmerTextView
+                       android:id="@+id/titanicText"
+                       android:layout_marginLeft="12dp"
+                       android:layout_width="wrap_content"
+                       android:layout_height="wrap_content"
+                       android:fontFamily="@font/g_bold"
+                       android:text="@string/high_demand"
+                       android:textColor="@color/purple_200"
+                       android:textSize="17sp"
+                       android:layout_centerInParent="true"
+                       />
+
+
+               </RelativeLayout>
+
+
+            </LinearLayout>
 
             <com.airbnb.lottie.LottieAnimationView
                 android:id="@+id/lottieWeather"
@@ -195,7 +245,8 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:lottie_fileName="pulsator.json"
                 app:lottie_loop="true"
-                app:lottie_speed="0.7" />
+                app:lottie_repeatMode="reverse"
+                app:lottie_speed="0.4" />
 
             <RelativeLayout
                 android:id="@+id/rvHint"
@@ -494,12 +545,6 @@
                         android:id="@+id/modeCreateOrder"
                         android:visibility="gone"
                         layout="@layout/bottom_sheet_where"
-                        />
-
-                    <include
-                        android:id="@+id/modeSearchCar"
-                        android:visibility="gone"
-                        layout="@layout/bottom_sheet_car_search"
                         />
 
                     <include
